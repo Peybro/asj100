@@ -22,20 +22,20 @@ export const actions = {
 			const timestamp = new Date().getTime();
 			const pictureName = `${name}_${timestamp}.jpg`;
 
-			// await setDoc(doc(db, 'kurzinterviews', '' + timestamp), {
-			// 	name: name,
-			// 	picture: picture.name !== '' ? pictureName : 'Kein Bild',
-			// 	questions: [answer0, answer1, answer2]
-			// });
+			await setDoc(doc(db, 'kurzinterviews', '' + timestamp), {
+				name: name,
+				picture: picture.name !== '' ? pictureName : 'Kein Bild',
+				questions: [answer1, answer2, answer3]
+			});
 
-			// if (picture.name !== '') {
-			// 	// upload to storage
-			// 	const storageRef = ref(storage, `/portraits/${pictureName}`);
+			if (picture.name !== '') {
+				// upload to storage
+				const storageRef = ref(storage, `/portraits/${pictureName}`);
 
-			// 	uploadBytes(storageRef, new Uint8Array(await picture.arrayBuffer())).then((snapshot) => {
-			// 		console.log('Uploaded an array!');
-			// 	});
-			// }
+				uploadBytes(storageRef, new Uint8Array(await picture.arrayBuffer())).then((snapshot) => {
+					console.log('Uploaded an array!');
+				});
+			}
 
 			console.log(name, picture, answer1, answer2, answer3, agreeConditions);
 		} catch (error) {

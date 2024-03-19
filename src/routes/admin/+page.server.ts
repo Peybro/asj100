@@ -6,15 +6,6 @@ import type { PersonEntry } from '$lib/PersonEntry.ts';
 import { redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 
-async function getDownloadUrl(pictureName: string) {
-	const storage = getStorage();
-	const pathReference = ref(storage, `portraits/${pictureName}`);
-
-	const url = await getDownloadURL(pathReference);
-
-	return url;
-}
-
 export async function load({ cookies }) {
 	// if (!cookies.get('user')) return;
 
@@ -22,17 +13,13 @@ export async function load({ cookies }) {
 	const snapshot = await getDocs(interviewRef);
 
 	const resultPromise = new Promise<PersonEntry[]>((resolve, reject) => {
-		const result: PersonEntry[] = [];
+		let result: PersonEntry[] = [];
 
-		snapshot.forEach((doc) => {
-			result.push(doc.data() as PersonEntry);
+		snapshot.forEach(async (doc) => {
+			const entry = doc.data() as PersonEntry;
+
+			result = [...result, { ...entry }];
 		});
-
-		for (let i = 0; i < result.length; i++) {
-			const pictureName = result[i].picture;
-
-			getDownloadUrl(pictureName).then((url) => (result[i].picture = url));
-		}
 
 		resolve(result);
 	});

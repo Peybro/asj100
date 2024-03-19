@@ -4,36 +4,40 @@
 	let slideIndex = 0;
 
 	let formValues = { name: '', picture: '', answer1: '', answer2: '', answer3: '' };
+
+	export let data;
 </script>
 
 <img src="100JahreASJLogo_RGB_4zu3.png" class="w-50" alt="Logo" />
 
-<div class="d-flex justify-content-between">
-	<button
-		class="btn btn-primary"
-		on:click={() => {
-			if (slideIndex > 0) {
-				slideIndex--;
-			}
-		}}
-		disabled={slideIndex === 0}>zurück</button
-	>
-	{#if slideIndex < 5}
+{#if !data.settings.onePage}
+	<div class="d-flex justify-content-between">
 		<button
 			class="btn btn-primary"
 			on:click={() => {
-				if (slideIndex < 5) {
-					slideIndex++;
+				if (slideIndex > 0) {
+					slideIndex--;
 				}
 			}}
-			disabled={(slideIndex === 0 && !formValues.name) ||
-				(slideIndex === 1 && !formValues.picture) ||
-				(slideIndex === 2 && !formValues.answer1) ||
-				(slideIndex === 3 && !formValues.answer2) ||
-				(slideIndex === 4 && !formValues.answer3)}>nächste</button
+			disabled={slideIndex === 0}>zurück</button
 		>
-	{/if}
-</div>
+		{#if slideIndex < 5}
+			<button
+				class="btn btn-primary"
+				on:click={() => {
+					if (slideIndex < 5) {
+						slideIndex++;
+					}
+				}}
+				disabled={(slideIndex === 0 && !formValues.name) ||
+					(slideIndex === 1 && !formValues.picture) ||
+					(slideIndex === 2 && !formValues.answer1) ||
+					(slideIndex === 3 && !formValues.answer2) ||
+					(slideIndex === 4 && !formValues.answer3)}>nächste</button
+			>
+		{/if}
+	</div>
+{/if}
 
 <form
 	class="card container pt-2 pb-5 my-3"
@@ -42,15 +46,15 @@
 	enctype="multipart/form-data"
 	use:enhance
 >
-	{#if slideIndex === 0}
+	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 0}>
 		<label class="form-label" for="name">Wie heißt du?</label>
 		<input type="text" class="form-control" id="name" name="name" bind:value={formValues.name} />
 		{#if formValues.name}
 			<div>Hallo {formValues.name}, danke dass du hieran teilnimmst!</div>
 		{/if}
-	{/if}
+	</div>
 
-	{#if slideIndex === 1}
+	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 1}>
 		<label class="form-label" for="picture">Bild</label>
 		<input
 			type="file"
@@ -60,10 +64,10 @@
 			accept="image/*;capture=camera"
 			bind:value={formValues.picture}
 		/>
-	{/if}
+	</div>
 
-	{#if slideIndex === 2}
-		<label class="form-label" for="question1">Was ist deine Lieblingsfarbe?</label>
+	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 2}>
+		<label class="form-label" for="question1">{data.settings.questions[0].question}</label>
 		<input
 			type="text"
 			class="form-control"
@@ -71,10 +75,10 @@
 			name="question1"
 			bind:value={formValues.answer1}
 		/>
-	{/if}
+	</div>
 
-	{#if slideIndex === 3}
-		<label class="form-label" for="question2">Was ist deine Lieblingszahl?</label>
+	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 3}>
+		<label class="form-label" for="question2">{data.settings.questions[1].question}</label>
 		<input
 			type="text"
 			class="form-control"
@@ -82,10 +86,10 @@
 			name="question2"
 			bind:value={formValues.answer2}
 		/>
-	{/if}
+	</div>
 
-	{#if slideIndex === 4}
-		<label class="form-label" for="question3">Was ist deine Lieblingspizza?</label>
+	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 4}>
+		<label class="form-label" for="question3">{data.settings.questions[2].question}</label>
 		<input
 			type="text"
 			class="form-control"
@@ -93,16 +97,18 @@
 			name="question3"
 			bind:value={formValues.answer3}
 		/>
-	{/if}
+	</div>
 
-	{#if slideIndex === 5}
-		<h4>Zusammenfassung</h4>
+	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 5}>
+		{#if !data.settings.onePage}
+			<h4>Zusammenfassung</h4>
 
-		<p>Name: {formValues.name}</p>
-		<p>Bild: {formValues.picture}</p>
-		<p>Frage 1: {formValues.answer1}</p>
-		<p>Frage 2: {formValues.answer2}</p>
-		<p>Frage 3: {formValues.answer3}</p>
+			<p>Name: {formValues.name}</p>
+			<p>Bild: {formValues.picture}</p>
+			<p>Frage 1: {formValues.answer1}</p>
+			<p>Frage 2: {formValues.answer2}</p>
+			<p>Frage 3: {formValues.answer3}</p>
+		{/if}
 
 		<div class="form-check">
 			<input
@@ -117,5 +123,5 @@
 		</div>
 
 		<input type="submit" class="btn btn-primary" value="Abschicken" />
-	{/if}
+	</div>
 </form>
