@@ -1,0 +1,20 @@
+import { auth } from '$lib/server/firebase';
+
+export async function load({ cookies, locals }) {
+	let user = null;
+	const uid = cookies.get('user');
+	if (!uid) return;
+	await auth
+		.verifyIdToken(uid)
+		.then((decodedToken) => {
+			user = decodedToken;
+		})
+		.catch((error) => {
+			console.error('Error while verifying token:', error);
+			cookies.delete('user', { path: '/' });
+		});
+
+	return {
+		user
+	};
+}
