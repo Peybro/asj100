@@ -40,7 +40,8 @@
 {/if}
 
 <form
-	class="card container pt-2 pb-5 my-3"
+	class:card={!data.settings.onePage}
+	class=""
 	action="?/upload"
 	method="post"
 	enctype="multipart/form-data"
@@ -48,7 +49,7 @@
 >
 	<div class:visually-hidden={!data.settings.onePage && slideIndex !== 0}>
 		<label class="form-label" for="name">Wie heißt du?</label>
-		<input type="text" class="form-control" id="name" name="name" bind:value={formValues.name} />
+		<input type="text" class="form-control" id="name" name="name" bind:value={formValues.name} placeholder="Name" />
 		{#if formValues.name}
 			<div>Hallo {formValues.name}, danke dass du hieran teilnimmst!</div>
 		{/if}
@@ -74,6 +75,7 @@
 			id="question1"
 			name="question1"
 			bind:value={formValues.answer1}
+			placeholder="Frage 1"
 		/>
 	</div>
 
@@ -85,6 +87,7 @@
 			id="question2"
 			name="question2"
 			bind:value={formValues.answer2}
+			placeholder="Frage 2"
 		/>
 	</div>
 
@@ -96,6 +99,7 @@
 			id="question3"
 			name="question3"
 			bind:value={formValues.answer3}
+			placeholder="Frage 3"
 		/>
 	</div>
 
