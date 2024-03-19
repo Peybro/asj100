@@ -11,6 +11,8 @@
 	}
 </script>
 
+<h1>Dashboard</h1>
+
 {#if data.user}
 	<div class="alert alert-info" role="alert">
 		<div>Du bist bereits eingeloggt.</div>
@@ -35,21 +37,22 @@
 	<p>loading...</p>
 {:then res}
 	{#each res as result, i}
-		<div class="card mb-2">
-			{#await getPictureUrl(result.picture)}
-				<p>loading...</p>
-			{:then pictureUrl}
-				<img src={pictureUrl} class="w-100 rounded-top p-1" alt={result.picture} />
-			{:catch error}
-				<p>{error.message}</p>
-			{/await}
-			<div class="container">
-				<h1>{result.name}</h1>
-				{#each result.questions as answer, j}
-					<div class="fw-bold">{data.fragen[j].question}</div>
-					<p>{answer}</p>
-				{/each}
-			</div>
+		{#if i > 0}
+			<hr />
+		{/if}
+		{#await getPictureUrl(result.picture)}
+			<p>loading...</p>
+		{:then pictureUrl}
+			<img src={pictureUrl} class="w-100 rounded-top p-1" alt={result.picture} />
+		{:catch error}
+			<p>{error.message}</p>
+		{/await}
+		<div class="container">
+			<h1>{result.name}</h1>
+			{#each result.questions as answer, j}
+				<div class="fw-bold">{data.settings.questions[j].question}</div>
+				<p>{answer}</p>
+			{/each}
 		</div>
 	{/each}
 {:catch error}

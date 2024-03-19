@@ -1,7 +1,7 @@
 import { db, storage } from '$lib/services/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes } from 'firebase/storage';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 
 export const actions = {
 	upload: async ({ cookies, request }) => {
@@ -32,12 +32,8 @@ export const actions = {
 				// upload to storage
 				const storageRef = ref(storage, `/portraits/${pictureName}`);
 
-				uploadBytes(storageRef, new Uint8Array(await picture.arrayBuffer())).then((snapshot) => {
-					console.log('Uploaded an array!');
-				});
+				uploadBytes(storageRef, new Uint8Array(await picture.arrayBuffer()));
 			}
-
-			console.log(name, picture, answer1, answer2, answer3, agreeConditions);
 		} catch (error) {
 			console.log(error);
 		}
