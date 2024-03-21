@@ -2,6 +2,11 @@
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import Datenschutzhinweis from '$lib/components/Datenschutzhinweis.svelte';
+	import { onMount } from 'svelte';
+
+	export let data;
 
 	const initialData = {
 		name: '',
@@ -19,29 +24,22 @@
 		answer2: string;
 		answer3: string;
 		agreeConditions: boolean;
-	} = browser
-		? JSON.parse(localStorage.getItem('formValues') ?? JSON.stringify(initialData))
-		: initialData;
-
-	$: {
-		if (browser) localStorage.setItem('formValues', JSON.stringify(formValues));
-	}
-
-	export let data;
+	} = { ...initialData };
 
 	function handleSubmit() {
-		localStorage.removeItem('formValues');
 		goto('/danke');
 	}
-</script>
 
-<svelte:window
-	on:unload={(event) => {
-		event.preventDefault();
-		localStorage.removeItem('formValues');
-		return '[This text is not visible]';
-	}}
-/>
+	let showDatenschutzhinweis = false;
+
+	onMount(() => {
+		showDatenschutzhinweis = $page.url.hash === '#datenschutzhinweis';
+	});
+
+	$: browser && showDatenschutzhinweis
+		? history.replaceState(null, 'Datenschutzhinweis', '#datenschutzhinweis')
+		: history.replaceState(null, '', ' ');
+</script>
 
 <img src="100JahreASJLogo_RGB_4zu3.png" alt="Logo" style="height: 100px;" />
 
@@ -54,84 +52,83 @@
 	use:enhance
 >
 	<fieldset>
-		<label class="form-label" for="name">Wie heißt du?</label>
-		<input
-			type="text"
-			class="form-control"
-			id="name"
-			name="name"
-			bind:value={formValues.name}
-			placeholder="Name"
-			aria-describedby="name-helper"
-			required
-		/>
-		{#if formValues.name}
-			<small id="name-helper">
-				Hallo {formValues.name}, danke dass du an dieser Umfrage teilnimmst!
-			</small>
-		{/if}
-
-		<label class="form-label" for="picture">Bild</label>
-		<input
-			type="file"
-			class="form-control"
-			id="picture"
-			name="picture"
-			accept="image/*;capture=camera"
-			bind:value={formValues.picture}
-			aria-describedby="picture-helper"
-			required
-		/>
-		<small id="picture-helper"> Zeig uns dein schönstes Lächeln! </small>
-
-		<label class="form-label" for="question1">{data.settings.questions[0].question}</label>
-		<input
-			type="text"
-			class="form-control"
-			id="question1"
-			name="question1"
-			bind:value={formValues.answer1}
-			placeholder="Frage 1"
-			required
-		/>
-
-		<label class="form-label" for="question2">{data.settings.questions[1].question}</label>
-		<input
-			type="text"
-			class="form-control"
-			id="question2"
-			name="question2"
-			bind:value={formValues.answer2}
-			placeholder="Frage 2"
-			required
-		/>
-
-		<label class="form-label" for="question3">{data.settings.questions[2].question}</label>
-		<input
-			type="text"
-			class="form-control"
-			id="question3"
-			name="question3"
-			bind:value={formValues.answer3}
-			placeholder="Frage 3"
-			required
-		/>
-
-		<div class="form-check">
+		<label
+			>Wie heißt du?
 			<input
-				class="form-check-input"
+				type="text"
+				name="name"
+				bind:value={formValues.name}
+				placeholder="Name"
+				aria-describedby="name-helper"
+				required
+			/>
+			{#if formValues.name}
+				<small id="name-helper">
+					Hallo {formValues.name}, danke dass du an dieser Umfrage teilnimmst!
+				</small>
+			{/if}
+		</label>
+
+		<label
+			>Bild
+			<input
+				type="file"
+				name="picture"
+				accept="image/*;capture=camera"
+				bind:value={formValues.picture}
+				aria-describedby="picture-helper"
+				required
+			/>
+			<small id="picture-helper"> Zeig uns dein schönstes Lächeln! </small>
+		</label>
+
+		<label
+			>{data.settings.questions[0].question}
+			<input
+				type="text"
+				name="question1"
+				bind:value={formValues.answer1}
+				placeholder="Frage 1"
+				required
+			/>
+		</label>
+
+		<label
+			>{data.settings.questions[1].question}
+			<input
+				type="text"
+				name="question2"
+				bind:value={formValues.answer2}
+				placeholder="Frage 2"
+				required
+			/>
+		</label>
+
+		<label
+			>{data.settings.questions[2].question}
+			<input
+				type="text"
+				name="question3"
+				bind:value={formValues.answer3}
+				placeholder="Frage 3"
+				required
+			/>
+		</label>
+
+		<label>
+			<input
 				type="checkbox"
-				value=""
-				id="agree"
 				name="agreeConditions"
 				bind:checked={formValues.agreeConditions}
 				required
 			/>
-			<label class="form-check-label" for="agree">
-				Ich habe den <a href="/datenschutz">Datenschutzhinweis</a> gelesen und bin mit dem Speichern
-				meiner Daten einverstanden.
-			</label>
-		</div>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-missing-attribute -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			Ich habe den
+			<a on:click|stopPropagation={() => (showDatenschutzhinweis = true)}>Datenschutzhinweis</a> gelesen
+			und bin mit dem Speichern meiner Daten einverstanden.
+		</label>
 	</fieldset>
 
 	<input
@@ -146,3 +143,10 @@
 			!formValues.agreeConditions}
 	/>
 </form>
+
+{#if showDatenschutzhinweis}
+	<Datenschutzhinweis close={() => (showDatenschutzhinweis = false)} />
+{/if}
+
+<style lang="scss" scoped>
+</style>
