@@ -1,59 +1,15 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	export let data;
 	import { enhance } from '$app/forms';
-	import { auth, db, storage } from '$lib/services/firebase.js';
-	import { redirect } from '@sveltejs/kit';
-	import {
-		browserLocalPersistence,
-		setPersistence,
-		signInWithEmailAndPassword
-	} from 'firebase/auth';
+	import { db, storage } from '$lib/services/firebase.js';
 	import { collection, deleteDoc, getDocs, query, where } from 'firebase/firestore';
 	import { ref, getDownloadURL } from 'firebase/storage';
+
+	export let data;
 
 	async function getPictureUrl(pictureName: string) {
 		const pathReference = ref(storage, `portraits/${pictureName}`);
 		const url = await getDownloadURL(pathReference);
 		return url;
-	}
-
-	async function login(event: Event) {
-		event.preventDefault();
-		const form = event.target as HTMLFormElement;
-		const formData = new FormData(form);
-
-		const email = formData.get('email');
-		const password = formData.get('password');
-
-		await setPersistence(auth, browserLocalPersistence);
-		signInWithEmailAndPassword(auth, email, password)
-			.then(async (userCredential) => {
-				//? Signed in
-				const user = userCredential.user;
-				if (browser) {
-					document.cookie = `user=${user.stsTokenManager.accessToken}; path=/;`;
-					location.reload();
-				}
-			})
-			.catch((error) => {
-				if (error.status === 301) {
-					throw redirect(301, '/');
-				}
-
-				return {
-					success: false,
-					error: 'Falsches Passwort!'
-				};
-			});
-	}
-
-	async function logout() {
-		await auth.signOut();
-		if (browser) {
-			document.cookie = `user=; path=/;`;
-			location.reload();
-		}
 	}
 
 	function downloadAll() {
@@ -93,12 +49,15 @@
 {#if data.user}
 	<div class="toolbar">
 		{#if !editMode}
+			<form action="?/logout" method="post" enctype="multipart/form-data" use:enhance>
+				<input type="button" class="secondary" value="Logout" />
+			</form>
+		{/if}
+		{#if !editMode}
 			<button>Alle downloaden</button>
 		{/if}
 		<button on:click={handleEditMode}>{editMode ? 'Fertig' : 'Löschmodus'}</button>
-		{#if !editMode}
-			<button class="secondary" on:click={logout}>Logout</button>
-		{/if}
+
 		<hr />
 	</div>
 
@@ -116,11 +75,13 @@
 						{:catch error}
 							<p>{error.message}</p>
 						{/await}
-						<div class="container">
+						<div>
 							<h1>{result.name}</h1>
 							{#each result.questions as answer, j}
-								<h5>{data.settings.questions[j].question}</h5>
-								<p>{answer}</p>
+								<label
+									>{data.settings.questions[j].question}
+									<input type="text" value={answer} readonly /></label
+								>
 							{/each}
 						</div>
 
@@ -137,7 +98,7 @@
 		<h4>{error.message}</h4>
 	{/await}
 {:else}
-	<form method="post" enctype="multipart/form-data" on:submit|preventDefault={login}>
+	<form action="?/login" method="post" enctype="multipart/form-data" use:enhance>
 		<label
 			>Email
 			<input type="text" name="email" />
@@ -147,18 +108,6 @@
 
 		<input type="submit" value="Login" />
 	</form>
-	<!-- <form 
-	action="?/login" 
-	method="post" enctype="multipart/form-data" use:enhance>
-		<label
-			>Email
-			<input type="text" name="email" />
-		</label>
-
-		<label>Passwort<input type="password" name="password" /></label>
-
-		<input type="submit" value="Login" />
-	</form> -->
 {/if}
 
 <style lang="scss" scoped>

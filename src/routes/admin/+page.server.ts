@@ -3,6 +3,10 @@ import { db } from '$lib/services/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import type { PersonEntry } from '$lib/types';
 import { auth } from '$lib/server/firebase';
+import { auth as authen } from '$lib/services/firebase';
+import { browser, dev } from '$app/environment';
+import { redirect } from '@sveltejs/kit';
+import { setPersistence, browserLocalPersistence, signInWithEmailAndPassword } from 'firebase/auth';
 
 export async function load({ cookies }) {
 	let user = null;
@@ -15,7 +19,7 @@ export async function load({ cookies }) {
 		})
 		.catch((error) => {
 			console.log(error);
-			// cookies.delete('user');
+			cookies.delete('user', { path: '/' });
 		});
 
 	if (!user) return;
@@ -40,39 +44,26 @@ export async function load({ cookies }) {
 	};
 }
 
-// export const actions = {
-// 	login: async ({ cookies, request }) => {
-// 		const data = await request.formData();
+export const actions = {
+	login: async ({ cookies, request }) => {
+		const data = await request.formData();
 
-// 		const email = data.get('email');
-// 		const password = data.get('password');
+		const email = data.get('email');
+		const password = data.get('password');
 
-// 		await setPersistence(auth, browserLocalPersistence);
-// 		signInWithEmailAndPassword(auth, email, password)
-// 			.then(async (userCredential) => {
-// 				//? Signed in
-// 				const user = userCredential.user;
-// 				console.log(user);
-// 				// cookies.set('user', user.uid, {
-// 				// 	path: '/',
-// 				// 	httpOnly: true,
-// 				// 	sameSite: 'strict',
-// 				// 	secure: !dev,
-// 				// 	maxAge: 60 * 60 * 24 * 7
-// 				// });
-// 				if (browser) document.cookie = `user=${user.stsTokenManager.accessToken}; path=/;`;
-// 				redirect(303, '/protected');
-// 			})
-// 			.catch((error) => {
-// 				console.log(error);
-// 				if (error.status === 301) {
-// 					throw redirect(301, '/');
-// 				}
-
-// 				return {
-// 					success: false,
-// 					error: 'Falsches Passwort!'
-// 				};
-// 			});
-// 	}
-// };
+		await setPersistence(authen, browserLocalPersistence);
+		const user = (await signInWithEmailAndPassword(authen, email, password)).user;
+		cookies.set('user', await user.getIdToken(true), {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: !dev,
+			maxAge: 60 * 60 * 24 * 7
+		});
+		throw redirect(307, '/admin');
+	},
+	logout: async ({ cookies }) => {
+		cookies.delete('user', { path: '/' });
+		throw redirect(307, '/admin');
+	}
+};
