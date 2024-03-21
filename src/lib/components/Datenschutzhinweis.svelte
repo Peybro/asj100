@@ -1,5 +1,9 @@
 <script lang="ts">
-	export let close: () => void;
+	import { pushState } from '$app/navigation';
+
+	function close() {
+		pushState('', { datenschutzhinweis: false });
+	}
 </script>
 
 <div class="d container">
@@ -29,9 +33,9 @@
 	.d {
 		position: fixed;
 		top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #13171f;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: #13171f;
 	}
 </style>

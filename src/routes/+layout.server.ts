@@ -1,4 +1,4 @@
-import type { SettingsEntry } from '$lib/PersonEntry.js';
+import type { SettingsEntry } from '$lib/types.js';
 import { db } from '$lib/services/firebase';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 

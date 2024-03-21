@@ -23,6 +23,7 @@ export const actions = {
 			const pictureName = `${name}_${timestamp}.jpg`;
 
 			await setDoc(doc(db, 'kurzinterviews', '' + timestamp), {
+				id: timestamp,
 				name: name,
 				picture: picture.name !== '' ? pictureName : 'Kein Bild',
 				questions: [answer1, answer2, answer3]

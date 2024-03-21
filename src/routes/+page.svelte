@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto, pushState, replaceState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Datenschutzhinweis from '$lib/components/Datenschutzhinweis.svelte';
 	import { onMount } from 'svelte';
@@ -30,15 +30,13 @@
 		goto('/danke');
 	}
 
-	let showDatenschutzhinweis = false;
+	function showDatenschutzhinweis() {
+		pushState('#datenschutzhinweis', { datenschutzhinweis: true });
+	}
 
 	onMount(() => {
-		showDatenschutzhinweis = $page.url.hash === '#datenschutzhinweis';
+		if ($page.url.hash === '#datenschutzhinweis') showDatenschutzhinweis();
 	});
-
-	$: browser && showDatenschutzhinweis
-		? history.replaceState(null, 'Datenschutzhinweis', '#datenschutzhinweis')
-		: history.replaceState(null, '', ' ');
 </script>
 
 <img src="100JahreASJLogo_RGB_4zu3.png" alt="Logo" style="height: 100px;" />
@@ -118,6 +116,7 @@
 		<label>
 			<input
 				type="checkbox"
+				role="switch"
 				name="agreeConditions"
 				bind:checked={formValues.agreeConditions}
 				required
@@ -126,8 +125,8 @@
 			<!-- svelte-ignore a11y-missing-attribute -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			Ich habe den
-			<a on:click|stopPropagation={() => (showDatenschutzhinweis = true)}>Datenschutzhinweis</a> gelesen
-			und bin mit dem Speichern meiner Daten einverstanden.
+			<a on:click|stopPropagation={showDatenschutzhinweis}>Datenschutzhinweis</a> gelesen und bin mit
+			dem Speichern meiner Daten einverstanden.
 		</label>
 	</fieldset>
 
@@ -144,8 +143,8 @@
 	/>
 </form>
 
-{#if showDatenschutzhinweis}
-	<Datenschutzhinweis close={() => (showDatenschutzhinweis = false)} />
+{#if $page.state.datenschutzhinweis}
+	<Datenschutzhinweis />
 {/if}
 
 <style lang="scss" scoped>

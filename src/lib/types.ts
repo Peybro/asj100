@@ -1,4 +1,5 @@
 export type PersonEntry = {
+	id: string;
 	name: string;
 	picture: string;
 	questions: string[];
