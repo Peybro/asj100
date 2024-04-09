@@ -12,8 +12,9 @@ export default function Login() {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    // const email = e.target?.elements.email.value;
-    // const password = e.target.elements.password.value;
+    // const data = new FormData(e.currentTarget);
+    // const email = data.get("email");
+    // const password = data.get("password");
 
     signInWithEmailAndPassword(auth, email, password);
   }

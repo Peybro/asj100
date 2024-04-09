@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import asj100 from "./../public/100JahreASJLogo_RGB_4zu3.png";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
@@ -23,8 +23,11 @@ export default function Home() {
   const [answers, setAnswers] = useState(["", "", ""]);
   const [accepted, setAccepted] = useState(false);
 
-  async function handleUpload(e) {
+  async function handleUpload(e: FormEvent) {
     e.preventDefault();
+
+    // const data = new FormData(e.currentTarget);
+    // const name = data.get("name");
 
     if (
       name === "" ||
