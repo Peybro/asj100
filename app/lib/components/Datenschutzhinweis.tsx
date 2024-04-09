@@ -37,7 +37,7 @@ export default function DatenschutzhinweisComponent({
             </p>
           </header>
           <p>
-            We're excited to have you join us for our upcoming event. Please
+            We are excited to have you join us for our upcoming event. Please
             arrive at the museum on time to check in and get started.
           </p>
           <ul>
