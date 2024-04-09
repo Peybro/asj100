@@ -33,7 +33,7 @@ export default function DatenschutzhinweisComponent({
               }}
             ></button>
             <p>
-              <strong>🗓️ Thank You for Registering!</strong>
+              <strong>Thank You for Registering!</strong>
             </p>
           </header>
           <p>
