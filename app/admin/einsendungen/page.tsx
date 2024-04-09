@@ -1,9 +1,11 @@
 "use client";
 
-import { db } from "@/app/lib/firebase-config";
+import InterviewCard from "@/app/lib/components/InterviewCard";
+import { db, storage } from "@/app/lib/firebase-config";
 import { collection } from "firebase/firestore";
 import Link from "next/link";
 import { useCollection } from "react-firebase-hooks/firestore";
+import { useDownloadURL } from "react-firebase-hooks/storage";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(
@@ -22,18 +24,13 @@ export default function Einsendungen() {
         {value &&
           value.docs.map((interview) => {
             return (
-              <article>
-                <header>[{interview.data().picture}]</header>
-
-                <p>Name: {interview.data().id}</p>
-                <p>Frage 1: {interview.data().questions[0]}</p>
-                <p>Frage 2: {interview.data().questions[1]}</p>
-                <p>Frage 3: {interview.data().questions[2]}</p>
-
-                <footer>
-                  <button>Download</button> <button>Löschen</button>
-                </footer>
-              </article>
+              <InterviewCard
+                key={interview.data().id}
+                imgPath={interview.data().picture}
+                name={interview.data().name}
+                age={interview.data().age}
+                answers={interview.data().questions}
+              />
             );
           })}
       </div>

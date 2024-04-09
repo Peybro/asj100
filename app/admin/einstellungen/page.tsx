@@ -35,18 +35,43 @@ export default function Einstellungen() {
 
           {settings.questions.map((question, i) => {
             return (
-              <input
-                key={i}
-                type="text"
-                value={question}
-                onChange={(e) => {
-                  const newQuestion = e.currentTarget.value;
-                  setSettings((prev) => ({
-                    ...prev,
-                    questions: settings.questions.toSpliced(i, 1, newQuestion),
-                  }));
-                }}
-              />
+              <article key={i}>
+                <header>Frage {i + 1}</header>
+
+                <input
+                  type="text"
+                  value={question.question}
+                  onChange={(e) => {
+                    const newQuestion = e.currentTarget.value;
+                    const example = settings.questions[i].example;
+                    setSettings((prev) => ({
+                      ...prev,
+                      questions: settings.questions.toSpliced(i, 1, {
+                        question: newQuestion,
+                        example,
+                      }),
+                    }));
+                  }}
+                />
+                <label>
+                  Beispiel
+                  <input
+                    type="text"
+                    value={question.example}
+                    onChange={(e) => {
+                      const question = settings.questions[i].question;
+                      const newExample = e.currentTarget.value;
+                      setSettings((prev) => ({
+                        ...prev,
+                        questions: settings.questions.toSpliced(i, 1, {
+                          question,
+                          example: newExample,
+                        }),
+                      }));
+                    }}
+                  />
+                </label>
+              </article>
             );
           })}
 
