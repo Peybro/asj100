@@ -1,72 +1,77 @@
-import { auth } from "@/app/lib/firebase-config"
-import { log } from "console";
+import { auth } from "@/app/lib/firebase-config";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { FormEvent } from "react";
-import { useAuthState, useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { FormEvent, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export default function Login() {
-    const [user, loading, error] = useAuthState(auth);
+  const [user, loading, error] = useAuthState(auth);
 
-    function handleSubmit(e) {
-        e.preventDefault();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-        const email = e.target.elements.email.value
-        const password = e.target.elements.password.value
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
 
-        signInWithEmailAndPassword(auth, email, password)
-    }
+    // const email = e.target?.elements.email.value;
+    // const password = e.target.elements.password.value;
 
-    const logout = () => {
-        signOut(auth);
-    };
+    signInWithEmailAndPassword(auth, email, password);
+  }
 
-    if (loading) {
-        return (
-            <div>
-                <p>Initialising User...</p>
-            </div>
-        );
-    }
-    if (error) {
-        return (
-            <div>
-                <p>Error: {error}</p>
-            </div>
-        );
-    }
-    if (user) {
-        return (
-            <div>
-                <p>Current User: {user.email}</p>
-                <button onClick={logout}>Log out</button>
-            </div>
-        );
-    }
+  const logout = () => {
+    signOut(auth);
+  };
 
-    return <form onSubmit={handleSubmit}>
-        <fieldset>
-            <label>
-                Email
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                />
-            </label>
+  if (loading) {
+    return (
+      <div>
+        <p>Angemeldeten Nutzer laden...</p>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div>
+        <p>Fehler: {error.message}</p>
+      </div>
+    );
+  }
+  if (user) {
+    return (
+      <div>
+        <p>Aktueller Nutzer: {user.email}</p>
+        <button onClick={logout}>Abmelden</button>
+      </div>
+    );
+  }
 
-            <label>
-                Passwort
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Passwort"
-                />
-            </label>
-        </fieldset>
+  return (
+    <form onSubmit={handleSubmit}>
+      <fieldset>
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.currentTarget.value)}
+          />
+        </label>
 
-        <input
-            type="submit"
-            value="Anmelden"
-        />
+        <label>
+          Passwort
+          <input
+            type="password"
+            name="password"
+            placeholder="Passwort"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+          />
+        </label>
+      </fieldset>
+
+      <input type="submit" value="Anmelden" />
     </form>
+  );
 }
