@@ -17,7 +17,10 @@ export default function Einstellungen() {
     setDoc(settingsRef, settings, { merge: true });
   }
 
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState<{
+    questions: { question: string; example: string }[];
+    datenschutzhinweis: { what: string; howLong: string; under18: string };
+  }>({});
 
   useEffect(() => {
     setSettings(value?.data()!);
