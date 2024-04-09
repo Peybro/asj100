@@ -5,6 +5,11 @@ import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useDocument, useDocumentOnce } from "react-firebase-hooks/firestore";
 
+type Settings = {
+  questions: { question: string; example: string }[];
+  datenschutzhinweis: { what: string; howLong: string; under18: string };
+};
+
 export default function Einstellungen() {
   const [value, loading, error] = useDocumentOnce(
     doc(db, "settings", "settings")
@@ -17,23 +22,26 @@ export default function Einstellungen() {
     setDoc(settingsRef, settings, { merge: true });
   }
 
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState<Settings>({
+    questions: [{ question: "", example: "" }],
+    datenschutzhinweis: { what: "", howLong: "", under18: "" },
+  });
 
   useEffect(() => {
-    setSettings(value?.data()!);
+    setSettings(value?.data() as Settings);
   }, [loading]);
 
   return (
     <>
       <h1>Einstellungen</h1>
-      {error && <strong>Error: {JSON.stringify(error)}</strong>}
-      {loading && <span>Collection: Loading...</span>}
+      {error && <strong>Fehler: {error.message}</strong>}
+      {loading && <span>Lade Einstellungen...</span>}
 
       {!loading && value && settings && (
         <>
           <h3>Fragen</h3>
 
-          {settings.questions?.map((question, i) => {
+          {settings.questions.map((question, i) => {
             return (
               <article key={i}>
                 <header>Frage {i + 1}</header>
@@ -43,10 +51,10 @@ export default function Einstellungen() {
                   value={question.question}
                   onChange={(e) => {
                     const newQuestion = e.currentTarget.value;
-                    const example = settings.questions[i]?.example;
+                    const example = settings.questions[i].example;
                     setSettings((prev) => ({
                       ...prev,
-                      questions: settings.questions?.toSpliced(i, 1, {
+                      questions: settings.questions.toSpliced(i, 1, {
                         question: newQuestion,
                         example,
                       }),
@@ -59,11 +67,11 @@ export default function Einstellungen() {
                     type="text"
                     value={question.example}
                     onChange={(e) => {
-                      const question = settings.questions[i]?.question;
+                      const question = settings.questions[i].question;
                       const newExample = e.currentTarget.value;
                       setSettings((prev) => ({
                         ...prev,
-                        questions: settings.questions?.toSpliced(i, 1, {
+                        questions: settings.questions.toSpliced(i, 1, {
                           question,
                           example: newExample,
                         }),
@@ -78,13 +86,13 @@ export default function Einstellungen() {
           <h3>Datenschutzhinweis</h3>
           <h4>Was passiert mit den Daten?</h4>
           <textarea
-            value={settings.datenschutzhinweis?.what}
+            value={settings.datenschutzhinweis.what}
             onChange={(e) => {
               const newValue = e.currentTarget.value;
               setSettings((prev) => ({
                 ...prev,
                 datenschutzhinweis: {
-                  ...settings.datenschutzhinweis?,
+                  ...settings.datenschutzhinweis,
                   what: newValue,
                 },
               }));
@@ -92,13 +100,13 @@ export default function Einstellungen() {
           />
           <h4>Wie lange werden sie gespeichert?</h4>
           <textarea
-            value={settings.datenschutzhinweis?.howLong}
+            value={settings.datenschutzhinweis.howLong}
             onChange={(e) => {
               const newValue = e.currentTarget.value;
               setSettings((prev) => ({
                 ...prev,
                 datenschutzhinweis: {
-                  ...settings.datenschutzhinweis?,
+                  ...settings.datenschutzhinweis,
                   howLong: newValue,
                 },
               }));
@@ -106,13 +114,13 @@ export default function Einstellungen() {
           />
           <h4>Unter 18?</h4>
           <textarea
-            value={settings.datenschutzhinweis?.under18}
+            value={settings.datenschutzhinweis.under18}
             onChange={(e) => {
               const newValue = e.currentTarget.value;
               setSettings((prev) => ({
                 ...prev,
                 datenschutzhinweis: {
-                  ...settings.datenschutzhinweis?,
+                  ...settings.datenschutzhinweis,
                   under18: newValue,
                 },
               }));
