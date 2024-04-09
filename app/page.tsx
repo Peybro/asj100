@@ -9,6 +9,8 @@ import { useDocument } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { db, storage } from "./lib/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
+import Datenschutzhinweis from "./datenschutzhinweis/page";
+import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
 
 export default function Home() {
   const [directCam, setDirectCam] = useState(false);
@@ -84,7 +86,6 @@ export default function Home() {
               onChange={(e) => setName(e.currentTarget.value)}
             />
           </label>
-
           <label>
             Wie alt bist du?
             <input
@@ -94,7 +95,6 @@ export default function Home() {
               onChange={(e) => setAge(e.currentTarget.value)}
             />
           </label>
-
           <label>
             Bild
             <input
@@ -110,11 +110,10 @@ export default function Home() {
             />
             <small id="picture-helper">Zeig uns dein schönstes Lächeln!</small>
           </label>
-
           <>
             <label>
               {error && "Konnte Frage 1 nicht laden"}
-              {loading && "Lade Frage 1..."}
+              {loading && <span aria-busy="true">Lade Frage 1...</span>}
               {!loading && value && value?.data()!.questions[0].question}
               <input
                 type="text"
@@ -163,7 +162,6 @@ export default function Home() {
               <small id="question3-helper"></small>
             </label>
           </>
-
           <label>
             <input
               name="terms"
@@ -171,8 +169,8 @@ export default function Home() {
               role="switch"
               onChange={() => setAccepted((prev) => !prev)}
             />
-            Ich habe den Datenschutzhinweis gelesen und bin mit dem Speichern
-            meiner Daten einverstanden.
+            Ich habe den <DatenschutzhinweisComponent open={false} /> gelesen
+            und bin mit dem Speichern meiner Daten einverstanden.
           </label>
         </fieldset>
 

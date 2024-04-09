@@ -9,11 +9,13 @@ export default function InterviewCard({
   name,
   age,
   answers,
+  editMode,
 }: {
   imgPath: string;
   name: string;
   age: number;
   answers: string[];
+  editMode: boolean;
 }) {
   const [url, loading, error] = useDownloadURL(
     storageRef(storage, `portraits/${imgPath}`)
@@ -43,7 +45,7 @@ export default function InterviewCard({
 
       <footer>
         <button onClick={download}>Download</button>{" "}
-        <button onClick={remove}>Löschen</button>
+        {editMode && <button onClick={remove}>Löschen</button>}
       </footer>
     </article>
   );
