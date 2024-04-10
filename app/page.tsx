@@ -126,7 +126,7 @@ export default function Home() {
                   i: number
                 ) => {
                   return (
-                    <label>
+                    <label key={i}>
                       {!loading && value && question.question}
                       <input
                         type="text"
