@@ -32,7 +32,7 @@ export default function AdminLayout({
         </ul>
         <ul>
           <li>
-            <Link href="/">Formular</Link>
+            <Link href="/">zum Formular</Link>
           </li>
           {user && (
             <li>

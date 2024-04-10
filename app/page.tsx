@@ -20,11 +20,21 @@ export default function Home() {
 
   const [uploadFile, uploading, snapshot, uploadError] = useUploadFile();
 
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
+  const [name, setName] = useState<string>("");
+  const [age, setAge] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File>();
-  const [answers, setAnswers] = useState(["", "", ""]);
-  const [accepted, setAccepted] = useState(false);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [accepted, setAccepted] = useState<boolean>(false);
+
+  const [clickCounter, setClickCounter] = useState<number>(0);
+
+  function reset() {
+    setName("");
+    setAge("");
+    setSelectedFile(undefined);
+    setAnswers([]);
+    setAccepted(false);
+  }
 
   async function handleUpload(e: FormEvent) {
     e.preventDefault();
@@ -36,9 +46,7 @@ export default function Home() {
       name === "" ||
       age === "" ||
       !selectedFile ||
-      answers[0] === "" ||
-      answers[1] === "" ||
-      answers[2] === "" ||
+      answers.some((answer) => answer === "") ||
       !accepted
     ) {
       alert("Bitte alles ausfüllen und akzeptieren!");
@@ -66,18 +74,25 @@ export default function Home() {
       },
     );
 
-    // reset
+    alert("Vielen Dank für deine Teilnahme!");
+    reset();
   }
 
   return (
     <main>
       <div className="flex justify-between">
-        <Image src={asj100} alt="Logo für 100 Jahre ASJ" height={130} />
-        <Link href="/admin">Dashboard</Link>
+        <Image
+          src={asj100}
+          alt="Logo für 100 Jahre ASJ"
+          height={130}
+          onClick={() => setClickCounter((prev) => prev + 1)}
+        />
+        {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
       </div>
 
       <form onSubmit={handleUpload}>
         <fieldset>
+          <h3>Das bin ich</h3>
           <article>
             <label>
               Wie heißt du?
@@ -91,10 +106,10 @@ export default function Home() {
             <label>
               Wie alt bist du?
               <input
-                type="text"
+                type="number"
                 name="age"
                 placeholder="Alter"
-                onChange={(e) => setAge(e.currentTarget.value)}
+                onChange={(e) => setAge(e.currentTarget.value.toString())}
               />
             </label>
             <label>
@@ -115,7 +130,9 @@ export default function Home() {
               </small>
             </label>
           </article>
-          <>
+
+          <h3>Fragen</h3>
+          <article>
             {error && `Konnte Fragen nicht laden`}
             {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
             {value
@@ -143,7 +160,8 @@ export default function Home() {
                   );
                 },
               )}
-          </>
+          </article>
+
           <label>
             <input
               name="terms"

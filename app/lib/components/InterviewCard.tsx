@@ -44,7 +44,7 @@ export default function InterviewCard({
         </header>
 
         <p>Name: {name}</p>
-        <p>Alter: {age}</p>
+        <p className={age < 18 ? "bg-red-500" : ""}>Alter: {age}</p>
         <p>Frage 1: {answers[0]}</p>
         <p>Frage 2: {answers[1]}</p>
         <p>Frage 3: {answers[2]}</p>
@@ -64,7 +64,9 @@ export default function InterviewCard({
   if (showAsList) {
     return (
       <details>
-        <summary>{name}</summary>
+        <summary>
+          {name} {age < 18 && <span>({"< 18"})</span>}
+        </summary>
         <CardContent />
       </details>
     );
