@@ -121,82 +121,92 @@ export default function Home() {
 
       <form onSubmit={handleUpload} id="interview-form">
         <fieldset>
-          <h3>Das bin ich</h3>
-          <article>
-            <label>
-              Wie heißt du?
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.currentTarget.value)}
-                required
-              />
-            </label>
-            <label>
-              Wie alt bist du?
-              <input
-                type="number"
-                name="age"
-                placeholder="Alter"
-                value={age}
-                onChange={(e) => setAge(e.currentTarget.value.toString())}
-                required
-              />
-            </label>
-            <label>
-              Bild
-              <input
-                type="file"
-                name="picture"
-                accept="image/png, image/gif, image/jpeg"
-                aria-describedby="picture-helper"
-                {...(directCam ? { capture: "environment" } : {})}
-                onChange={(e) => {
-                  const file = e.target.files ? e.target.files[0] : undefined;
-                  setSelectedFile(file);
-                }}
-                required
-              />
-              <small id="picture-helper">
-                Zeig uns dein schönstes Lächeln!
-              </small>
-            </label>
-          </article>
+          <div className="flex flex-col lg:flex-row gap-2">
+            <div>
+              <h3>Das bin ich</h3>
+              <article>
+                <label>
+                  Wie heißt du?
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) => setName(e.currentTarget.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Wie alt bist du?
+                  <input
+                    type="number"
+                    name="age"
+                    placeholder="Alter"
+                    value={age}
+                    onChange={(e) => setAge(e.currentTarget.value.toString())}
+                    required
+                  />
+                </label>
+                <label>
+                  Bild
+                  <input
+                    type="file"
+                    name="picture"
+                    accept="image/png, image/gif, image/jpeg"
+                    aria-describedby="picture-helper"
+                    {...(directCam ? { capture: "environment" } : {})}
+                    onChange={(e) => {
+                      const file = e.target.files
+                        ? e.target.files[0]
+                        : undefined;
+                      setSelectedFile(file);
+                    }}
+                    required
+                  />
+                  <small id="picture-helper">
+                    Zeig uns dein schönstes Lächeln!
+                  </small>
+                </label>
+              </article>
+            </div>
 
-          <h3>Fragen</h3>
-          <article>
-            {error && `Konnte Fragen nicht laden`}
-            {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
-            {value
-              ?.data()!
-              .questions.map(
-                (
-                  question: { question: string; example: string },
-                  i: number,
-                ) => {
-                  return (
-                    <label key={i}>
-                      {!loading && value && question.question}
-                      <input
-                        type="text"
-                        name={`question${i + 1}`}
-                        placeholder={question.example}
-                        aria-describedby={`question${i + 1}-helper`}
-                        value={answers[i]}
-                        onChange={(e) => {
-                          const answer = e.currentTarget.value;
-                          setAnswers((prev) => prev.toSpliced(i, 1, answer));
-                        }}
-                        required
-                      />
-                      <small id={`question${i + 1}-helper`}></small>
-                    </label>
-                  );
-                },
-              )}
-          </article>
+            <div>
+              <h3>Fragen</h3>
+              <article>
+                {error && `Konnte Fragen nicht laden`}
+                {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
+                {value
+                  ?.data()!
+                  .questions.map(
+                    (
+                      question: { question: string; example: string },
+                      i: number,
+                    ) => {
+                      return (
+                        <label key={i}>
+                          {!loading && value && question.question}
+                          <input
+                            type="text"
+                            name={`question${i + 1}`}
+                            placeholder={question.example}
+                            aria-describedby={`question${i + 1}-helper`}
+                            value={answers[i]}
+                            onChange={(e) => {
+                              const answer = e.currentTarget.value;
+                              setAnswers((prev) =>
+                                prev.toSpliced(i, 1, answer),
+                              );
+                            }}
+                            required
+                          />
+                          <small id={`question${i + 1}-helper`}></small>
+                        </label>
+                      );
+                    },
+                  )}
+              </article>
+            </div>
+          </div>
 
           <label>
             <input

@@ -53,57 +53,63 @@ export default function Einstellungen() {
   return (
     <>
       <h1>Einstellungen</h1>
+
+      <div className="grid mb-2">
+        <button onClick={safeSettings}>Speichern</button>
+      </div>
+
       {error && <strong>Fehler: {error.message}</strong>}
       {loading && <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>}
 
       {!loading && value && settings && (
         <>
           <h3>Fragen</h3>
+          <div className="flex flex-col lg:flex-row gap-2">
+            {settings.questions.map((question, i) => {
+              return (
+                <article key={i}>
+                  <header>Frage {i + 1}</header>
 
-          {settings.questions.map((question, i) => {
-            return (
-              <article key={i}>
-                <header>Frage {i + 1}</header>
-
-                <label>
-                  Frage
-                  <input
-                    type="text"
-                    value={question.question}
-                    onChange={(e) => {
-                      const newQuestion = e.currentTarget.value;
-                      const example = settings.questions[i].example;
-                      setSettings((prev) => ({
-                        ...prev,
-                        questions: settings.questions.toSpliced(i, 1, {
-                          question: newQuestion,
-                          example,
-                        }),
-                      }));
-                    }}
-                  />
-                </label>
-                <label>
-                  Beispiel
-                  <input
-                    type="text"
-                    value={question.example}
-                    onChange={(e) => {
-                      const question = settings.questions[i].question;
-                      const newExample = e.currentTarget.value;
-                      setSettings((prev) => ({
-                        ...prev,
-                        questions: settings.questions.toSpliced(i, 1, {
-                          question,
-                          example: newExample,
-                        }),
-                      }));
-                    }}
-                  />
-                </label>
-              </article>
-            );
-          })}
+                  <label>
+                    Frage
+                    <input
+                      type="text"
+                      value={question.question}
+                      onChange={(e) => {
+                        const newQuestion = e.currentTarget.value;
+                        const example = settings.questions[i].example;
+                        setSettings((prev) => ({
+                          ...prev,
+                          questions: settings.questions.toSpliced(i, 1, {
+                            question: newQuestion,
+                            example,
+                          }),
+                        }));
+                      }}
+                    />
+                  </label>
+                  <label>
+                    Beispiel
+                    <input
+                      type="text"
+                      value={question.example}
+                      onChange={(e) => {
+                        const question = settings.questions[i].question;
+                        const newExample = e.currentTarget.value;
+                        setSettings((prev) => ({
+                          ...prev,
+                          questions: settings.questions.toSpliced(i, 1, {
+                            question,
+                            example: newExample,
+                          }),
+                        }));
+                      }}
+                    />
+                  </label>
+                </article>
+              );
+            })}
+          </div>
 
           <button type="submit" className="secondary" disabled>
             Neue Frage
@@ -111,122 +117,136 @@ export default function Einstellungen() {
 
           <h3>Datenschutzhinweis</h3>
 
-          <article>
-            <label>
-              Titel
-              <input
-                type="text"
-                value={settings.datenschutzhinweis.what.heading}
-                onChange={(e) => {
-                  const newValue = e.currentTarget.value;
-                  setSettings((prev) => ({
-                    ...prev,
-                    datenschutzhinweis: {
-                      ...settings.datenschutzhinweis,
-                      what: {
-                        heading: newValue,
-                        text: settings.datenschutzhinweis.what.text,
+          <div className="flex flex-col lg:flex-row gap-2">
+            <article>
+              <label>
+                Titel
+                <input
+                  type="text"
+                  value={settings.datenschutzhinweis.what.heading}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      datenschutzhinweis: {
+                        ...settings.datenschutzhinweis,
+                        what: {
+                          heading: newValue,
+                          text: settings.datenschutzhinweis.what.text,
+                        },
                       },
-                    },
-                  }));
-                }}
-              />
-            </label>
-            <label>
-              Text
-              <textarea
-                value={settings.datenschutzhinweis.what.text}
-                onChange={(e) => {
-                  const newValue = e.currentTarget.value;
-                  setSettings((prev) => ({
-                    ...prev,
-                    datenschutzhinweis: {
-                      ...settings.datenschutzhinweis,
-                      what: {
-                        heading: settings.datenschutzhinweis.what.heading,
-                        text: newValue,
+                    }));
+                  }}
+                />
+              </label>
+              <label>
+                Text
+                <textarea
+                  value={settings.datenschutzhinweis.what.text}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      datenschutzhinweis: {
+                        ...settings.datenschutzhinweis,
+                        what: {
+                          heading: settings.datenschutzhinweis.what.heading,
+                          text: newValue,
+                        },
                       },
-                    },
-                  }));
-                }}
-                rows={5}
-              />
-            </label>
-          </article>
+                    }));
+                  }}
+                  rows={4}
+                />
+              </label>
+            </article>
 
-          <article>
-            <input
-              type="text"
-              value={settings.datenschutzhinweis.howLong.heading}
-              onChange={(e) => {
-                const newValue = e.currentTarget.value;
-                setSettings((prev) => ({
-                  ...prev,
-                  datenschutzhinweis: {
-                    ...settings.datenschutzhinweis,
-                    howLong: {
-                      heading: newValue,
-                      text: settings.datenschutzhinweis.howLong.text,
-                    },
-                  },
-                }));
-              }}
-            />
-            <textarea
-              value={settings.datenschutzhinweis.howLong.text}
-              onChange={(e) => {
-                const newValue = e.currentTarget.value;
-                setSettings((prev) => ({
-                  ...prev,
-                  datenschutzhinweis: {
-                    ...settings.datenschutzhinweis,
-                    howLong: {
-                      heading: settings.datenschutzhinweis.howLong.heading,
-                      text: newValue,
-                    },
-                  },
-                }));
-              }}
-            />
-          </article>
+            <article>
+              <label>
+                Titel
+                <input
+                  type="text"
+                  value={settings.datenschutzhinweis.howLong.heading}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      datenschutzhinweis: {
+                        ...settings.datenschutzhinweis,
+                        howLong: {
+                          heading: newValue,
+                          text: settings.datenschutzhinweis.howLong.text,
+                        },
+                      },
+                    }));
+                  }}
+                />
+              </label>
+              <label>
+                Text
+                <textarea
+                  value={settings.datenschutzhinweis.howLong.text}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      datenschutzhinweis: {
+                        ...settings.datenschutzhinweis,
+                        howLong: {
+                          heading: settings.datenschutzhinweis.howLong.heading,
+                          text: newValue,
+                        },
+                      },
+                    }));
+                  }}
+                  rows={4}
+                />
+              </label>
+            </article>
 
-          <article>
-            <input
-              type="text"
-              value={settings.datenschutzhinweis.under18.heading}
-              onChange={(e) => {
-                const newValue = e.currentTarget.value;
-                setSettings((prev) => ({
-                  ...prev,
-                  datenschutzhinweis: {
-                    ...settings.datenschutzhinweis,
-                    under18: {
-                      heading: newValue,
-                      text: settings.datenschutzhinweis.under18.text,
-                    },
-                  },
-                }));
-              }}
-            />
-            <textarea
-              value={settings.datenschutzhinweis.under18.text}
-              onChange={(e) => {
-                const newValue = e.currentTarget.value;
-                setSettings((prev) => ({
-                  ...prev,
-                  datenschutzhinweis: {
-                    ...settings.datenschutzhinweis,
-                    under18: {
-                      heading: settings.datenschutzhinweis.under18.heading,
-                      text: newValue,
-                    },
-                  },
-                }));
-              }}
-            />
-          </article>
-
-          <button onClick={safeSettings}>Speichern</button>
+            <article>
+              <label>
+                Titel
+                <input
+                  type="text"
+                  value={settings.datenschutzhinweis.under18.heading}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      datenschutzhinweis: {
+                        ...settings.datenschutzhinweis,
+                        under18: {
+                          heading: newValue,
+                          text: settings.datenschutzhinweis.under18.text,
+                        },
+                      },
+                    }));
+                  }}
+                />
+              </label>
+              <label>
+                Text
+                <textarea
+                  value={settings.datenschutzhinweis.under18.text}
+                  onChange={(e) => {
+                    const newValue = e.currentTarget.value;
+                    setSettings((prev) => ({
+                      ...prev,
+                      datenschutzhinweis: {
+                        ...settings.datenschutzhinweis,
+                        under18: {
+                          heading: settings.datenschutzhinweis.under18.heading,
+                          text: newValue,
+                        },
+                      },
+                    }));
+                  }}
+                  rows={4}
+                />
+              </label>
+            </article>
+          </div>
         </>
       )}
     </>
