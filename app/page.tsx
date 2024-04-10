@@ -217,8 +217,6 @@ export default function Home() {
           value={uploading ? "Lade hoch..." : "Abschicken"}
         />
       </form>
-
-      <button onClick={reset}>Reset</button>
     </main>
   );
 }
