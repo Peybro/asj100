@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import asj100 from "./../public/100JahreASJLogo_RGB_4zu3.png";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
@@ -12,6 +12,7 @@ import { useUploadFile } from "react-firebase-hooks/storage";
 import Datenschutzhinweis from "./datenschutzhinweis/page";
 import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
 import LoadingSpinner from "./lib/components/LoadingSpinner";
+import { Bounce, toast } from "react-toastify";
 
 export default function Home() {
   const [directCam, setDirectCam] = useState(false);
@@ -29,10 +30,15 @@ export default function Home() {
   const [clickCounter, setClickCounter] = useState<number>(0);
 
   function reset() {
+    (document.querySelector("#interview-form") as HTMLFormElement)!.reset();
+
     setName("");
     setAge("");
-    setSelectedFile(undefined);
-    setAnswers([]);
+    setAnswers(
+      value
+        ?.data()!
+        .questions.map((_: { question: string; example: string }) => ""),
+    );
     setAccepted(false);
   }
 
@@ -49,7 +55,20 @@ export default function Home() {
       answers.some((answer) => answer === "") ||
       !accepted
     ) {
-      alert("Bitte alles ausfüllen und akzeptieren!");
+      toast.error(
+        "Bitte alle Felder ausfüllen und bestätigen, dass du die Datenschutzbestimmungen akzeptierst.",
+        {
+          position: "top-right",
+          autoClose: 8000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        },
+      );
       return;
     }
 
@@ -75,7 +94,17 @@ export default function Home() {
     );
 
     reset();
-    alert("Vielen Dank für deine Teilnahme!");
+    toast.success("Vielen Dank für deine Teilnahme!", {
+      position: "top-right",
+      autoClose: 8000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    });
   }
 
   return (
@@ -90,7 +119,7 @@ export default function Home() {
         {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
       </div>
 
-      <form onSubmit={handleUpload}>
+      <form onSubmit={handleUpload} id="interview-form">
         <fieldset>
           <h3>Das bin ich</h3>
           <article>
@@ -100,7 +129,9 @@ export default function Home() {
                 type="text"
                 name="name"
                 placeholder="Name"
+                value={name}
                 onChange={(e) => setName(e.currentTarget.value)}
+                required
               />
             </label>
             <label>
@@ -109,7 +140,9 @@ export default function Home() {
                 type="number"
                 name="age"
                 placeholder="Alter"
+                value={age}
                 onChange={(e) => setAge(e.currentTarget.value.toString())}
+                required
               />
             </label>
             <label>
@@ -124,6 +157,7 @@ export default function Home() {
                   const file = e.target.files ? e.target.files[0] : undefined;
                   setSelectedFile(file);
                 }}
+                required
               />
               <small id="picture-helper">
                 Zeig uns dein schönstes Lächeln!
@@ -150,10 +184,12 @@ export default function Home() {
                         name={`question${i + 1}`}
                         placeholder={question.example}
                         aria-describedby={`question${i + 1}-helper`}
+                        value={answers[i]}
                         onChange={(e) => {
                           const answer = e.currentTarget.value;
                           setAnswers((prev) => prev.toSpliced(i, 1, answer));
                         }}
+                        required
                       />
                       <small id={`question${i + 1}-helper`}></small>
                     </label>
@@ -167,7 +203,9 @@ export default function Home() {
               name="terms"
               type="checkbox"
               role="switch"
+              checked={accepted}
               onChange={() => setAccepted((prev) => !prev)}
+              required
             />
             Ich habe den <DatenschutzhinweisComponent open={false} /> gelesen
             und bin mit dem Speichern meiner Daten einverstanden.
@@ -179,6 +217,8 @@ export default function Home() {
           value={uploading ? "Lade hoch..." : "Abschicken"}
         />
       </form>
+
+      <button onClick={reset}>Reset</button>
     </main>
   );
 }

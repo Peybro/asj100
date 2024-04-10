@@ -26,7 +26,7 @@ export default function InterviewCard({
   const storageRef = ref(storage, `portraits/${imgPath}`);
 
   const [value, answersLoading, answersError] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   const [url, loading, error] = useDownloadURL(storageRef);
@@ -40,7 +40,7 @@ export default function InterviewCard({
         (question: { question: string; example: string }, i: number) => {
           answer += question.question + "\n";
           answer += answers[i] + "\n\n";
-        }
+        },
       );
 
     return answer;

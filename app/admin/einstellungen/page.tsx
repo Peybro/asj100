@@ -5,6 +5,7 @@ import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
+import { Bounce, toast } from "react-toastify";
 
 type Settings = {
   questions: { question: string; example: string }[];
@@ -17,14 +18,23 @@ type Settings = {
 
 export default function Einstellungen() {
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
-  function safeSettings() {
-    console.log(settings);
+  async function safeSettings() {
+    await setDoc(doc(db, "settings", "settings"), settings, { merge: true });
 
-    const settingsRef = doc(db, "settings", "settings");
-    setDoc(settingsRef, settings, { merge: true });
+    toast.success("Einstellungen gespeichert", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      transition: Bounce,
+    });
   }
 
   const [settings, setSettings] = useState<Settings>({

@@ -9,11 +9,11 @@ import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(
-    collection(db, "kurzinterviews")
+    collection(db, "kurzinterviews"),
   );
 
   const [answersValue, answersLoading, answersError] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   const [editMode, setEditMode] = useState(false);
@@ -28,7 +28,7 @@ export default function Einsendungen() {
         (question: { question: string; example: string }, i: number) => {
           answer += question.question + "\n";
           answer += interviewAnswers[i] + "\n\n";
-        }
+        },
       );
 
     return answer;
@@ -60,7 +60,7 @@ ${getQuestionAnswer(interview.questions)}
           age: number;
           picture: string;
           questions: string[];
-        }
+        },
       );
     });
 
