@@ -1,6 +1,10 @@
 "use client";
 
+import { doc } from "firebase/firestore";
 import { useState } from "react";
+import { useDocumentOnce } from "react-firebase-hooks/firestore";
+import { db } from "../firebase-config";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function DatenschutzhinweisComponent({
   open,
@@ -9,10 +13,14 @@ export default function DatenschutzhinweisComponent({
 }) {
   const [openState, setOpenState] = useState(open);
 
+  const [value, loading, error] = useDocumentOnce(
+    doc(db, "settings", "settings")
+  );
+
   return (
     <>
       <span
-        className="text-blue-500"
+        className="text-blue-400"
         onClick={(e) => {
           e.preventDefault();
           setOpenState(true);
@@ -33,17 +41,35 @@ export default function DatenschutzhinweisComponent({
               }}
             ></button>
             <p>
-              <strong>Thank You for Registering!</strong>
+              <strong>Datenschutzhinweis</strong>
             </p>
           </header>
-          <p>
-            We are excited to have you join us for our upcoming event. Please
-            arrive at the museum on time to check in and get started.
-          </p>
-          <ul>
-            <li>Date: Saturday, April 15</li>
-            <li>Time: 10:00am - 12:00pm</li>
-          </ul>
+          {error && <p>{error.message}</p>}
+          {loading && (
+            <LoadingSpinner>Lade Datenschutzhinweis...</LoadingSpinner>
+          )}
+          {!loading && value && (
+            <>
+              <h4>{value?.data()!.datenschutzhinweis.what.heading}</h4>
+              <p>{value?.data()!.datenschutzhinweis.what.text}</p>
+              <h4>{value?.data()!.datenschutzhinweis.howLong.heading}</h4>
+              <p>{value?.data()!.datenschutzhinweis.howLong.text}</p>
+              <h4>{value?.data()!.datenschutzhinweis.under18.heading}</h4>
+              <p>{value?.data()!.datenschutzhinweis.under18.text}</p>
+            </>
+          )}
+          <footer>
+            <button
+              aria-label="Close"
+              className="secondary"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpenState(false);
+              }}
+            >
+              Schließen
+            </button>
+          </footer>
         </article>
       </dialog>
     </>

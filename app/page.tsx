@@ -11,6 +11,7 @@ import { db, storage } from "./lib/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
 import Datenschutzhinweis from "./datenschutzhinweis/page";
 import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
+import LoadingSpinner from "./lib/components/LoadingSpinner";
 
 export default function Home() {
   const [directCam, setDirectCam] = useState(false);
@@ -77,90 +78,73 @@ export default function Home() {
 
       <form onSubmit={handleUpload}>
         <fieldset>
-          <label>
-            Wie heißt du?
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              onChange={(e) => setName(e.currentTarget.value)}
-            />
-          </label>
-          <label>
-            Wie alt bist du?
-            <input
-              type="text"
-              name="age"
-              placeholder="Alter"
-              onChange={(e) => setAge(e.currentTarget.value)}
-            />
-          </label>
-          <label>
-            Bild
-            <input
-              type="file"
-              name="picture"
-              accept="image/png, image/gif, image/jpeg"
-              aria-describedby="picture-helper"
-              {...(directCam ? { capture: "environment" } : {})}
-              onChange={(e) => {
-                const file = e.target.files ? e.target.files[0] : undefined;
-                setSelectedFile(file);
-              }}
-            />
-            <small id="picture-helper">Zeig uns dein schönstes Lächeln!</small>
-          </label>
+          <article>
+            <label>
+              Wie heißt du?
+              <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                onChange={(e) => setName(e.currentTarget.value)}
+              />
+            </label>
+            <label>
+              Wie alt bist du?
+              <input
+                type="text"
+                name="age"
+                placeholder="Alter"
+                onChange={(e) => setAge(e.currentTarget.value)}
+              />
+            </label>
+            <label>
+              Bild
+              <input
+                type="file"
+                name="picture"
+                accept="image/png, image/gif, image/jpeg"
+                aria-describedby="picture-helper"
+                {...(directCam ? { capture: "environment" } : {})}
+                onChange={(e) => {
+                  const file = e.target.files ? e.target.files[0] : undefined;
+                  setSelectedFile(file);
+                }}
+              />
+              <small id="picture-helper">
+                Zeig uns dein schönstes Lächeln!
+              </small>
+            </label>
+          </article>
           <>
-            <label>
-              {error && "Konnte Frage 1 nicht laden"}
-              {loading && <span aria-busy="true">Lade Frage 1...</span>}
-              {!loading && value && value?.data()!.questions[0].question}
-              <input
-                type="text"
-                name="question1"
-                placeholder={value?.data()!.questions[0].example}
-                aria-describedby="question1-helper"
-                onChange={(e) => {
-                  const answer = e.currentTarget.value;
-                  setAnswers((prev) => prev.toSpliced(0, 1, answer));
-                }}
-              />
-              <small id="question1-helper"></small>
-            </label>
-
-            <label>
-              {error && "Konnte Frage 2 nicht laden"}
-              {loading && "Lade Frage 2..."}
-              {!loading && value && value?.data()!.questions[1].question}
-              <input
-                type="text"
-                name="question2"
-                placeholder={value?.data()!.questions[1].example}
-                aria-describedby="question2-helper"
-                onChange={(e) => {
-                  const answer = e.currentTarget.value;
-                  setAnswers((prev) => prev.toSpliced(1, 1, answer));
-                }}
-              />
-              <small id="question2-helper"></small>
-            </label>
-
-            <label>
-              {error && "Konnte Frage 3 nicht laden"}
-              {loading && "Lade Frage 3..."}
-              {!loading && value && value?.data()!.questions[2].question}
-              <input
-                type="text"
-                name="question3"
-                placeholder={value?.data()!.questions[2].example}
-                aria-describedby="question3-helper"
-                onChange={(e) => {
-                  const answer = e.currentTarget.value;
-                  setAnswers((prev) => prev.toSpliced(2, 1, answer));
-                }}
-              />
-              <small id="question3-helper"></small>
-            </label>
+            {error && `Konnte Fragen nicht laden`}
+            {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
+            {value
+              ?.data()!
+              .questions.map(
+                (
+                  question: { question: string; example: string },
+                  i: number
+                ) => {
+                  return (
+                    <label>
+                      {!loading && value && question.question}
+                      <input
+                        type="text"
+                        name={`question${i + 1}`}
+                        placeholder={question.example}
+                        aria-describedby={`question${i + 1}-helper`}
+                        onChange={(e) => {
+                          const answer = e.currentTarget.value;
+                          setAnswers((prev) =>
+                            prev.toSpliced(0, i + 1, answer)
+                          );
+                        }}
+                      />
+                      <small id={`question${i + 1}-helper`}></small>
+                    </label>
+                  );
+                }
+              )}
           </>
           <label>
             <input
@@ -174,7 +158,10 @@ export default function Home() {
           </label>
         </fieldset>
 
-        <input type="submit" value="Abschicken" />
+        <input
+          type="submit"
+          value={uploading ? "Lade hoch..." : "Abschicken"}
+        />
       </form>
     </main>
   );

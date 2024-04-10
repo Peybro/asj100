@@ -35,33 +35,56 @@ export default function AdminLayout({
             <Link href="/">Formular</Link>
           </li>
           {user && (
-            <>
-              <li>
-                <Link href="/admin/einsendungen" passHref legacyBehavior>
-                  <a
-                    style={{
-                      color: path.endsWith("einsendungen") ? "#017fc0" : "",
-                    }}
+            <li>
+              <details className="dropdown">
+                <summary role="button">
+                  Menü
+                  {/* <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
                   >
-                    Einsendungen
-                  </a>
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin/einstellungen" passHref legacyBehavior>
-                  <a
-                    style={{
-                      color: path.endsWith("einstellungen") ? "#017fc0" : "",
-                    }}
-                  >
-                    Einstellungen
-                  </a>
-                </Link>
-              </li>
-              <li>
-                <button onClick={logout}>Logout</button>
-              </li>
-            </>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                    />
+                  </svg> */}
+                </summary>
+                <ul dir="rtl">
+                  <li>
+                    <Link href="/admin/einsendungen" passHref legacyBehavior>
+                      <a
+                        style={{
+                          color: path.endsWith("einsendungen") ? "#017fc0" : "",
+                        }}
+                      >
+                        Einsendungen
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/admin/einstellungen" passHref legacyBehavior>
+                      <a
+                        style={{
+                          color: path.endsWith("einstellungen")
+                            ? "#017fc0"
+                            : "",
+                        }}
+                      >
+                        Einstellungen
+                      </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={logout}>Logout</button>
+                  </li>
+                </ul>
+              </details>
+            </li>
           )}
         </ul>
       </nav>

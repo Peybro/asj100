@@ -1,5 +1,6 @@
 "use client";
 
+import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -7,7 +8,11 @@ import { useDocument, useDocumentOnce } from "react-firebase-hooks/firestore";
 
 type Settings = {
   questions: { question: string; example: string }[];
-  datenschutzhinweis: { what: string; howLong: string; under18: string };
+  datenschutzhinweis: {
+    what: { heading: string; text: string };
+    howLong: { heading: string; text: string };
+    under18: { heading: string; text: string };
+  };
 };
 
 export default function Einstellungen() {
@@ -24,7 +29,11 @@ export default function Einstellungen() {
 
   const [settings, setSettings] = useState<Settings>({
     questions: [{ question: "", example: "" }],
-    datenschutzhinweis: { what: "", howLong: "", under18: "" },
+    datenschutzhinweis: {
+      what: { heading: "", text: "" },
+      howLong: { heading: "", text: "" },
+      under18: { heading: "", text: "" },
+    },
   });
 
   useEffect(() => {
@@ -35,7 +44,7 @@ export default function Einstellungen() {
     <>
       <h1>Einstellungen</h1>
       {error && <strong>Fehler: {error.message}</strong>}
-      {loading && <span>Lade Einstellungen...</span>}
+      {loading && <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>}
 
       {!loading && value && settings && (
         <>
@@ -83,49 +92,120 @@ export default function Einstellungen() {
             );
           })}
 
+          <button type="submit" className="secondary" disabled>
+            Neue Frage
+          </button>
+
           <h3>Datenschutzhinweis</h3>
-          <h4>Was passiert mit den Daten?</h4>
-          <textarea
-            value={settings.datenschutzhinweis.what}
-            onChange={(e) => {
-              const newValue = e.currentTarget.value;
-              setSettings((prev) => ({
-                ...prev,
-                datenschutzhinweis: {
-                  ...settings.datenschutzhinweis,
-                  what: newValue,
-                },
-              }));
-            }}
-          />
-          <h4>Wie lange werden sie gespeichert?</h4>
-          <textarea
-            value={settings.datenschutzhinweis.howLong}
-            onChange={(e) => {
-              const newValue = e.currentTarget.value;
-              setSettings((prev) => ({
-                ...prev,
-                datenschutzhinweis: {
-                  ...settings.datenschutzhinweis,
-                  howLong: newValue,
-                },
-              }));
-            }}
-          />
-          <h4>Unter 18?</h4>
-          <textarea
-            value={settings.datenschutzhinweis.under18}
-            onChange={(e) => {
-              const newValue = e.currentTarget.value;
-              setSettings((prev) => ({
-                ...prev,
-                datenschutzhinweis: {
-                  ...settings.datenschutzhinweis,
-                  under18: newValue,
-                },
-              }));
-            }}
-          />
+
+          <article>
+            <input
+              type="text"
+              value={settings.datenschutzhinweis.what.heading}
+              onChange={(e) => {
+                const newValue = e.currentTarget.value;
+                setSettings((prev) => ({
+                  ...prev,
+                  datenschutzhinweis: {
+                    ...settings.datenschutzhinweis,
+                    what: {
+                      heading: newValue,
+                      text: settings.datenschutzhinweis.what.text,
+                    },
+                  },
+                }));
+              }}
+            />
+            <textarea
+              value={settings.datenschutzhinweis.what.text}
+              onChange={(e) => {
+                const newValue = e.currentTarget.value;
+                setSettings((prev) => ({
+                  ...prev,
+                  datenschutzhinweis: {
+                    ...settings.datenschutzhinweis,
+                    what: {
+                      heading: settings.datenschutzhinweis.what.heading,
+                      text: newValue,
+                    },
+                  },
+                }));
+              }}
+            />
+          </article>
+
+          <article>
+            <input
+              type="text"
+              value={settings.datenschutzhinweis.howLong.heading}
+              onChange={(e) => {
+                const newValue = e.currentTarget.value;
+                setSettings((prev) => ({
+                  ...prev,
+                  datenschutzhinweis: {
+                    ...settings.datenschutzhinweis,
+                    howLong: {
+                      heading: newValue,
+                      text: settings.datenschutzhinweis.howLong.text,
+                    },
+                  },
+                }));
+              }}
+            />
+            <textarea
+              value={settings.datenschutzhinweis.howLong.text}
+              onChange={(e) => {
+                const newValue = e.currentTarget.value;
+                setSettings((prev) => ({
+                  ...prev,
+                  datenschutzhinweis: {
+                    ...settings.datenschutzhinweis,
+                    howLong: {
+                      heading: settings.datenschutzhinweis.howLong.heading,
+                      text: newValue,
+                    },
+                  },
+                }));
+              }}
+            />
+          </article>
+
+          <article>
+            <input
+              type="text"
+              value={settings.datenschutzhinweis.under18.heading}
+              onChange={(e) => {
+                const newValue = e.currentTarget.value;
+                setSettings((prev) => ({
+                  ...prev,
+                  datenschutzhinweis: {
+                    ...settings.datenschutzhinweis,
+                    under18: {
+                      heading: newValue,
+                      text: settings.datenschutzhinweis.under18.text,
+                    },
+                  },
+                }));
+              }}
+            />
+            <textarea
+              value={settings.datenschutzhinweis.under18.text}
+              onChange={(e) => {
+                const newValue = e.currentTarget.value;
+                setSettings((prev) => ({
+                  ...prev,
+                  datenschutzhinweis: {
+                    ...settings.datenschutzhinweis,
+                    under18: {
+                      heading: settings.datenschutzhinweis.under18.heading,
+                      text: newValue,
+                    },
+                  },
+                }));
+              }}
+            />
+          </article>
+
           <button onClick={safeSettings}>Speichern</button>
         </>
       )}

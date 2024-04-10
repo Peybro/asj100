@@ -23,12 +23,15 @@ export default function Einsendungen() {
     <>
       <h1>Einsendungen</h1>
 
-      <div className="mb-2">
+      <div className="grid mb-2">
         <Link href="/" role="button">
           zum Formular
         </Link>{" "}
         <button onClick={downloadAll}>Alle downloaden</button>{" "}
-        <button onClick={() => setEditMode((prev) => !prev)}>
+        <button
+          className="secondary"
+          onClick={() => setEditMode((prev) => !prev)}
+        >
           {editMode ? "Fertig" : "Bearbeiten"}
         </button>
       </div>
@@ -43,6 +46,7 @@ export default function Einsendungen() {
               return (
                 <InterviewCard
                   key={interview.data().id}
+                  id={interview.data().id}
                   imgPath={interview.data().picture}
                   name={interview.data().name}
                   age={interview.data().age}

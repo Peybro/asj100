@@ -2,15 +2,18 @@
 
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { getStorage, ref as storageRef } from "firebase/storage";
-import { storage } from "../firebase-config";
+import { db, storage } from "../firebase-config";
+import { deleteDoc, doc } from "firebase/firestore";
 
 export default function InterviewCard({
+  id,
   imgPath,
   name,
   age,
   answers,
   editMode,
 }: {
+  id: string;
   imgPath: string;
   name: string;
   age: number;
@@ -25,8 +28,8 @@ export default function InterviewCard({
     alert("Download");
   }
 
-  function remove() {
-    alert("Löschen");
+  async function remove() {
+    await deleteDoc(doc(db, "kurzinterviews", id));
   }
 
   return (
@@ -45,7 +48,11 @@ export default function InterviewCard({
 
       <footer>
         <button onClick={download}>Download</button>{" "}
-        {editMode && <button onClick={remove}>Löschen</button>}
+        {editMode && (
+          <button className="bg-red-500 border-red-500" onClick={remove}>
+            Löschen
+          </button>
+        )}
       </footer>
     </article>
   );
