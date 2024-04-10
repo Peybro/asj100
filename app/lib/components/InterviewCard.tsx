@@ -12,6 +12,7 @@ export default function InterviewCard({
   age,
   answers,
   editMode,
+  showAsList,
 }: {
   id: string;
   imgPath: string;
@@ -19,9 +20,10 @@ export default function InterviewCard({
   age: number;
   answers: string[];
   editMode: boolean;
+  showAsList: boolean;
 }) {
   const [url, loading, error] = useDownloadURL(
-    storageRef(storage, `portraits/${imgPath}`)
+    storageRef(storage, `portraits/${imgPath}`),
   );
 
   function download() {
@@ -32,28 +34,41 @@ export default function InterviewCard({
     await deleteDoc(doc(db, "kurzinterviews", id));
   }
 
-  return (
-    <article>
-      <header>
-        {error && <p>Fehler beim Laden des Bildes: {error.message}</p>}
-        {loading && <p>Lade bild...</p>}
-        {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
-      </header>
+  function CardContent() {
+    return (
+      <article>
+        <header>
+          {error && <p>Fehler beim Laden des Bildes: {error.message}</p>}
+          {loading && <p>Lade bild...</p>}
+          {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
+        </header>
 
-      <p>Name: {name}</p>
-      <p>Alter: {age}</p>
-      <p>Frage 1: {answers[0]}</p>
-      <p>Frage 2: {answers[1]}</p>
-      <p>Frage 3: {answers[2]}</p>
+        <p>Name: {name}</p>
+        <p>Alter: {age}</p>
+        <p>Frage 1: {answers[0]}</p>
+        <p>Frage 2: {answers[1]}</p>
+        <p>Frage 3: {answers[2]}</p>
 
-      <footer>
-        <button onClick={download}>Download</button>{" "}
-        {editMode && (
-          <button className="bg-red-500 border-red-500" onClick={remove}>
-            Löschen
-          </button>
-        )}
-      </footer>
-    </article>
-  );
+        <footer>
+          <button onClick={download}>Download</button>{" "}
+          {editMode && (
+            <button className="bg-red-500 border-red-500" onClick={remove}>
+              Löschen
+            </button>
+          )}
+        </footer>
+      </article>
+    );
+  }
+
+  if (showAsList) {
+    return (
+      <details>
+        <summary>{name}</summary>
+        <CardContent />
+      </details>
+    );
+  } else {
+    return <CardContent />;
+  }
 }

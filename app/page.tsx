@@ -63,7 +63,7 @@ export default function Home() {
       selectedFile,
       {
         contentType: "image/jpeg",
-      }
+      },
     );
 
     // reset
@@ -123,7 +123,7 @@ export default function Home() {
               .questions.map(
                 (
                   question: { question: string; example: string },
-                  i: number
+                  i: number,
                 ) => {
                   return (
                     <label key={i}>
@@ -135,15 +135,13 @@ export default function Home() {
                         aria-describedby={`question${i + 1}-helper`}
                         onChange={(e) => {
                           const answer = e.currentTarget.value;
-                          setAnswers((prev) =>
-                            prev.toSpliced(0, i + 1, answer)
-                          );
+                          setAnswers((prev) => prev.toSpliced(i, 1, answer));
                         }}
                       />
                       <small id={`question${i + 1}-helper`}></small>
                     </label>
                   );
-                }
+                },
               )}
           </>
           <label>

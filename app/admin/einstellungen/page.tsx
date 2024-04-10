@@ -17,7 +17,7 @@ type Settings = {
 
 export default function Einstellungen() {
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   function safeSettings() {
