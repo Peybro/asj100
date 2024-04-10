@@ -17,7 +17,7 @@ type Settings = {
 
 export default function Einstellungen() {
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    doc(db, "settings", "settings")
   );
 
   function safeSettings() {
@@ -55,21 +55,24 @@ export default function Einstellungen() {
               <article key={i}>
                 <header>Frage {i + 1}</header>
 
-                <input
-                  type="text"
-                  value={question.question}
-                  onChange={(e) => {
-                    const newQuestion = e.currentTarget.value;
-                    const example = settings.questions[i].example;
-                    setSettings((prev) => ({
-                      ...prev,
-                      questions: settings.questions.toSpliced(i, 1, {
-                        question: newQuestion,
-                        example,
-                      }),
-                    }));
-                  }}
-                />
+                <label>
+                  Frage
+                  <input
+                    type="text"
+                    value={question.question}
+                    onChange={(e) => {
+                      const newQuestion = e.currentTarget.value;
+                      const example = settings.questions[i].example;
+                      setSettings((prev) => ({
+                        ...prev,
+                        questions: settings.questions.toSpliced(i, 1, {
+                          question: newQuestion,
+                          example,
+                        }),
+                      }));
+                    }}
+                  />
+                </label>
                 <label>
                   Beispiel
                   <input
@@ -99,39 +102,46 @@ export default function Einstellungen() {
           <h3>Datenschutzhinweis</h3>
 
           <article>
-            <input
-              type="text"
-              value={settings.datenschutzhinweis.what.heading}
-              onChange={(e) => {
-                const newValue = e.currentTarget.value;
-                setSettings((prev) => ({
-                  ...prev,
-                  datenschutzhinweis: {
-                    ...settings.datenschutzhinweis,
-                    what: {
-                      heading: newValue,
-                      text: settings.datenschutzhinweis.what.text,
+            <label>
+              Titel
+              <input
+                type="text"
+                value={settings.datenschutzhinweis.what.heading}
+                onChange={(e) => {
+                  const newValue = e.currentTarget.value;
+                  setSettings((prev) => ({
+                    ...prev,
+                    datenschutzhinweis: {
+                      ...settings.datenschutzhinweis,
+                      what: {
+                        heading: newValue,
+                        text: settings.datenschutzhinweis.what.text,
+                      },
                     },
-                  },
-                }));
-              }}
-            />
-            <textarea
-              value={settings.datenschutzhinweis.what.text}
-              onChange={(e) => {
-                const newValue = e.currentTarget.value;
-                setSettings((prev) => ({
-                  ...prev,
-                  datenschutzhinweis: {
-                    ...settings.datenschutzhinweis,
-                    what: {
-                      heading: settings.datenschutzhinweis.what.heading,
-                      text: newValue,
+                  }));
+                }}
+              />
+            </label>
+            <label>
+              Text
+              <textarea
+                value={settings.datenschutzhinweis.what.text}
+                onChange={(e) => {
+                  const newValue = e.currentTarget.value;
+                  setSettings((prev) => ({
+                    ...prev,
+                    datenschutzhinweis: {
+                      ...settings.datenschutzhinweis,
+                      what: {
+                        heading: settings.datenschutzhinweis.what.heading,
+                        text: newValue,
+                      },
                     },
-                  },
-                }));
-              }}
-            />
+                  }));
+                }}
+                rows={5}
+              />
+            </label>
           </article>
 
           <article>
