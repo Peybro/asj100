@@ -4,7 +4,7 @@ import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { useDocument, useDocumentOnce } from "react-firebase-hooks/firestore";
+import { useDocumentOnce } from "react-firebase-hooks/firestore";
 
 type Settings = {
   questions: { question: string; example: string }[];

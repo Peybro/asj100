@@ -1,9 +1,10 @@
 "use client";
 
 import { useDownloadURL } from "react-firebase-hooks/storage";
-import { getStorage, ref as storageRef } from "firebase/storage";
+import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
+import { useDocumentOnce } from "react-firebase-hooks/firestore";
 
 export default function InterviewCard({
   id,
@@ -22,16 +23,50 @@ export default function InterviewCard({
   editMode: boolean;
   showAsList: boolean;
 }) {
-  const [url, loading, error] = useDownloadURL(
-    storageRef(storage, `portraits/${imgPath}`),
+  const storageRef = ref(storage, `portraits/${imgPath}`);
+
+  const [value, answersLoading, answersError] = useDocumentOnce(
+    doc(db, "settings", "settings")
   );
 
-  function download() {
-    alert("Download");
+  const [url, loading, error] = useDownloadURL(storageRef);
+
+  function getQuestionAnswer() {
+    let answer = "";
+
+    value
+      ?.data()!
+      .questions.forEach(
+        (question: { question: string; example: string }, i: number) => {
+          answer += question.question + "\n";
+          answer += answers[i] + "\n\n";
+        }
+      );
+
+    return answer;
+  }
+
+  async function download() {
+    const link = document.createElement("a");
+    const content = `Name: ${name}, Alter: ${age}
+Bild: ${imgPath}
+
+${getQuestionAnswer()}`;
+
+    const file = new Blob([content], { type: "text/plain" });
+    link.href = URL.createObjectURL(file);
+    link.download = `${name}_${id}.txt`;
+    link.click();
+    URL.revokeObjectURL(link.href);
   }
 
   async function remove() {
-    await deleteDoc(doc(db, "kurzinterviews", id));
+    try {
+      await deleteDoc(doc(db, "kurzinterviews", id));
+      await deleteObject(storageRef);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function CardContent() {

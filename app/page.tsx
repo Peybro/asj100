@@ -74,8 +74,8 @@ export default function Home() {
       },
     );
 
-    alert("Vielen Dank für deine Teilnahme!");
     reset();
+    alert("Vielen Dank für deine Teilnahme!");
   }
 
   return (
