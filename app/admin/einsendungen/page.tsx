@@ -1,6 +1,9 @@
+"use client";
+
 import InterviewCard from "@/app/lib/components/InterviewCard";
 import { db } from "@/app/lib/firebase-config";
 import { collection, doc } from "firebase/firestore";
+import { LoadingSpinner } from "@/app/lib/components/LoadingSpinner";
 import { useState } from "react";
 import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
 
@@ -102,7 +105,7 @@ ${getQuestionAnswer(interview.questions)}
 
       <div>
         {error && <strong>Fehler: {error.message}</strong>}
-        {loading && <span>Lade Einsendungen...</span>}
+        {loading && <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>}
 
         {value && (
           <div className="grid">

@@ -2,85 +2,51 @@
 
 import Image from "next/image";
 import asj100 from "./../public/100JahreASJLogo_RGB_4zu3.png";
-import { FormEvent, useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "firebase/firestore";
 import { db, storage } from "./lib/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
-import Datenschutzhinweis from "./datenschutzhinweis/page";
 import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
 import LoadingSpinner from "./lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 
 export default function Home() {
+  // form-hooks
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
-  } = useForm();
-  const onSubmit = (data: unknown) => console.log(data);
+  } = useForm<HTMLInputElement>();
 
-  const [directCam, setDirectCam] = useState(false);
-
+  // firebase-hooks
   const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
-
   const [uploadFile, uploading, snapshot, uploadError] = useUploadFile();
 
-  const [name, setName] = useState<string>("");
-  const [age, setAge] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File>();
-  const [answers, setAnswers] = useState<string[]>([]);
-  const [accepted, setAccepted] = useState<boolean>(false);
-
+  // states
+  const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
 
-  function reset() {
-    (document.querySelector("#interview-form") as HTMLFormElement)!.reset();
-
-    setName("");
-    setAge("");
-    setAnswers(
-      value
-        ?.data()!
-        .questions.map((_: { question: string; example: string }) => "")
-    );
-    setAccepted(false);
-  }
-
-  async function handleUpload(e: FormEvent) {
-    e.preventDefault();
-
-    // const data = new FormData(e.currentTarget);
-    // const name = data.get("name");
-
-    if (
-      name === "" ||
-      age === "" ||
-      !selectedFile ||
-      answers.some((answer) => answer === "") ||
-      !accepted
-    ) {
-      toast.error(
-        "Bitte alle Felder ausfüllen und bestätigen, dass du die Datenschutzbestimmungen akzeptierst.",
-        {
-          position: "top-right",
-          autoClose: 8000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        }
-      );
-      return;
-    }
-
+  async function onSubmit({
+    name,
+    age,
+    picture,
+    question1,
+    question2,
+    question3,
+  }: {
+    name: string;
+    age: number;
+    picture: File[];
+    question1: string;
+    question2: string;
+    question3: string;
+    terms: boolean;
+  }) {
     const now = new Date().getTime().toString();
 
     const pictureName = `${name}_${now}.jpg`;
@@ -90,16 +56,16 @@ export default function Home() {
       id: now,
       name,
       age,
-      questions: answers,
+      questions: [question1, question2, question3],
       picture: pictureName,
     });
 
-    const result = await uploadFile(
+    await uploadFile(
       storageRef(storage, `portraits/${pictureName}`),
-      selectedFile,
+      picture[0],
       {
         contentType: "image/jpeg",
-      }
+      },
     );
 
     reset();
@@ -128,7 +94,7 @@ export default function Home() {
         {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} id="interview-form">
+      <form onSubmit={handleSubmit(onSubmit)}>
         <fieldset>
           <div className="flex flex-col lg:flex-row gap-2">
             <div>
@@ -144,7 +110,11 @@ export default function Home() {
                       : {})}
                     aria-describedby="valid-helper-name"
                     {...register("name", {
-                      required: { value: true, message: "Bitte Name angeben" },
+                      required: {
+                        value: true,
+                        message:
+                          "Bitte teil uns mit wie du heißt damit wir dich zuordnen können.",
+                      },
                     })}
                   />
                   {errors.name && (
@@ -163,7 +133,11 @@ export default function Home() {
                       : {})}
                     aria-describedby="valid-helper-age"
                     {...register("age", {
-                      required: { value: true, message: "Bitte Alter angeben" },
+                      required: {
+                        value: true,
+                        message:
+                          "Bitte gib dein Alter an. (siehe Datenschutzhinweis)",
+                      },
                     })}
                   />
                   {errors.age && (
@@ -183,7 +157,11 @@ export default function Home() {
                       ? { "aria-invalid": Object.hasOwn(errors, "picture") }
                       : {})}
                     {...register("picture", {
-                      required: { value: true, message: "Bitte Bild angeben" },
+                      required: {
+                        value: true,
+                        message:
+                          "Bitte lade ein Bild von dir hoch um deinem Interview ein Gesicht zu geben.",
+                      },
                     })}
                   />
                   {errors.picture ? (
@@ -209,7 +187,7 @@ export default function Home() {
                   .questions.map(
                     (
                       question: { question: string; example: string },
-                      i: number
+                      i: number,
                     ) => {
                       return (
                         <label key={i}>
@@ -221,7 +199,7 @@ export default function Home() {
                               ? {
                                   "aria-invalid": Object.hasOwn(
                                     errors,
-                                    `question${i + 1}`
+                                    `question${i + 1}`,
                                   ),
                                 }
                               : {})}
@@ -229,7 +207,7 @@ export default function Home() {
                             {...register(`question${i + 1}`, {
                               required: {
                                 value: true,
-                                message: "Bitte Frage beantworten",
+                                message: "Bitte beantworte diese Frage.",
                               },
                             })}
                           />
@@ -240,7 +218,7 @@ export default function Home() {
                           )}
                         </label>
                       );
-                    }
+                    },
                   )}
               </article>
             </div>
@@ -255,14 +233,18 @@ export default function Home() {
                 ? { "aria-invalid": Object.hasOwn(errors, "terms") }
                 : {})}
               {...register("terms", {
-                required: { value: true, message: "Bitte akzeptieren" },
+                required: {
+                  value: true,
+                  message:
+                    "Bitte lies und akzeptiere den Datenschutzhinweis bevor du dein Interview abschicken kannst.",
+                },
               })}
             />
             Ich habe den <DatenschutzhinweisComponent open={false} /> gelesen
             und bin mit dem Speichern meiner Daten einverstanden.
           </label>
           {errors.terms && (
-            <small id="valid-helper-terms">
+            <small id="valid-helper-terms" className="text-red-300">
               {errors.terms?.message! as string}
             </small>
           )}
@@ -271,6 +253,7 @@ export default function Home() {
         <input
           type="submit"
           value={uploading ? "Lade hoch..." : "Abschicken"}
+          disabled={uploading || !value}
         />
       </form>
     </main>

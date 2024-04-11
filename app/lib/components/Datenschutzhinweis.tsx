@@ -17,7 +17,7 @@ export default function DatenschutzhinweisComponent({
   const [openState, setOpenState] = useState(open);
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   return (
@@ -55,12 +55,14 @@ export default function DatenschutzhinweisComponent({
           )}
           {!loading && value && (
             <>
-              <h4>{value?.data()!.datenschutzhinweis.what.heading}</h4>
-              <p>{value?.data()!.datenschutzhinweis.what.text}</p>
-              <h4>{value?.data()!.datenschutzhinweis.howLong.heading}</h4>
-              <p>{value?.data()!.datenschutzhinweis.howLong.text}</p>
-              <h4>{value?.data()!.datenschutzhinweis.under18.heading}</h4>
-              <p>{value?.data()!.datenschutzhinweis.under18.text}</p>
+              {value?.data()!.datenschutzhinweis.map((hinweis) => {
+                return (
+                  <>
+                    <h4>{hinweis.title}</h4>
+                    <p>{hinweis.text}</p>
+                  </>
+                );
+              })}
             </>
           )}
           <footer>

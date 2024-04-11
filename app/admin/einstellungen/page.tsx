@@ -1,251 +1,282 @@
+"use client";
+
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
+import { useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 
-type Settings = {
-  questions: { question: string; example: string }[];
-  datenschutzhinweis: {
-    what: { heading: string; text: string };
-    howLong: { heading: string; text: string };
-    under18: { heading: string; text: string };
-  };
-};
+type Question = { question: string; example: string };
+type Datenschutz = { title: string; text: string };
+
+function Close() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="w-6 h-6"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 18 18 6M6 6l12 12"
+      />
+    </svg>
+  );
+}
 
 export default function Einstellungen() {
+  // form-hooks
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<HTMLInputElement>();
+
   const [value, loading, error] = useDocumentOnce(
     doc(db, "settings", "settings"),
   );
 
-  async function safeSettings() {
-    await setDoc(doc(db, "settings", "settings"), settings, { merge: true });
-
-    toast.success("Einstellungen gespeichert", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-      transition: Bounce,
-    });
-  }
-
-  const [settings, setSettings] = useState<Settings>({
-    questions: [{ question: "", example: "" }],
-    datenschutzhinweis: {
-      what: { heading: "", text: "" },
-      howLong: { heading: "", text: "" },
-      under18: { heading: "", text: "" },
-    },
-  });
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
 
   useEffect(() => {
-    setSettings(value?.data() as Settings);
+    setQuestions(value?.data()!.questions as Question);
+    setDatenschutz(value?.data()!.datenschutzhinweis as Datenschutz);
   }, [loading]);
+
+  async function safeSettings(data) {
+    const settings = {
+      questions: [],
+      datenschutzhinweis: [],
+    };
+
+    questions.forEach((question, i) => {
+      settings.questions.push({
+        question: data[`question${i + 1}`],
+        example: data[`example${i + 1}`],
+      });
+    });
+
+    datenschutz.forEach((question, i) => {
+      settings.datenschutzhinweis.push({
+        title: data[`ds-title${i + 1}`],
+        text: data[`ds-text${i + 1}`],
+      });
+    });
+
+    try {
+      await setDoc(doc(db, "settings", "settings"), settings, { merge: true });
+      toast.success("Einstellungen gespeichert", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        transition: Bounce,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function addQuestion(e) {
+    e.preventDefault();
+
+    const newQuestion: Question = { question: "", example: "" };
+    setQuestions((prev) => [...prev, newQuestion]);
+  }
+
+  function removeQuestion(index: number) {
+    setQuestions((prev) => [...prev.toSpliced(index, 1)]);
+  }
+
+  function addHinweis(e) {
+    e.preventDefault();
+
+    const newHinweis: Datenschutz = { title: "", text: "" };
+    setDatenschutz((prev) => [...prev, newHinweis]);
+  }
+
+  function removeHinweis(index: number) {
+    setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
+  }
 
   return (
     <>
       <h1>Einstellungen</h1>
 
-      <div className="grid mb-2">
-        <button onClick={safeSettings}>Speichern</button>
+      <div className="grid mb-2 sticky top-5">
+        <button form="settingsForm" onClick={safeSettings} disabled={loading}>
+          Speichern
+        </button>
       </div>
 
       {error && <strong>Fehler: {error.message}</strong>}
       {loading && <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>}
 
-      {!loading && value && settings && (
-        <>
-          <h3>Fragen</h3>
-          <div className="flex flex-col lg:flex-row gap-2">
-            {settings.questions.map((question, i) => {
-              return (
-                <article key={i}>
-                  <header>Frage {i + 1}</header>
+      {!loading && questions && datenschutz && (
+        <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
+          <fieldset>
+            <h3>Fragen</h3>
+            <div className="flex flex-col lg:flex-row gap-2">
+              {questions.map((question, i) => {
+                return (
+                  <article key={`question${i}`}>
+                    <header className="flex justify-between">
+                      <p>Frage {i + 1}</p>
+                      <span onClick={() => removeQuestion(i)}>
+                        <Close />
+                      </span>
+                    </header>
+
+                    <label>
+                      Frage
+                      <input
+                        type="text"
+                        defaultValue={question.question}
+                        {...(Object.hasOwn(errors, `question${i + 1}`)
+                          ? {
+                              "aria-invalid": Object.hasOwn(
+                                errors,
+                                `question${i + 1}`,
+                              ),
+                            }
+                          : {})}
+                        aria-describedby={`valid-helper-question${i + 1}`}
+                        {...register(`question${i + 1}`, {
+                          required: {
+                            value: true,
+                            message: "Bitte eine Frage angeben.",
+                          },
+                        })}
+                      />
+                      {errors[`question${i + 1}`] && (
+                        <small id={`valid-helper-question${i + 1}`}>
+                          {errors[`question${i + 1}`]?.message! as string}
+                        </small>
+                      )}
+                    </label>
+                    <label>
+                      Beispiel
+                      <input
+                        type="text"
+                        defaultValue={question.example}
+                        {...(Object.hasOwn(errors, `example${i + 1}`)
+                          ? {
+                              "aria-invalid": Object.hasOwn(
+                                errors,
+                                `example${i + 1}`,
+                              ),
+                            }
+                          : {})}
+                        aria-describedby={`valid-helper-example${i + 1}`}
+                        {...register(`example${i + 1}`, {
+                          required: {
+                            value: false,
+                            message: `Bitte ein Beispiel für Frage ${i + 1} angeben.`,
+                          },
+                        })}
+                      />
+                      {errors[`example${i + 1}`] && (
+                        <small id={`valid-helper-example${i + 1}`}>
+                          {errors[`example${i + 1}`]?.message! as string}
+                        </small>
+                      )}
+                    </label>
+                  </article>
+                );
+              })}
+            </div>
+
+            <button type="submit" className="secondary" onClick={addQuestion}>
+              Neue Frage
+            </button>
+
+            <h3>Datenschutzhinweis</h3>
+            <div className="flex flex-col lg:flex-row gap-2">
+              {datenschutz.map((hinweis, i) => (
+                <article key={`hinweis${i}`}>
+                  <header className="flex justify-between">
+                    <p>Hinweis {i + 1}</p>
+                    <span onClick={() => removeHinweis(i)}>
+                      <Close />
+                    </span>
+                  </header>
 
                   <label>
-                    Frage
+                    Titel
                     <input
                       type="text"
-                      value={question.question}
-                      onChange={(e) => {
-                        const newQuestion = e.currentTarget.value;
-                        const example = settings.questions[i].example;
-                        setSettings((prev) => ({
-                          ...prev,
-                          questions: settings.questions.toSpliced(i, 1, {
-                            question: newQuestion,
-                            example,
-                          }),
-                        }));
-                      }}
+                      defaultValue={hinweis.title}
+                      {...(Object.hasOwn(errors, `ds-title${i + 1}`)
+                        ? {
+                            "aria-invalid": Object.hasOwn(
+                              errors,
+                              `ds-title${i + 1}`,
+                            ),
+                          }
+                        : {})}
+                      aria-describedby={`valid-helper-ds-title${i + 1}`}
+                      {...register(`ds-title${i + 1}`, {
+                        required: {
+                          value: false,
+                          message: `Bitte einen Titel für den Hinweis angeben.`,
+                        },
+                      })}
                     />
+                    {errors[`ds-title${i + 1}`] && (
+                      <small id={`valid-helper-ds-title${i + 1}`}>
+                        {errors[`ds-title${i + 1}`]?.message! as string}
+                      </small>
+                    )}
                   </label>
+
                   <label>
-                    Beispiel
-                    <input
+                    Text
+                    <textarea
                       type="text"
-                      value={question.example}
-                      onChange={(e) => {
-                        const question = settings.questions[i].question;
-                        const newExample = e.currentTarget.value;
-                        setSettings((prev) => ({
-                          ...prev,
-                          questions: settings.questions.toSpliced(i, 1, {
-                            question,
-                            example: newExample,
-                          }),
-                        }));
-                      }}
+                      defaultValue={hinweis.text}
+                      {...(Object.hasOwn(errors, `ds-text${i + 1}`)
+                        ? {
+                            "aria-invalid": Object.hasOwn(
+                              errors,
+                              `ds-text${i + 1}`,
+                            ),
+                          }
+                        : {})}
+                      aria-describedby={`valid-helper-ds-text${i + 1}`}
+                      {...register(`ds-text${i + 1}`, {
+                        required: {
+                          value: false,
+                          message: `Bitte eine Beschreibung für den Hinweis angeben.`,
+                        },
+                      })}
                     />
+                    {errors[`ds-text${i + 1}`] && (
+                      <small id={`valid-helper-ds-text${i + 1}`}>
+                        {errors[`ds-text${i + 1}`]?.message! as string}
+                      </small>
+                    )}
                   </label>
                 </article>
-              );
-            })}
-          </div>
+              ))}
+            </div>
 
-          <button type="submit" className="secondary" disabled>
-            Neue Frage
-          </button>
-
-          <h3>Datenschutzhinweis</h3>
-
-          <div className="flex flex-col lg:flex-row gap-2">
-            <article>
-              <label>
-                Titel
-                <input
-                  type="text"
-                  value={settings.datenschutzhinweis.what.heading}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.value;
-                    setSettings((prev) => ({
-                      ...prev,
-                      datenschutzhinweis: {
-                        ...settings.datenschutzhinweis,
-                        what: {
-                          heading: newValue,
-                          text: settings.datenschutzhinweis.what.text,
-                        },
-                      },
-                    }));
-                  }}
-                />
-              </label>
-              <label>
-                Text
-                <textarea
-                  value={settings.datenschutzhinweis.what.text}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.value;
-                    setSettings((prev) => ({
-                      ...prev,
-                      datenschutzhinweis: {
-                        ...settings.datenschutzhinweis,
-                        what: {
-                          heading: settings.datenschutzhinweis.what.heading,
-                          text: newValue,
-                        },
-                      },
-                    }));
-                  }}
-                  rows={4}
-                />
-              </label>
-            </article>
-
-            <article>
-              <label>
-                Titel
-                <input
-                  type="text"
-                  value={settings.datenschutzhinweis.howLong.heading}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.value;
-                    setSettings((prev) => ({
-                      ...prev,
-                      datenschutzhinweis: {
-                        ...settings.datenschutzhinweis,
-                        howLong: {
-                          heading: newValue,
-                          text: settings.datenschutzhinweis.howLong.text,
-                        },
-                      },
-                    }));
-                  }}
-                />
-              </label>
-              <label>
-                Text
-                <textarea
-                  value={settings.datenschutzhinweis.howLong.text}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.value;
-                    setSettings((prev) => ({
-                      ...prev,
-                      datenschutzhinweis: {
-                        ...settings.datenschutzhinweis,
-                        howLong: {
-                          heading: settings.datenschutzhinweis.howLong.heading,
-                          text: newValue,
-                        },
-                      },
-                    }));
-                  }}
-                  rows={4}
-                />
-              </label>
-            </article>
-
-            <article>
-              <label>
-                Titel
-                <input
-                  type="text"
-                  value={settings.datenschutzhinweis.under18.heading}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.value;
-                    setSettings((prev) => ({
-                      ...prev,
-                      datenschutzhinweis: {
-                        ...settings.datenschutzhinweis,
-                        under18: {
-                          heading: newValue,
-                          text: settings.datenschutzhinweis.under18.text,
-                        },
-                      },
-                    }));
-                  }}
-                />
-              </label>
-              <label>
-                Text
-                <textarea
-                  value={settings.datenschutzhinweis.under18.text}
-                  onChange={(e) => {
-                    const newValue = e.currentTarget.value;
-                    setSettings((prev) => ({
-                      ...prev,
-                      datenschutzhinweis: {
-                        ...settings.datenschutzhinweis,
-                        under18: {
-                          heading: settings.datenschutzhinweis.under18.heading,
-                          text: newValue,
-                        },
-                      },
-                    }));
-                  }}
-                  rows={4}
-                />
-              </label>
-            </article>
-          </div>
-        </>
+            <button type="submit" className="secondary" onClick={addHinweis}>
+              Neuer Hinweis
+            </button>
+          </fieldset>
+        </form>
       )}
     </>
   );
