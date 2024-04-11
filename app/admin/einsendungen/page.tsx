@@ -1,9 +1,6 @@
-"use client";
-
 import InterviewCard from "@/app/lib/components/InterviewCard";
 import { db } from "@/app/lib/firebase-config";
 import { collection, doc } from "firebase/firestore";
-import Link from "next/link";
 import { useState } from "react";
 import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
 

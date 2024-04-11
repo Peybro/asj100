@@ -123,7 +123,7 @@ export default function Home() {
         <fieldset>
           <div className="flex flex-col lg:flex-row gap-2">
             <div>
-              <h3>Das bin ich</h3>
+              <h3>Über dich</h3>
               <article>
                 <label>
                   Wie heißt du?

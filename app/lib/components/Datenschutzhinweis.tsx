@@ -5,22 +5,25 @@ import { useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { db } from "../firebase-config";
 import LoadingSpinner from "./LoadingSpinner";
+import Link from "next/link";
 
 export default function DatenschutzhinweisComponent({
   open,
+  closable = true,
 }: {
   open: boolean;
+  closable?: boolean;
 }) {
   const [openState, setOpenState] = useState(open);
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    doc(db, "settings", "settings")
   );
 
   return (
     <>
       <span
-        className="text-blue-400"
+        className="text-blue-400 underline"
         onClick={(e) => {
           e.preventDefault();
           setOpenState(true);
@@ -32,14 +35,16 @@ export default function DatenschutzhinweisComponent({
       <dialog open={openState} className="modal-is-opening modal-is-closing">
         <article>
           <header>
-            <button
-              aria-label="Close"
-              rel="prev"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenState(false);
-              }}
-            ></button>
+            {closable && (
+              <button
+                aria-label="Close"
+                rel="prev"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpenState(false);
+                }}
+              ></button>
+            )}
             <p>
               <strong>Datenschutzhinweis</strong>
             </p>
@@ -59,16 +64,23 @@ export default function DatenschutzhinweisComponent({
             </>
           )}
           <footer>
-            <button
-              aria-label="Close"
-              className="secondary"
-              onClick={(e) => {
-                e.preventDefault();
-                setOpenState(false);
-              }}
-            >
-              Schließen
-            </button>
+            {closable && (
+              <button
+                aria-label="Close"
+                className="secondary"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpenState(false);
+                }}
+              >
+                Schließen
+              </button>
+            )}
+            {!closable && (
+              <Link href="/" passHref legacyBehavior>
+                <a className="text-blue-400 underline">zum Formular</a>
+              </Link>
+            )}
           </footer>
         </article>
       </dialog>

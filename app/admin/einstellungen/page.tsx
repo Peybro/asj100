@@ -1,5 +1,3 @@
-"use client";
-
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
