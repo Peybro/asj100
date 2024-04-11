@@ -13,8 +13,17 @@ import Datenschutzhinweis from "./datenschutzhinweis/page";
 import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
 import LoadingSpinner from "./lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
+import { useForm } from "react-hook-form";
 
 export default function Home() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const onSubmit = (data: unknown) => console.log(data);
+
   const [directCam, setDirectCam] = useState(false);
 
   const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
@@ -37,7 +46,7 @@ export default function Home() {
     setAnswers(
       value
         ?.data()!
-        .questions.map((_: { question: string; example: string }) => ""),
+        .questions.map((_: { question: string; example: string }) => "")
     );
     setAccepted(false);
   }
@@ -67,7 +76,7 @@ export default function Home() {
           progress: undefined,
           theme: "dark",
           transition: Bounce,
-        },
+        }
       );
       return;
     }
@@ -90,7 +99,7 @@ export default function Home() {
       selectedFile,
       {
         contentType: "image/jpeg",
-      },
+      }
     );
 
     reset();
@@ -119,7 +128,7 @@ export default function Home() {
         {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
       </div>
 
-      <form onSubmit={handleUpload} id="interview-form">
+      <form onSubmit={handleSubmit(onSubmit)} id="interview-form">
         <fieldset>
           <div className="flex flex-col lg:flex-row gap-2">
             <div>
@@ -129,43 +138,63 @@ export default function Home() {
                   Wie heißt du?
                   <input
                     type="text"
-                    name="name"
                     placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.currentTarget.value)}
-                    required
+                    {...(Object.hasOwn(errors, "name")
+                      ? { "aria-invalid": Object.hasOwn(errors, "name") }
+                      : {})}
+                    aria-describedby="valid-helper-name"
+                    {...register("name", {
+                      required: { value: true, message: "Bitte Name angeben" },
+                    })}
                   />
+                  {errors.name && (
+                    <small id="valid-helper-name">
+                      {errors.name?.message! as string}
+                    </small>
+                  )}
                 </label>
                 <label>
                   Wie alt bist du?
                   <input
                     type="number"
-                    name="age"
                     placeholder="Alter"
-                    value={age}
-                    onChange={(e) => setAge(e.currentTarget.value.toString())}
-                    required
+                    {...(Object.hasOwn(errors, "age")
+                      ? { "aria-invalid": Object.hasOwn(errors, "age") }
+                      : {})}
+                    aria-describedby="valid-helper-age"
+                    {...register("age", {
+                      required: { value: true, message: "Bitte Alter angeben" },
+                    })}
                   />
+                  {errors.age && (
+                    <small id="valid-helper-age">
+                      {errors.age?.message! as string}
+                    </small>
+                  )}
                 </label>
                 <label>
                   Bild
                   <input
                     type="file"
-                    name="picture"
                     accept="image/png, image/gif, image/jpeg"
-                    aria-describedby="picture-helper"
                     {...(directCam ? { capture: "environment" } : {})}
-                    onChange={(e) => {
-                      const file = e.target.files
-                        ? e.target.files[0]
-                        : undefined;
-                      setSelectedFile(file);
-                    }}
-                    required
+                    aria-describedby="valid-helper-picture"
+                    {...(Object.hasOwn(errors, "picture")
+                      ? { "aria-invalid": Object.hasOwn(errors, "picture") }
+                      : {})}
+                    {...register("picture", {
+                      required: { value: true, message: "Bitte Bild angeben" },
+                    })}
                   />
-                  <small id="picture-helper">
-                    Zeig uns dein schönstes Lächeln!
-                  </small>
+                  {errors.picture ? (
+                    <small id="valid-helper-picture">
+                      {errors.picture?.message! as string}
+                    </small>
+                  ) : (
+                    <small id="picture-helper">
+                      Zeig uns dein schönstes Lächeln!
+                    </small>
+                  )}
                 </label>
               </article>
             </div>
@@ -180,29 +209,38 @@ export default function Home() {
                   .questions.map(
                     (
                       question: { question: string; example: string },
-                      i: number,
+                      i: number
                     ) => {
                       return (
                         <label key={i}>
                           {!loading && value && question.question}
                           <input
                             type="text"
-                            name={`question${i + 1}`}
                             placeholder={question.example}
-                            aria-describedby={`question${i + 1}-helper`}
-                            value={answers[i]}
-                            onChange={(e) => {
-                              const answer = e.currentTarget.value;
-                              setAnswers((prev) =>
-                                prev.toSpliced(i, 1, answer),
-                              );
-                            }}
-                            required
+                            {...(Object.hasOwn(errors, `question${i + 1}`)
+                              ? {
+                                  "aria-invalid": Object.hasOwn(
+                                    errors,
+                                    `question${i + 1}`
+                                  ),
+                                }
+                              : {})}
+                            aria-describedby={`valid-helper-question${i + 1}`}
+                            {...register(`question${i + 1}`, {
+                              required: {
+                                value: true,
+                                message: "Bitte Frage beantworten",
+                              },
+                            })}
                           />
-                          <small id={`question${i + 1}-helper`}></small>
+                          {errors[`question${i + 1}`] && (
+                            <small id={`valid-helper-question${i + 1}`}>
+                              {errors[`question${i + 1}`]?.message! as string}
+                            </small>
+                          )}
                         </label>
                       );
-                    },
+                    }
                   )}
               </article>
             </div>
@@ -210,16 +248,24 @@ export default function Home() {
 
           <label>
             <input
-              name="terms"
               type="checkbox"
               role="switch"
-              checked={accepted}
-              onChange={() => setAccepted((prev) => !prev)}
-              required
+              aria-describedby="valid-helper-terms"
+              {...(Object.hasOwn(errors, "terms")
+                ? { "aria-invalid": Object.hasOwn(errors, "terms") }
+                : {})}
+              {...register("terms", {
+                required: { value: true, message: "Bitte akzeptieren" },
+              })}
             />
             Ich habe den <DatenschutzhinweisComponent open={false} /> gelesen
             und bin mit dem Speichern meiner Daten einverstanden.
           </label>
+          {errors.terms && (
+            <small id="valid-helper-terms">
+              {errors.terms?.message! as string}
+            </small>
+          )}
         </fieldset>
 
         <input
