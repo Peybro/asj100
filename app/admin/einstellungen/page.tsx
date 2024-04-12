@@ -7,7 +7,8 @@ import React, { useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
-import { Question, Datenschutz } from "@/app/lib/types";
+import type { Question } from "@/app/lib/types/Question";
+import type { Datenschutz } from "@/app/lib/types/Datenschutz";
 
 function Close() {
   return (

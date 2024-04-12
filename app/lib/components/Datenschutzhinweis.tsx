@@ -3,8 +3,8 @@
 import { doc } from "firebase/firestore";
 import { useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
-import { db } from "../firebase-config";
-import LoadingSpinner from "./LoadingSpinner";
+import { db } from "@/app/lib/firebase-config";
+import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import Link from "next/link";
 
 export default function DatenschutzhinweisComponent({

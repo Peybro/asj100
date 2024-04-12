@@ -1,19 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import asj100 from "./../public/100JahreASJLogo_RGB_4zu3.png";
+import asj100 from "@/public/100JahreASJLogo_RGB_4zu3.png";
 import { useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "firebase/firestore";
-import { db, storage } from "./lib/firebase-config";
+import { db, storage } from "@/app/lib/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
-import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
-import LoadingSpinner from "./lib/components/LoadingSpinner";
+import DatenschutzhinweisComponent from "@/app/lib/components/Datenschutzhinweis";
+import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
-import { Question } from "./lib/types";
+import type { Question } from "@/app/lib/types/Question";
 
 export default function Home() {
   // form-hooks

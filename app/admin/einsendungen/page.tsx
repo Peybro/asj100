@@ -6,7 +6,7 @@ import InterviewCard from "@/app/lib/components/InterviewCard";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { useState } from "react";
 import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
-import { Answer } from "@/app/lib/types";
+import type { Answer } from "@/app/lib/types/Answer";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(

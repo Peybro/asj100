@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
-import { db, storage } from "../firebase-config";
+import { db, storage } from "@/app/lib/firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
-import { Answer } from "../types";
+import type { Answer } from "@/app/lib/types/Answer";
 
 export default function InterviewCard({
   id,
