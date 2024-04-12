@@ -17,14 +17,11 @@ export default function Login() {
 
   const [loginError, setLoginError] = useState(false);
 
-  async function login({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) {
+  async function login(data: {email:string; password:string}) {
     try {
+      const email = data.email;
+      const password= data.password;
+
       await signInWithEmailAndPassword(auth, email, password);
       setLoginError(false);
     } catch (error) {
