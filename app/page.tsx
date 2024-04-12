@@ -31,42 +31,35 @@ export default function Home() {
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
 
-  async function onSubmit({
-    name,
-    age,
-    picture,
-    question1,
-    question2,
-    question3,
-  }: {
-    name: string;
-    age: number;
-    picture: File[];
-    question1: string;
-    question2: string;
-    question3: string;
-    terms: boolean;
-  }) {
+  async function onSubmit(data) {
+    const name = data.name;
+    const age = data.age;
+    const picture = data.picture[0];
+
     const now = new Date().getTime().toString();
 
     const pictureName = `${name}_${now}.jpg`;
+
+    const answers = [];
+    value.data().questions.forEach((question, i) => {
+      answers.push({
+        question: question.question,
+        answer: data[`question${i + 1}`],
+      });
+    });
 
     const interviewRef = doc(db, "kurzinterviews", now);
     setDoc(interviewRef, {
       id: now,
       name,
       age,
-      questions: [question1, question2, question3],
+      answers,
       picture: pictureName,
     });
 
-    await uploadFile(
-      storageRef(storage, `portraits/${pictureName}`),
-      picture[0],
-      {
-        contentType: "image/jpeg",
-      },
-    );
+    await uploadFile(storageRef(storage, `portraits/${pictureName}`), picture, {
+      contentType: "image/jpeg",
+    });
 
     reset();
     toast.success("Vielen Dank für deine Teilnahme!", {
@@ -182,44 +175,51 @@ export default function Home() {
               <article>
                 {error && `Konnte Fragen nicht laden`}
                 {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
-                {value
-                  ?.data()!
-                  .questions.map(
-                    (
-                      question: { question: string; example: string },
-                      i: number,
-                    ) => {
-                      return (
-                        <label key={i}>
-                          {!loading && value && question.question}
-                          <input
-                            type="text"
-                            placeholder={question.example}
-                            {...(Object.hasOwn(errors, `question${i + 1}`)
-                              ? {
-                                  "aria-invalid": Object.hasOwn(
-                                    errors,
-                                    `question${i + 1}`,
-                                  ),
-                                }
-                              : {})}
-                            aria-describedby={`valid-helper-question${i + 1}`}
-                            {...register(`question${i + 1}`, {
-                              required: {
-                                value: true,
-                                message: "Bitte beantworte diese Frage.",
-                              },
-                            })}
-                          />
-                          {errors[`question${i + 1}`] && (
-                            <small id={`valid-helper-question${i + 1}`}>
-                              {errors[`question${i + 1}`]?.message! as string}
-                            </small>
-                          )}
-                        </label>
-                      );
-                    },
-                  )}
+                {value?.data()!.questions.length === 0 && (
+                  <p>
+                    Keine Fragen?? Komm zu einem späteren Zeitpunkt bitte
+                    wieder...
+                  </p>
+                )}
+                {value?.data()!.questions.length > 0 &&
+                  value
+                    ?.data()!
+                    .questions.map(
+                      (
+                        question: { question: string; example: string },
+                        i: number,
+                      ) => {
+                        return (
+                          <label key={i}>
+                            {!loading && value && question.question}
+                            <input
+                              type="text"
+                              placeholder={question.example}
+                              {...(Object.hasOwn(errors, `question${i + 1}`)
+                                ? {
+                                    "aria-invalid": Object.hasOwn(
+                                      errors,
+                                      `question${i + 1}`,
+                                    ),
+                                  }
+                                : {})}
+                              aria-describedby={`valid-helper-question${i + 1}`}
+                              {...register(`question${i + 1}`, {
+                                required: {
+                                  value: true,
+                                  message: "Bitte beantworte diese Frage.",
+                                },
+                              })}
+                            />
+                            {errors[`question${i + 1}`] && (
+                              <small id={`valid-helper-question${i + 1}`}>
+                                {errors[`question${i + 1}`]?.message! as string}
+                              </small>
+                            )}
+                          </label>
+                        );
+                      },
+                    )}
               </article>
             </div>
           </div>

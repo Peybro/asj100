@@ -55,14 +55,18 @@ export default function DatenschutzhinweisComponent({
           )}
           {!loading && value && (
             <>
-              {value?.data()!.datenschutzhinweis.map((hinweis) => {
-                return (
-                  <>
-                    <h4>{hinweis.title}</h4>
-                    <p>{hinweis.text}</p>
-                  </>
-                );
-              })}
+              {value?.data()!.datenschutzhinweis.length === 0 && (
+                <p>Noch keine Datenschutzbestimmungen angegeben...</p>
+              )}
+              {value?.data()!.datenschutzhinweis.length > 0 &&
+                value?.data()!.datenschutzhinweis.map((hinweis) => {
+                  return (
+                    <>
+                      <h4>{hinweis.title}</h4>
+                      <p>{hinweis.text}</p>
+                    </>
+                  );
+                })}
             </>
           )}
           <footer>

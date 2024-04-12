@@ -1,9 +1,9 @@
 "use client";
 
-import InterviewCard from "@/app/lib/components/InterviewCard";
 import { db } from "@/app/lib/firebase-config";
 import { collection, doc } from "firebase/firestore";
-import { LoadingSpinner } from "@/app/lib/components/LoadingSpinner";
+import InterviewCard from "@/app/lib/components/InterviewCard";
+import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { useState } from "react";
 import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
 
@@ -19,19 +19,15 @@ export default function Einsendungen() {
   const [editMode, setEditMode] = useState(false);
   const [showAsList, setShowAsList] = useState(true);
 
-  function getQuestionAnswer(interviewAnswers: string[]) {
-    let answer = "";
+  function getQuestionAnswer(answers) {
+    let returnAnswer = "";
 
-    answersValue
-      ?.data()!
-      .questions.forEach(
-        (question: { question: string; example: string }, i: number) => {
-          answer += question.question + "\n";
-          answer += interviewAnswers[i] + "\n\n";
-        },
-      );
+    answers.forEach((answer) => {
+      returnAnswer += answer.question + "\n";
+      returnAnswer += answer.answer + "\n\n";
+    });
 
-    return answer;
+    return returnAnswer;
   }
 
   function addPerson(interview: {
@@ -39,12 +35,12 @@ export default function Einsendungen() {
     name: string;
     age: number;
     picture: string;
-    questions: string[];
+    answers: { question: string; answer: string }[];
   }) {
     return `Name: ${interview.name}, Alter: ${interview.age}
 Bild: ${interview.picture}
 
-${getQuestionAnswer(interview.questions)}
+${getQuestionAnswer(interview.answers)}
 =============================================\n\n`;
   }
 
@@ -59,7 +55,7 @@ ${getQuestionAnswer(interview.questions)}
           name: string;
           age: number;
           picture: string;
-          questions: string[];
+          answers: { question: string; answer: string }[];
         },
       );
     });
@@ -109,20 +105,22 @@ ${getQuestionAnswer(interview.questions)}
 
         {value && (
           <div className="grid">
-            {value.docs.map((interview) => {
-              return (
-                <InterviewCard
-                  key={interview.data().id}
-                  id={interview.data().id}
-                  imgPath={interview.data().picture}
-                  name={interview.data().name}
-                  age={interview.data().age}
-                  answers={interview.data().questions}
-                  editMode={editMode}
-                  showAsList={showAsList}
-                />
-              );
-            })}
+            {value.docs.length === 0 && <p>Keine Einsendungen</p>}
+            {value.docs.length > 0 &&
+              value.docs.map((interview) => {
+                return (
+                  <InterviewCard
+                    key={interview.data().id}
+                    id={interview.data().id}
+                    imgPath={interview.data().picture}
+                    name={interview.data().name}
+                    age={interview.data().age}
+                    answers={interview.data().answers}
+                    editMode={editMode}
+                    showAsList={showAsList}
+                  />
+                );
+              })}
           </div>
         )}
       </div>

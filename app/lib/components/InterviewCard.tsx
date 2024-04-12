@@ -19,31 +19,23 @@ export default function InterviewCard({
   imgPath: string;
   name: string;
   age: number;
-  answers: string[];
+  answers: { question: string; answer: string }[];
   editMode: boolean;
   showAsList: boolean;
 }) {
   const storageRef = ref(storage, `portraits/${imgPath}`);
 
-  const [value, answersLoading, answersError] = useDocumentOnce(
-    doc(db, "settings", "settings"),
-  );
-
   const [url, loading, error] = useDownloadURL(storageRef);
 
   function getQuestionAnswer() {
-    let answer = "";
+    let returnAnswer = "";
 
-    value
-      ?.data()!
-      .questions.forEach(
-        (question: { question: string; example: string }, i: number) => {
-          answer += question.question + "\n";
-          answer += answers[i] + "\n\n";
-        },
-      );
+    answers.forEach((answer: { question: string; answer: string }) => {
+      returnAnswer += answer.question + "\n";
+      returnAnswer += answer.answer + "\n\n";
+    });
 
-    return answer;
+    return returnAnswer;
   }
 
   async function download() {
@@ -78,11 +70,21 @@ ${getQuestionAnswer()}`;
           {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
         </header>
 
-        <p>Name: {name}</p>
-        <p className={age < 18 ? "bg-red-500" : ""}>Alter: {age}</p>
-        <p>Frage 1: {answers[0]}</p>
-        <p>Frage 2: {answers[1]}</p>
-        <p>Frage 3: {answers[2]}</p>
+        <p>
+          <span className="font-bold">Name:</span> {name}
+        </p>
+        <p className={age < 18 ? "bg-red-500" : ""}>
+          <span className="font-bold">Alter:</span> {age}
+        </p>
+        {answers.map((answer) => {
+          return (
+            <div className="mb-3">
+              <span className="font-bold">{answer.question}</span>
+              <br />
+              <span>{answer.answer}</span>
+            </div>
+          );
+        })}
 
         <footer>
           <button onClick={download}>Download</button>{" "}

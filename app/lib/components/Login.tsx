@@ -2,21 +2,34 @@ import { auth } from "@/app/lib/firebase-config";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { FormEvent, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { useForm } from "react-hook-form";
 
 export default function Login() {
+  // form-hooks
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<HTMLInputElement>();
+
   const [user, loading, error] = useAuthState(auth);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-
-    // const data = new FormData(e.currentTarget);
-    // const email = data.get("email");
-    // const password = data.get("password");
-
-    signInWithEmailAndPassword(auth, email, password);
+  async function login({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setLoginError(false);
+    } catch (error) {
+      setLoginError(true);
+    }
   }
 
   const logout = () => {
@@ -47,31 +60,56 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(login)}>
       <fieldset>
         <label>
           Email
           <input
             type="email"
-            name="email"
             placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
+            {...(Object.hasOwn(errors, "email")
+              ? { "aria-invalid": Object.hasOwn(errors, "email") }
+              : {})}
+            aria-describedby="valid-helper-email"
+            {...register("email", {
+              required: {
+                value: true,
+                message: "Bitte Email angeben",
+              },
+            })}
           />
+          {errors.email && (
+            <small id="valid-helper-email">
+              {errors.email?.message! as string}
+            </small>
+          )}
         </label>
 
         <label>
           Passwort
           <input
             type="password"
-            name="password"
             placeholder="Passwort"
-            value={password}
-            onChange={(e) => setPassword(e.currentTarget.value)}
+            {...(Object.hasOwn(errors, "password")
+              ? { "aria-invalid": Object.hasOwn(errors, "password") }
+              : {})}
+            aria-describedby="valid-helper-password"
+            {...register("password", {
+              required: {
+                value: true,
+                message: "Bitte Passwort angeben",
+              },
+            })}
           />
+          {errors.password && (
+            <small id="valid-helper-password">
+              {errors.password?.message! as string}
+            </small>
+          )}
         </label>
       </fieldset>
 
+      {loginError && <p className="text-red-400">Falsche Anmeldedaten...</p>}
       <input type="submit" value="Anmelden" />
     </form>
   );
