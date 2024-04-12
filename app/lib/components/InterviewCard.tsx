@@ -5,6 +5,7 @@ import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
+import { Answer } from "../types";
 
 export default function InterviewCard({
   id,
@@ -19,7 +20,7 @@ export default function InterviewCard({
   imgPath: string;
   name: string;
   age: number;
-  answers: { question: string; answer: string }[];
+  answers: Answer[];
   editMode: boolean;
   showAsList: boolean;
 }) {
@@ -30,7 +31,7 @@ export default function InterviewCard({
   function getQuestionAnswer() {
     let returnAnswer = "";
 
-    answers.forEach((answer: { question: string; answer: string }) => {
+    answers.forEach((answer: Answer) => {
       returnAnswer += answer.question + "\n";
       returnAnswer += answer.answer + "\n\n";
     });
@@ -67,7 +68,8 @@ ${getQuestionAnswer()}`;
         <header>
           {error && <p>Fehler beim Laden des Bildes: {error.message}</p>}
           {loading && <p>Lade bild...</p>}
-          {!loading && url && <Image src={url} alt={`Bild von ${name}`} />}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
         </header>
 
         <p>
@@ -76,17 +78,15 @@ ${getQuestionAnswer()}`;
         <p className={age < 18 ? "bg-red-500" : ""}>
           <span className="font-bold">Alter:</span> {age}
         </p>
-        {answers.map(
-          (answer: { question: string; answer: string }, i: number) => {
-            return (
-              <div key={i} className="mb-3">
-                <span className="font-bold">{answer.question}</span>
-                <br />
-                <span>{answer.answer}</span>
-              </div>
-            );
-          },
-        )}
+        {answers.map((answer: Answer, i: number) => {
+          return (
+            <div key={i} className="mb-3">
+              <span className="font-bold">{answer.question}</span>
+              <br />
+              <span>{answer.answer}</span>
+            </div>
+          );
+        })}
 
         <footer>
           <button onClick={download}>Download</button>{" "}

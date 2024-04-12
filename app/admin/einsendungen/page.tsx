@@ -6,6 +6,7 @@ import InterviewCard from "@/app/lib/components/InterviewCard";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { useState } from "react";
 import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
+import { Answer } from "@/app/lib/types";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(
@@ -35,7 +36,7 @@ export default function Einsendungen() {
     name: string;
     age: number;
     picture: string;
-    answers: { question: string; answer: string }[];
+    answers: Answer[];
   }) {
     return `Name: ${interview.name}, Alter: ${interview.age}
 Bild: ${interview.picture}
@@ -55,7 +56,7 @@ ${getQuestionAnswer(interview.answers)}
           name: string;
           age: number;
           picture: string;
-          answers: { question: string; answer: string }[];
+          answers: Answer[];
         },
       );
     });
@@ -110,12 +111,12 @@ ${getQuestionAnswer(interview.answers)}
               value.docs.map((interview) => {
                 return (
                   <InterviewCard
-                    key={interview.data().id}
-                    id={interview.data().id}
-                    imgPath={interview.data().picture}
-                    name={interview.data().name}
-                    age={interview.data().age}
-                    answers={interview.data().answers}
+                    key={interview.data().id as string}
+                    id={interview.data().id as string}
+                    imgPath={interview.data().picture as string}
+                    name={interview.data().name as string}
+                    age={interview.data().age as number}
+                    answers={interview.data().answers as Answer[]}
                     editMode={editMode}
                     showAsList={showAsList}
                   />

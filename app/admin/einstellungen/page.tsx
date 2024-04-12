@@ -7,9 +7,7 @@ import React, { useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
-
-type Question = { question: string; example: string };
-type Datenschutz = { title: string; text: string };
+import { Question, Datenschutz } from "@/app/lib/types";
 
 function Close() {
   return (
@@ -40,7 +38,7 @@ export default function Einstellungen() {
   } = useForm<HTMLInputElement>();
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -149,7 +147,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `question${i + 1}`
+                                `question${i + 1}`,
                               ),
                             }
                           : {})}
@@ -176,7 +174,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `example${i + 1}`
+                                `example${i + 1}`,
                               ),
                             }
                           : {})}
@@ -223,7 +221,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-title${i + 1}`
+                              `ds-title${i + 1}`,
                             ),
                           }
                         : {})}
@@ -251,7 +249,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-text${i + 1}`
+                              `ds-text${i + 1}`,
                             ),
                           }
                         : {})}

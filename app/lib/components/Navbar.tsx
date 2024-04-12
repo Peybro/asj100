@@ -47,9 +47,7 @@ export default function Navbar({ user }) {
                 <li>
                   <Link href="/admin/einsendungen" passHref legacyBehavior>
                     <a
-                      style={{
-                        color: path.endsWith("einsendungen") ? "#017fc0" : "",
-                      }}
+                      className={`${path.endsWith("einsendungen") ? "text-blue-400" : ""}`}
                     >
                       Einsendungen
                     </a>
@@ -58,9 +56,7 @@ export default function Navbar({ user }) {
                 <li>
                   <Link href="/admin/einstellungen" passHref legacyBehavior>
                     <a
-                      style={{
-                        color: path.endsWith("einstellungen") ? "#017fc0" : "",
-                      }}
+                      className={`${path.endsWith("einstellungen") ? "text-blue-400" : ""}`}
                     >
                       Einstellungen
                     </a>

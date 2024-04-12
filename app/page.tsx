@@ -13,6 +13,7 @@ import DatenschutzhinweisComponent from "./lib/components/Datenschutzhinweis";
 import LoadingSpinner from "./lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { Question } from "./lib/types";
 
 export default function Home() {
   // form-hooks
@@ -41,12 +42,14 @@ export default function Home() {
     const pictureName = `${name}_${now}.jpg`;
 
     const answers = [];
-    value.data().questions.forEach((question, i) => {
-      answers.push({
-        question: question.question,
-        answer: data[`question${i + 1}`],
-      });
-    });
+    (value.data()!.questions as Question[]).forEach(
+      (question: Question, i: number) => {
+        answers.push({
+          question: question.question,
+          answer: data[`question${i + 1}`],
+        });
+      },
+    );
 
     const interviewRef = doc(db, "kurzinterviews", now);
     setDoc(interviewRef, {
