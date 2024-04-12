@@ -1,6 +1,6 @@
 import { auth } from "@/app/lib/firebase-config";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 

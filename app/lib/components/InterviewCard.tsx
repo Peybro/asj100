@@ -5,7 +5,6 @@ import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
-import { useDocumentOnce } from "react-firebase-hooks/firestore";
 
 export default function InterviewCard({
   id,
@@ -77,15 +76,17 @@ ${getQuestionAnswer()}`;
         <p className={age < 18 ? "bg-red-500" : ""}>
           <span className="font-bold">Alter:</span> {age}
         </p>
-        {answers.map((answer: {question:string;answer:string}, i: number) => {
-          return (
-            <div key={i} className="mb-3">
-              <span className="font-bold">{answer.question}</span>
-              <br />
-              <span>{answer.answer}</span>
-            </div>
-          );
-        })}
+        {answers.map(
+          (answer: { question: string; answer: string }, i: number) => {
+            return (
+              <div key={i} className="mb-3">
+                <span className="font-bold">{answer.question}</span>
+                <br />
+                <span>{answer.answer}</span>
+              </div>
+            );
+          },
+        )}
 
         <footer>
           <button onClick={download}>Download</button>{" "}

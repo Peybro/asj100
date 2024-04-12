@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/app/lib/firebase-config";
 import Login from "@/app/lib/components/Login";
