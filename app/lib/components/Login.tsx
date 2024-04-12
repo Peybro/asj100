@@ -11,7 +11,7 @@ export default function Login() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<HTMLInputElement>();
+  } = useForm();
 
   const [user, loading, error] = useAuthState(auth);
 
