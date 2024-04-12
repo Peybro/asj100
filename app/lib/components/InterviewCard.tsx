@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "../firebase-config";
@@ -67,7 +68,7 @@ ${getQuestionAnswer()}`;
         <header>
           {error && <p>Fehler beim Laden des Bildes: {error.message}</p>}
           {loading && <p>Lade bild...</p>}
-          {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
+          {!loading && url && <Image src={url} alt={`Bild von ${name}`} />}
         </header>
 
         <p>
@@ -76,9 +77,9 @@ ${getQuestionAnswer()}`;
         <p className={age < 18 ? "bg-red-500" : ""}>
           <span className="font-bold">Alter:</span> {age}
         </p>
-        {answers.map((answer) => {
+        {answers.map((answer: {question:string;answer:string}, i: number) => {
           return (
-            <div className="mb-3">
+            <div key={i} className="mb-3">
               <span className="font-bold">{answer.question}</span>
               <br />
               <span>{answer.answer}</span>
