@@ -40,7 +40,7 @@ export default function Einstellungen() {
   } = useForm<HTMLInputElement>();
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    doc(db, "settings", "settings")
   );
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -49,6 +49,7 @@ export default function Einstellungen() {
   useEffect(() => {
     setQuestions(value?.data()!.questions as Question);
     setDatenschutz(value?.data()!.datenschutzhinweis as Datenschutz);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
   async function safeSettings(data) {
@@ -148,7 +149,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `question${i + 1}`,
+                                `question${i + 1}`
                               ),
                             }
                           : {})}
@@ -175,7 +176,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `example${i + 1}`,
+                                `example${i + 1}`
                               ),
                             }
                           : {})}
@@ -222,7 +223,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-title${i + 1}`,
+                              `ds-title${i + 1}`
                             ),
                           }
                         : {})}
@@ -250,7 +251,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-text${i + 1}`,
+                              `ds-text${i + 1}`
                             ),
                           }
                         : {})}
