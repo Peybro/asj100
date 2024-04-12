@@ -46,8 +46,8 @@ export default function Einstellungen() {
   const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
 
   useEffect(() => {
-    setQuestions(value?.data()!.questions as Question);
-    setDatenschutz(value?.data()!.datenschutzhinweis as Datenschutz);
+    setQuestions(value?.data()!.questions as Question[]);
+    setDatenschutz(value?.data()!.datenschutzhinweis as Datenschutz[]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
