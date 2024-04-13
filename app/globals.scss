@@ -8,13 +8,13 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
-body {
-  overflow-x: hidden;
-}
-
-.bleed {
-  padding-left: 3000px;
-  margin-left: -3000px;
-  padding-right: 3000px;
-  margin-right: -3000px;
+.bleed:before {
+  content:"";
+  z-index:-1;
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:-100vw;
+  right:-100vw;
+  background:inherit;
 }
