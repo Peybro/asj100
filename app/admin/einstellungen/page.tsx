@@ -36,7 +36,7 @@ export default function Einstellungen() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<HTMLInputElement>();
+  } = useForm();
 
   const [value, loading, error] = useDocumentOnce(
     doc(db, "settings", "settings"),

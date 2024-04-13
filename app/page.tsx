@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import asj100 from "@/public/100JahreASJLogo_RGB_4zu3.png";
+import asj100 from "./../../public/100JahreASJLogo_RGB_4zu3.png";
 import { useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
@@ -22,7 +22,7 @@ export default function Home() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<HTMLInputElement>();
+  } = useForm();
 
   // firebase-hooks
   const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
@@ -90,7 +90,7 @@ export default function Home() {
         {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      {/* <form onSubmit={handleSubmit(onSubmit)}>
         <fieldset>
           <div className="flex flex-col lg:flex-row gap-2">
             <div>
@@ -258,7 +258,7 @@ export default function Home() {
           value={uploading ? "Lade hoch..." : "Abschicken"}
           disabled={uploading || !value}
         />
-      </form>
+      </form> */}
     </main>
   );
 }
