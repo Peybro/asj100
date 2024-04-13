@@ -48,7 +48,7 @@ export default function Home() {
           question: question.question,
           answer: data[`question${i + 1}`],
         });
-      },
+      }
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
@@ -90,8 +90,8 @@ export default function Home() {
         {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
       </div>
 
-      {/* <form onSubmit={handleSubmit(onSubmit)}>
-        <fieldset>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/*  <fieldset>
           <div className="flex flex-col lg:flex-row gap-2">
             <div>
               <h3>Über dich</h3>
@@ -257,8 +257,8 @@ export default function Home() {
           type="submit"
           value={uploading ? "Lade hoch..." : "Abschicken"}
           disabled={uploading || !value}
-        />
-      </form> */}
+        />*/}
+      </form>
     </main>
   );
 }
