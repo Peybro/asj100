@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
+import ErrorIndicator from "./ErrorIndicator";
 
 interface IFormData {
   email: string;
@@ -112,7 +113,11 @@ export default function Login() {
         </label>
       </fieldset>
 
-      {loginError && <p className="text-red-400">Falsche Anmeldedaten...</p>}
+      {loginError && (
+        <ErrorIndicator>
+          <p className="text-red-400">Falsche Anmeldedaten...</p>
+        </ErrorIndicator>
+      )}
       <input type="submit" value="Anmelden" />
     </form>
   );

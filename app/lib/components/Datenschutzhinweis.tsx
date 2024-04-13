@@ -6,6 +6,7 @@ import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { db } from "@/app/lib/firebase-config";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import Link from "next/link";
+import ErrorIndicator from "./ErrorIndicator";
 
 export default function DatenschutzhinweisComponent({
   open,
@@ -17,7 +18,7 @@ export default function DatenschutzhinweisComponent({
   const [openState, setOpenState] = useState(open);
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    doc(db, "settings", "settings")
   );
 
   return (
@@ -49,7 +50,7 @@ export default function DatenschutzhinweisComponent({
               <strong>Datenschutzhinweis</strong>
             </p>
           </header>
-          {error && <p>{error.message}</p>}
+          {error && <ErrorIndicator error={error} />}
           {loading && (
             <LoadingSpinner>Lade Datenschutzhinweis...</LoadingSpinner>
           )}

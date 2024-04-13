@@ -14,6 +14,7 @@ import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import type { Question } from "@/app/lib/types/Question";
+import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 
 interface IFormData {
   name: string;
@@ -57,7 +58,7 @@ export default function Home() {
           question: question.question,
           answer: data[`question${i + 1}`],
         });
-      },
+      }
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
@@ -185,7 +186,9 @@ export default function Home() {
             <div>
               <h3>Fragen</h3>
               <article>
-                {error && `Konnte Fragen nicht laden`}
+                {error && (
+                  <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
+                )}
                 {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
                 {value?.data()!.questions.length === 0 && (
                   <p>
@@ -199,7 +202,7 @@ export default function Home() {
                     .questions.map(
                       (
                         question: { question: string; example: string },
-                        i: number,
+                        i: number
                       ) => {
                         return (
                           <label key={i}>
@@ -211,7 +214,7 @@ export default function Home() {
                                 ? {
                                     "aria-invalid": Object.hasOwn(
                                       errors,
-                                      `question${i + 1}`,
+                                      `question${i + 1}`
                                     ),
                                   }
                                 : {})}
@@ -230,7 +233,7 @@ export default function Home() {
                             )}
                           </label>
                         );
-                      },
+                      }
                     )}
               </article>
             </div>

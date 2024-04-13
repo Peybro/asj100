@@ -5,6 +5,7 @@ import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "@/app/lib/firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
+import ErrorIndicator from "./ErrorIndicator";
 
 export default function InterviewCard({
   id,
@@ -65,7 +66,11 @@ ${getQuestionAnswer()}`;
     return (
       <article>
         <header>
-          {error && <p>Fehler beim Laden des Bildes: {error.message}</p>}
+          {error && (
+            <ErrorIndicator error={error}>
+              <p>Fehler beim Laden des Bildes</p>
+            </ErrorIndicator>
+          )}
           {loading && <p>Lade bild...</p>}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
@@ -101,12 +106,14 @@ ${getQuestionAnswer()}`;
 
   if (showAsList) {
     return (
-      <details>
-        <summary>
-          {name} {age < 18 && <span>({"< 18"})</span>}
-        </summary>
-        <CardContent />
-      </details>
+      <>
+        <details>
+          <summary>
+            {name} {age < 18 && <span>({"< 18"})</span>}
+          </summary>
+          <CardContent />
+        </details>
+      </>
     );
   } else {
     return <CardContent />;

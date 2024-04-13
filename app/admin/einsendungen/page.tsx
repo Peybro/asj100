@@ -1,21 +1,18 @@
 "use client";
 
 import { db } from "@/app/lib/firebase-config";
-import { collection, doc } from "firebase/firestore";
+import { collection } from "firebase/firestore";
 import InterviewCard from "@/app/lib/components/InterviewCard";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { useState } from "react";
-import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
 import Toolbar from "@/app/lib/components/Toolbar";
+import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(
-    collection(db, "kurzinterviews"),
-  );
-
-  const [answersValue, answersLoading, answersError] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    collection(db, "kurzinterviews")
   );
 
   const [editMode, setEditMode] = useState(false);
@@ -58,7 +55,7 @@ ${getQuestionAnswer(interview.answers)}
           age: number;
           picture: string;
           answers: Answer[];
-        },
+        }
       );
     });
 
@@ -75,9 +72,6 @@ ${getQuestionAnswer(interview.answers)}
       <h1>Einsendungen</h1>
 
       <Toolbar>
-        {/* <Link href="/" role="button">
-          zum Formular
-        </Link>{" "} */}
         <button onClick={downloadAll}>Alle downloaden</button>{" "}
         <button
           className="secondary"
@@ -99,7 +93,7 @@ ${getQuestionAnswer(interview.answers)}
 
       <hr />
       <div>
-        {error && <strong>Fehler: {error.message}</strong>}
+        {error && <ErrorIndicator error={error} />}
         {loading && <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>}
 
         {value && (

@@ -10,6 +10,7 @@ import { Bounce, toast } from "react-toastify";
 import type { Question } from "@/app/lib/types/Question";
 import type { Datenschutz } from "@/app/lib/types/Datenschutz";
 import Toolbar from "@/app/lib/components/Toolbar";
+import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 
 function Close() {
   return (
@@ -50,7 +51,7 @@ export default function Einstellungen() {
   } = useForm<IFormData>();
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    doc(db, "settings", "settings")
   );
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -139,7 +140,7 @@ export default function Einstellungen() {
         </button>
       </Toolbar>
 
-      {error && <strong>Fehler: {error.message}</strong>}
+      {error && <ErrorIndicator error={error} />}
       {loading && <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>}
 
       {!loading && questions && datenschutz && (
@@ -166,7 +167,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `question${i + 1}`,
+                                `question${i + 1}`
                               ),
                             }
                           : {})}
@@ -193,7 +194,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `example${i + 1}`,
+                                `example${i + 1}`
                               ),
                             }
                           : {})}
@@ -240,7 +241,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-title${i + 1}`,
+                              `ds-title${i + 1}`
                             ),
                           }
                         : {})}
@@ -267,7 +268,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-text${i + 1}`,
+                              `ds-text${i + 1}`
                             ),
                           }
                         : {})}
