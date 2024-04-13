@@ -4,6 +4,11 @@ import { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 
+interface IFormData {
+  email: string;
+  password: string;
+}
+
 export default function Login() {
   // form-hooks
   const {
@@ -11,16 +16,16 @@ export default function Login() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm<IFormData>();
 
   const [user, loading, error] = useAuthState(auth);
 
   const [loginError, setLoginError] = useState(false);
 
-  async function login(data: {email:string; password:string}) {
+  async function login(data: { email: string; password: string }) {
     try {
       const email = data.email;
-      const password= data.password;
+      const password = data.password;
 
       await signInWithEmailAndPassword(auth, email, password);
       setLoginError(false);

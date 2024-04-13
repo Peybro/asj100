@@ -17,18 +17,13 @@ import type { Question } from "@/app/lib/types/Question";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-const schema = z.object({
-  name: z.string().min(1),
-  age: z.number().min(1),
-  picture: z.string(),
-  answers: z.array(
-    z.object({
-      question: z.string(),
-      answer: z.string(),
-    })
-  ),
-  terms: z.boolean(),
-});
+interface IFormData {
+  name: string;
+  age: number;
+  picture: string;
+  questions: Question[];
+  terms: boolean;
+}
 
 export default function Home() {
   // form-hooks
@@ -37,9 +32,7 @@ export default function Home() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    resolver: zodResolver(schema),
-  });
+  } = useForm<IFormData>();
 
   // firebase-hooks
   const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
@@ -65,7 +58,7 @@ export default function Home() {
           question: question.question,
           answer: data[`question${i + 1}`],
         });
-      }
+      },
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
@@ -207,7 +200,7 @@ export default function Home() {
                     .questions.map(
                       (
                         question: { question: string; example: string },
-                        i: number
+                        i: number,
                       ) => {
                         return (
                           <label key={i}>
@@ -219,7 +212,7 @@ export default function Home() {
                                 ? {
                                     "aria-invalid": Object.hasOwn(
                                       errors,
-                                      `question${i + 1}`
+                                      `question${i + 1}`,
                                     ),
                                   }
                                 : {})}
@@ -238,7 +231,7 @@ export default function Home() {
                             )}
                           </label>
                         );
-                      }
+                      },
                     )}
               </article>
             </div>

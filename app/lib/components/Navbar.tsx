@@ -8,7 +8,7 @@ export default function Navbar({ user }: { user: any }) {
   const path = usePathname();
 
   function logout() {
-    signOut(auth).then(_ => router.push("/admin"));
+    signOut(auth).then((_) => router.push("/admin"));
   }
 
   return (

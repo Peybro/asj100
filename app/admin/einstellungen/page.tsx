@@ -29,6 +29,13 @@ function Close() {
   );
 }
 
+interface IFormData {
+  [key: `question${number}`]: string;
+  [key: `example${number}`]: string;
+  [key: `ds-title${number}`]: string;
+  [key: `ds-text${number}`]: string;
+}
+
 export default function Einstellungen() {
   // form-hooks
   const {
@@ -36,7 +43,7 @@ export default function Einstellungen() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm<IFormData>();
 
   const [value, loading, error] = useDocumentOnce(
     doc(db, "settings", "settings"),
