@@ -14,6 +14,21 @@ import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import type { Question } from "@/app/lib/types/Question";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const schema = z.object({
+  name: z.string().min(1),
+  age: z.number().min(1),
+  picture: z.string(),
+  answers: z.array(
+    z.object({
+      question: z.string(),
+      answer: z.string(),
+    })
+  ),
+  terms: z.boolean().isTrue(),
+});
 
 export default function Home() {
   // form-hooks
@@ -22,7 +37,9 @@ export default function Home() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
 
   // firebase-hooks
   const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
