@@ -7,6 +7,7 @@ import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { useState } from "react";
 import { useCollection, useDocumentOnce } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
+import Toolbar from "@/app/lib/components/Toolbar";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(
@@ -73,7 +74,7 @@ ${getQuestionAnswer(interview.answers)}
     <>
       <h1>Einsendungen</h1>
 
-      <div className="grid mb-2">
+      <Toolbar>
         {/* <Link href="/" role="button">
           zum Formular
         </Link>{" "} */}
@@ -84,9 +85,7 @@ ${getQuestionAnswer(interview.answers)}
         >
           {editMode ? "Fertig" : "Bearbeiten"}
         </button>
-      </div>
-
-      <hr />
+      </Toolbar>
 
       <label>
         <input
@@ -99,7 +98,6 @@ ${getQuestionAnswer(interview.answers)}
       </label>
 
       <hr />
-
       <div>
         {error && <strong>Fehler: {error.message}</strong>}
         {loading && <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>}

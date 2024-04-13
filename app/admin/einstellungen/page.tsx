@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 import type { Question } from "@/app/lib/types/Question";
 import type { Datenschutz } from "@/app/lib/types/Datenschutz";
+import Toolbar from "@/app/lib/components/Toolbar";
 
 function Close() {
   return (
@@ -31,8 +32,11 @@ function Close() {
 
 interface IFormData {
   [key: `question${number}`]: string;
+
   [key: `example${number}`]: string;
+
   [key: `ds-title${number}`]: string;
+
   [key: `ds-text${number}`]: string;
 }
 
@@ -46,7 +50,7 @@ export default function Einstellungen() {
   } = useForm<IFormData>();
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -124,11 +128,16 @@ export default function Einstellungen() {
     <>
       <h1>Einstellungen</h1>
 
-      <div className="grid mb-2 sticky top-5">
-        <button form="settingsForm" onClick={safeSettings} disabled={loading}>
+      <Toolbar>
+        <button
+          form="settingsForm"
+          onClick={safeSettings}
+          disabled={loading}
+          className=""
+        >
           Speichern
         </button>
-      </div>
+      </Toolbar>
 
       {error && <strong>Fehler: {error.message}</strong>}
       {loading && <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>}
@@ -157,7 +166,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `question${i + 1}`
+                                `question${i + 1}`,
                               ),
                             }
                           : {})}
@@ -184,7 +193,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `example${i + 1}`
+                                `example${i + 1}`,
                               ),
                             }
                           : {})}
@@ -231,7 +240,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-title${i + 1}`
+                              `ds-title${i + 1}`,
                             ),
                           }
                         : {})}
@@ -258,7 +267,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-text${i + 1}`
+                              `ds-text${i + 1}`,
                             ),
                           }
                         : {})}

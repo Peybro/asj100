@@ -4,12 +4,12 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/app/lib/firebase-config";
 import Login from "@/app/lib/components/Login";
 import Navbar from "@/app/lib/components/Navbar";
-import React from "react";
+import { ReactNode } from "react";
 
 export default function AdminLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   const [user, loading, error] = useAuthState(auth);
 
