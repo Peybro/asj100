@@ -72,7 +72,10 @@ ${getQuestionAnswer(interview.answers)}
       <h1>Einsendungen</h1>
 
       <Toolbar>
-        <button onClick={downloadAll}>Alle downloaden</button>{" "}
+        {/* <Link href="/" role="button">
+          zum Formular
+        </Link>{" "} */}
+        <button onClick={downloadAll} disabled={value && value?.docs?.length === 0}>Alle downloaden</button>{" "}
         <button
           className="secondary"
           onClick={() => setEditMode((prev) => !prev)}
