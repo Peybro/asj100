@@ -91,7 +91,7 @@ export default function Home() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/*  <fieldset>
+        <fieldset>
           <div className="flex flex-col lg:flex-row gap-2">
             <div>
               <h3>Über dich</h3>
@@ -190,7 +190,7 @@ export default function Home() {
                     .questions.map(
                       (
                         question: { question: string; example: string },
-                        i: number,
+                        i: number
                       ) => {
                         return (
                           <label key={i}>
@@ -202,7 +202,7 @@ export default function Home() {
                                 ? {
                                     "aria-invalid": Object.hasOwn(
                                       errors,
-                                      `question${i + 1}`,
+                                      `question${i + 1}`
                                     ),
                                   }
                                 : {})}
@@ -221,7 +221,7 @@ export default function Home() {
                             )}
                           </label>
                         );
-                      },
+                      }
                     )}
               </article>
             </div>
@@ -257,7 +257,7 @@ export default function Home() {
           type="submit"
           value={uploading ? "Lade hoch..." : "Abschicken"}
           disabled={uploading || !value}
-        />*/}
+        />
       </form>
     </main>
   );
