@@ -18,7 +18,7 @@ export default function DatenschutzhinweisComponent({
   const [openState, setOpenState] = useState(open);
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
 
   return (

@@ -9,12 +9,12 @@
 }
 
 .bleed:before {
-  content:"";
-  z-index:-1;
-  position:absolute;
-  top:0;
-  bottom:0;
-  left:-100vw;
-  right:-100vw;
-  background:inherit;
+  content: "";
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -100vw;
+  right: -100vw;
+  background: inherit;
 }

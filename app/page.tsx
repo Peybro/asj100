@@ -58,7 +58,7 @@ export default function Home() {
           question: question.question,
           answer: data[`question${i + 1}`],
         });
-      }
+      },
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
@@ -202,7 +202,7 @@ export default function Home() {
                     .questions.map(
                       (
                         question: { question: string; example: string },
-                        i: number
+                        i: number,
                       ) => {
                         return (
                           <label key={i}>
@@ -214,7 +214,7 @@ export default function Home() {
                                 ? {
                                     "aria-invalid": Object.hasOwn(
                                       errors,
-                                      `question${i + 1}`
+                                      `question${i + 1}`,
                                     ),
                                   }
                                 : {})}
@@ -233,7 +233,7 @@ export default function Home() {
                             )}
                           </label>
                         );
-                      }
+                      },
                     )}
               </article>
             </div>

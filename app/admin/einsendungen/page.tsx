@@ -12,7 +12,7 @@ import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 
 export default function Einsendungen() {
   const [value, loading, error] = useCollection(
-    collection(db, "kurzinterviews")
+    collection(db, "kurzinterviews"),
   );
 
   const [editMode, setEditMode] = useState(false);
@@ -55,7 +55,7 @@ ${getQuestionAnswer(interview.answers)}
           age: number;
           picture: string;
           answers: Answer[];
-        }
+        },
       );
     });
 
@@ -75,7 +75,12 @@ ${getQuestionAnswer(interview.answers)}
         {/* <Link href="/" role="button">
           zum Formular
         </Link>{" "} */}
-        <button onClick={downloadAll} disabled={value && value?.docs?.length === 0}>Alle downloaden</button>{" "}
+        <button
+          onClick={downloadAll}
+          disabled={value && value?.docs?.length === 0}
+        >
+          Alle downloaden
+        </button>{" "}
         <button
           className="secondary"
           onClick={() => setEditMode((prev) => !prev)}
