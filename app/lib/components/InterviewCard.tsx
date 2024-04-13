@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "@/app/lib/firebase-config";

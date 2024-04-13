@@ -24,6 +24,7 @@ export default function Login() {
 
       await signInWithEmailAndPassword(auth, email, password);
       setLoginError(false);
+      reset();
     } catch (error) {
       setLoginError(true);
     }

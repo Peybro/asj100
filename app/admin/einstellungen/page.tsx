@@ -244,7 +244,6 @@ export default function Einstellungen() {
                   <label>
                     Text
                     <textarea
-                      type="text"
                       defaultValue={hinweis.text}
                       {...(Object.hasOwn(errors, `ds-text${i + 1}`)
                         ? {

@@ -3,13 +3,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@/app/lib/firebase-config";
 import { signOut } from "firebase/auth";
 
-export default function Navbar({ user }) {
+export default function Navbar({ user }: { user: any }) {
   const router = useRouter();
   const path = usePathname();
 
   function logout() {
-    signOut(auth);
-    router.push("/admin");
+    signOut(auth).then(_ => router.push("/admin"));
   }
 
   return (

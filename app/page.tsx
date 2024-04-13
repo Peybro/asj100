@@ -52,7 +52,7 @@ export default function Home() {
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
-    setDoc(interviewRef, {
+    await setDoc(interviewRef, {
       id: now,
       name,
       age,
