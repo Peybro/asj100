@@ -46,7 +46,7 @@ export default function Einstellungen() {
   } = useForm<IFormData>();
 
   const [value, loading, error] = useDocumentOnce(
-    doc(db, "settings", "settings"),
+    doc(db, "settings", "settings")
   );
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -104,7 +104,8 @@ export default function Einstellungen() {
   }
 
   function removeQuestion(index: number) {
-    setQuestions((prev) => [...prev.toSpliced(index, 1)]);
+    // setQuestions((prev) => [...prev.toSpliced(index, 1)]);
+    setQuestions((prev) => prev.filter((_, i) => i !== index));
   }
 
   function addHinweis(e) {
@@ -115,7 +116,8 @@ export default function Einstellungen() {
   }
 
   function removeHinweis(index: number) {
-    setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
+    // setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
+    setDatenschutz((prev) => prev.filter((_, i) => i !== index));
   }
 
   return (
@@ -155,7 +157,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `question${i + 1}`,
+                                `question${i + 1}`
                               ),
                             }
                           : {})}
@@ -182,7 +184,7 @@ export default function Einstellungen() {
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `example${i + 1}`,
+                                `example${i + 1}`
                               ),
                             }
                           : {})}
@@ -229,7 +231,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-title${i + 1}`,
+                              `ds-title${i + 1}`
                             ),
                           }
                         : {})}
@@ -256,7 +258,7 @@ export default function Einstellungen() {
                         ? {
                             "aria-invalid": Object.hasOwn(
                               errors,
-                              `ds-text${i + 1}`,
+                              `ds-text${i + 1}`
                             ),
                           }
                         : {})}
