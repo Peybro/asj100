@@ -27,7 +27,7 @@ const schema = z.object({
       answer: z.string(),
     })
   ),
-  terms: z.boolean().isTrue(),
+  terms: z.boolean(),
 });
 
 export default function Home() {
