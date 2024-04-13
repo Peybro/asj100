@@ -78,7 +78,7 @@ ${getQuestionAnswer(interview.answers)}
         {/* <Link href="/" role="button">
           zum Formular
         </Link>{" "} */}
-        <button onClick={downloadAll}>Alle downloaden</button>{" "}
+        <button onClick={downloadAll} disabled={value && value?.docs?.length === 0}>Alle downloaden</button>{" "}
         <button
           className="secondary"
           onClick={() => setEditMode((prev) => !prev)}
