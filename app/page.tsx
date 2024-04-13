@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import asj100 from "./../../public/100JahreASJLogo_RGB_4zu3.png";
+import asj100 from "public/100JahreASJLogo_RGB_4zu3.png";
 import { useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
