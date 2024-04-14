@@ -110,7 +110,7 @@ export default function Home() {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <fieldset>
-          <div className="flex flex-col lg:flex-row gap-2">
+          <div className="autogrid">
             <div>
               <h3>Über dich</h3>
               <article>

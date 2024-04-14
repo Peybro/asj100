@@ -19,3 +19,10 @@ body {
   background: #13171f !important;
   // border: 1px solid white !important;
 }
+
+// use this instead of the default tailwind grid as it doesn't work well with the pico grid
+.autogrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0.5rem;
+}

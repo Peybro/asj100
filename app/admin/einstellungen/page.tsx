@@ -159,7 +159,7 @@ export default function Einstellungen() {
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
           <fieldset>
             <h3>Fragen</h3>
-            <div className="flex flex-col lg:flex-row gap-2">
+            <div className="autogrid">
               {questions.map((question, i) => {
                 return (
                   <article key={`question${i}`}>
@@ -238,7 +238,7 @@ export default function Einstellungen() {
             </button>
 
             <h3>Datenschutzhinweis</h3>
-            <div className="flex flex-col lg:flex-row gap-2">
+            <div className="autogrid">
               {datenschutz.map((hinweis, i) => (
                 <article key={`hinweis${i}`}>
                   <header className="flex justify-between">
