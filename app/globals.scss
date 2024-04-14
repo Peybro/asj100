@@ -14,3 +14,8 @@ body {
   margin-left: 50%;
   transform: translateX(-50%);
 }
+
+.Toastify__toast--success {
+  background: #13171f !important;
+  // border: 1px solid white !important;
+}

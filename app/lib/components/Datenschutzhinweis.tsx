@@ -8,6 +8,9 @@ import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import Link from "next/link";
 import ErrorIndicator from "./ErrorIndicator";
 
+/**
+ * Displays the privacy policy
+ */
 export default function DatenschutzhinweisComponent({
   open,
   closable = true,

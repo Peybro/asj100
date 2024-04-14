@@ -3,7 +3,7 @@
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
@@ -33,11 +33,8 @@ function Close() {
 
 interface IFormData {
   [key: `question${number}`]: string;
-
   [key: `example${number}`]: string;
-
   [key: `ds-title${number}`]: string;
-
   [key: `ds-text${number}`]: string;
 }
 
@@ -63,20 +60,24 @@ export default function Einstellungen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
 
-  async function safeSettings(data) {
+  /**
+   * Save settings to Firestore
+   * @param data - Form data
+   */
+  async function safeSettings(data: IFormData) {
     const settings = {
       questions: [],
       datenschutzhinweis: [],
     };
 
-    questions.forEach((question, i) => {
+    questions.forEach((_, i) => {
       settings.questions.push({
         question: data[`question${i + 1}`],
         example: data[`example${i + 1}`],
       });
     });
 
-    datenschutz.forEach((question, i) => {
+    datenschutz.forEach((_, i) => {
       settings.datenschutzhinweis.push({
         title: data[`ds-title${i + 1}`],
         text: data[`ds-text${i + 1}`],
@@ -86,7 +87,7 @@ export default function Einstellungen() {
     try {
       await setDoc(doc(db, "settings", "settings"), settings, { merge: true });
       toast.success("Einstellungen gespeichert", {
-        position: "top-right",
+        position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -101,25 +102,41 @@ export default function Einstellungen() {
     }
   }
 
-  function addQuestion(e) {
+  /**
+   * Add a new question to the form
+   * @param e - MouseEvent
+   */
+  function addQuestion(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
     const newQuestion: Question = { question: "", example: "" };
     setQuestions((prev) => [...prev, newQuestion]);
   }
 
+  /**
+   * Remove a question from the form
+   * @param index - Index of the question
+   */
   function removeQuestion(index: number) {
     // setQuestions((prev) => [...prev.toSpliced(index, 1)]);
     setQuestions((prev) => prev.filter((_, i) => i !== index));
   }
 
-  function addHinweis(e) {
+  /**
+   * Add a new Hinweis to the form
+   * @param e - MouseEvent
+   */
+  function addHinweis(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
     const newHinweis: Datenschutz = { title: "", text: "" };
     setDatenschutz((prev) => [...prev, newHinweis]);
   }
 
+  /**
+   * Remove a Hinweis from the form
+   * @param index - Index of the Hinweis
+   */
   function removeHinweis(index: number) {
     // setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
     setDatenschutz((prev) => prev.filter((_, i) => i !== index));
@@ -130,12 +147,7 @@ export default function Einstellungen() {
       <h1>Einstellungen</h1>
 
       <Toolbar>
-        <button
-          form="settingsForm"
-          onClick={safeSettings}
-          disabled={loading}
-          className=""
-        >
+        <button form="settingsForm" disabled={loading} className="">
           Speichern
         </button>
       </Toolbar>
@@ -176,6 +188,10 @@ export default function Einstellungen() {
                           required: {
                             value: true,
                             message: "Bitte eine Frage angeben.",
+                          },
+                          minLength: {
+                            value: 5,
+                            message: `Die Frage muss mindestens 5 Zeichen lang sein.`,
                           },
                         })}
                       />
@@ -248,8 +264,12 @@ export default function Einstellungen() {
                       aria-describedby={`valid-helper-ds-title${i + 1}`}
                       {...register(`ds-title${i + 1}`, {
                         required: {
-                          value: false,
+                          value: true,
                           message: `Bitte einen Titel für den Hinweis angeben.`,
+                        },
+                        minLength: {
+                          value: 10,
+                          message: `Der Titel muss mindestens 10 Zeichen lang sein.`,
                         },
                       })}
                     />
@@ -275,8 +295,12 @@ export default function Einstellungen() {
                       aria-describedby={`valid-helper-ds-text${i + 1}`}
                       {...register(`ds-text${i + 1}`, {
                         required: {
-                          value: false,
+                          value: true,
                           message: `Bitte eine Beschreibung für den Hinweis angeben.`,
+                        },
+                        minLength: {
+                          value: 10,
+                          message: `Der Hinweis muss mindestens 10 Zeichen lang sein.`,
                         },
                       })}
                     />

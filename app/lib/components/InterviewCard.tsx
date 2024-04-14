@@ -7,6 +7,9 @@ import { deleteDoc, doc } from "firebase/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
 import ErrorIndicator from "./ErrorIndicator";
 
+/**
+ * Displays a card with the information of an interview
+ */
 export default function InterviewCard({
   id,
   imgPath,
@@ -28,7 +31,11 @@ export default function InterviewCard({
 
   const [url, loading, error] = useDownloadURL(storageRef);
 
-  function getQuestionAnswer() {
+  /**
+   * Builds the answer string for a person in a readable format
+   * @returns String with all answers
+   */
+  function buildAnswerString() {
     let returnAnswer = "";
 
     answers.forEach((answer: Answer) => {
@@ -39,12 +46,15 @@ export default function InterviewCard({
     return returnAnswer;
   }
 
+  /**
+   * Downloads the interview as a text file
+   */
   async function download() {
     const link = document.createElement("a");
     const content = `Name: ${name}, Alter: ${age}
 Bild: ${imgPath}
 
-${getQuestionAnswer()}`;
+${buildAnswerString()}`;
 
     const file = new Blob([content], { type: "text/plain" });
     link.href = URL.createObjectURL(file);
@@ -53,6 +63,9 @@ ${getQuestionAnswer()}`;
     URL.revokeObjectURL(link.href);
   }
 
+  /**
+   * Removes the interview from the database and its picture storage
+   */
   async function remove() {
     try {
       await deleteDoc(doc(db, "kurzinterviews", id));
@@ -62,7 +75,11 @@ ${getQuestionAnswer()}`;
     }
   }
 
-  function CardContent() {
+  /**
+   * Card content
+   * @returns Card content
+   */
+  function CardContent(): JSX.Element {
     return (
       <article>
         <header>

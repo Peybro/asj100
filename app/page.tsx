@@ -37,7 +37,7 @@ export default function Home() {
 
   // firebase-hooks
   const [settingsValue, settingsLoading, settingsError] = useDocument(
-    doc(db, "settings", "settings")
+    doc(db, "settings", "settings"),
   );
   const [uploadFile, uploading, snapshot, uploadError] = useUploadFile();
   const [user, userLoading, userError] = useAuthState(auth);
@@ -46,6 +46,10 @@ export default function Home() {
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
 
+  /**
+   * Submits the form data
+   * @param data - The form data
+   */
   async function onSubmit(data: IFormData) {
     const name = data.name;
     const age = data.age;
@@ -62,7 +66,7 @@ export default function Home() {
           question: question.question,
           answer: data[`question${i + 1}`],
         });
-      }
+      },
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
@@ -80,7 +84,7 @@ export default function Home() {
 
     reset();
     toast.success("Vielen Dank für deine Teilnahme!", {
-      position: "top-right",
+      position: "top-center",
       autoClose: 8000,
       hideProgressBar: false,
       closeOnClick: true,
@@ -217,7 +221,7 @@ export default function Home() {
                     .questions.map(
                       (
                         question: { question: string; example: string },
-                        i: number
+                        i: number,
                       ) => {
                         return (
                           <label key={i}>
@@ -231,7 +235,7 @@ export default function Home() {
                                 ? {
                                     "aria-invalid": Object.hasOwn(
                                       errors,
-                                      `question${i + 1}`
+                                      `question${i + 1}`,
                                     ),
                                   }
                                 : {})}
@@ -255,7 +259,7 @@ export default function Home() {
                             )}
                           </label>
                         );
-                      }
+                      },
                     )}
               </article>
             </div>
@@ -281,7 +285,7 @@ export default function Home() {
             und bin mit dem Speichern meiner Daten einverstanden.
           </label>
           {errors.terms && (
-            <small id="valid-helper-terms" className="text-red-300">
+            <small id="valid-helper-terms" className="text-red-400">
               {errors.terms?.message! as string}
             </small>
           )}

@@ -1,5 +1,8 @@
 import { ReactNode } from "react";
 
+/**
+ * Displays an error message
+ */
 export default function ErrorIndicator({
   children,
   error,

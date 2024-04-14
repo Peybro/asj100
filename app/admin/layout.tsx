@@ -17,7 +17,7 @@ export default function AdminLayout({
     <>
       <Navbar user={user} />
 
-      {!user && <Login />}
+      {!user && <Login user={user} loading={loading} error={error} />}
 
       {user && children}
     </>

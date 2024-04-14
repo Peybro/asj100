@@ -1,5 +1,9 @@
 import { ReactNode } from "react";
 
+/**
+ * Displays a toolbar at the top of the page
+ * @param children - The children to display in the toolbar
+ */
 export default function ToolBar({
   children,
 }: Readonly<{

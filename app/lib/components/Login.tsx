@@ -10,7 +10,10 @@ interface IFormData {
   password: string;
 }
 
-export default function Login() {
+/**
+ * Displays a login form
+ */
+export default function Login({ user, loading, error }) {
   // form-hooks
   const {
     register,
@@ -19,15 +22,20 @@ export default function Login() {
     formState: { errors },
   } = useForm<IFormData>();
 
-  const [user, loading, error] = useAuthState(auth);
-
   const [loginError, setLoginError] = useState(false);
 
-  async function login(data: { email: string; password: string }) {
+  /**
+   * Logs in a user
+   * @param loginObject - The login object containing email and password
+   */
+  async function login({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) {
     try {
-      const email = data.email;
-      const password = data.password;
-
       await signInWithEmailAndPassword(auth, email, password);
       setLoginError(false);
       reset();
@@ -36,6 +44,9 @@ export default function Login() {
     }
   }
 
+  /**
+   * Logs out the current user
+   */
   const logout = () => {
     signOut(auth);
   };
