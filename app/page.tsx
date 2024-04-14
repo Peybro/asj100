@@ -20,7 +20,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 interface IFormData {
   name: string;
   age: number;
-  picture: string;
+  picture: (Blob | Uint8Array | ArrayBuffer)[];
   terms: boolean;
 
   [key: `question${number}`]: string[];
@@ -36,7 +36,9 @@ export default function Home() {
   } = useForm<IFormData>();
 
   // firebase-hooks
-  const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
+  const [settingsValue, settingsLoading, settingsError] = useDocument(
+    doc(db, "settings", "settings")
+  );
   const [uploadFile, uploading, snapshot, uploadError] = useUploadFile();
   const [user, userLoading, userError] = useAuthState(auth);
 
@@ -44,7 +46,7 @@ export default function Home() {
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
 
-  async function onSubmit(data) {
+  async function onSubmit(data: IFormData) {
     const name = data.name;
     const age = data.age;
     const picture = data.picture[0];
@@ -54,7 +56,7 @@ export default function Home() {
     const pictureName = `${name}_${now}.jpg`;
 
     const answers = [];
-    (value.data()!.questions as Question[]).forEach(
+    (settingsValue.data()!.questions as Question[]).forEach(
       (question: Question, i: number) => {
         answers.push({
           question: question.question,
@@ -123,6 +125,11 @@ export default function Home() {
                         message:
                           "Bitte teil uns mit wie du heißt damit wir dich zuordnen können.",
                       },
+                      minLength: {
+                        value: 2,
+                        message:
+                          "Dein Name muss mindestens 2 Zeichen lang sein.",
+                      },
                     })}
                   />
                   {errors.name && (
@@ -145,6 +152,10 @@ export default function Home() {
                         value: true,
                         message:
                           "Bitte gib dein Alter an. (siehe Datenschutzhinweis)",
+                      },
+                      min: {
+                        value: 3,
+                        message: "Du musst mindestens 3 Jahre alt sein.",
                       },
                     })}
                   />
@@ -188,18 +199,20 @@ export default function Home() {
             <div>
               <h3>Fragen</h3>
               <article>
-                {error && (
+                {settingsError && (
                   <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
                 )}
-                {loading && <LoadingSpinner>Lade Fragen</LoadingSpinner>}
-                {value?.data()!.questions.length === 0 && (
+                {settingsLoading && (
+                  <LoadingSpinner>Lade Fragen</LoadingSpinner>
+                )}
+                {settingsValue?.data()!.questions.length === 0 && (
                   <p>
                     Keine Fragen?? Komm zu einem späteren Zeitpunkt bitte
                     wieder...
                   </p>
                 )}
-                {value?.data()!.questions.length > 0 &&
-                  value
+                {settingsValue?.data()!.questions.length > 0 &&
+                  settingsValue
                     ?.data()!
                     .questions.map(
                       (
@@ -208,7 +221,9 @@ export default function Home() {
                       ) => {
                         return (
                           <label key={i}>
-                            {!loading && value && question.question}
+                            {!settingsLoading &&
+                              settingsValue &&
+                              question.question}
                             <input
                               type="text"
                               placeholder={question.example}
@@ -225,6 +240,11 @@ export default function Home() {
                                 required: {
                                   value: true,
                                   message: "Bitte beantworte diese Frage.",
+                                },
+                                minLength: {
+                                  value: 5,
+                                  message:
+                                    "Deine Antwort sollte mindestens 5 Zeichen lang sein.",
                                 },
                               })}
                             />
@@ -270,7 +290,7 @@ export default function Home() {
         <input
           type="submit"
           value={uploading ? "Lade hoch..." : "Abschicken"}
-          disabled={uploading || !value}
+          disabled={uploading || !settingsValue}
         />
       </form>
     </main>
