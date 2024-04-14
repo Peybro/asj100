@@ -6,9 +6,11 @@ export default function ToolBar({
   children: ReactNode;
 }>) {
   return (
-    <div className="sticky top-0 pt-5 backdrop-blur-md">
-      <div className="grid mb-2">{children}</div>
-      <hr />
-    </div>
+    <>
+      <div className="bleed sticky top-0 pt-5 backdrop-blur-md">
+        <div className="grid mb-2 container">{children}</div>
+        <hr />
+      </div>
+    </>
   );
 }

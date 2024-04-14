@@ -15,7 +15,7 @@ export default function Navbar({ user }: { user: any }) {
     <nav>
       <ul>
         <li>
-          <strong>Dashboard</strong>
+          <strong>Adminboard</strong>
         </li>
       </ul>
       <ul>

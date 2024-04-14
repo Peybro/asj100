@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "firebase/firestore";
-import { db, storage } from "@/app/lib/firebase-config";
+import { auth, db, storage } from "@/app/lib/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
 import DatenschutzhinweisComponent from "@/app/lib/components/Datenschutzhinweis";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
@@ -15,6 +15,7 @@ import { Bounce, toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import type { Question } from "@/app/lib/types/Question";
 import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 interface IFormData {
   name: string;
@@ -37,6 +38,7 @@ export default function Home() {
   // firebase-hooks
   const [value, loading, error] = useDocument(doc(db, "settings", "settings"));
   const [uploadFile, uploading, snapshot, uploadError] = useUploadFile();
+  const [user, userLoading, userError] = useAuthState(auth);
 
   // states
   const [directCam, setDirectCam] = useState(false);
@@ -58,7 +60,7 @@ export default function Home() {
           question: question.question,
           answer: data[`question${i + 1}`],
         });
-      },
+      }
     );
 
     const interviewRef = doc(db, "kurzinterviews", now);
@@ -94,10 +96,10 @@ export default function Home() {
         <Image
           src={asj100}
           alt="Logo für 100 Jahre ASJ"
-          height={130}
+          width={200}
           onClick={() => setClickCounter((prev) => prev + 1)}
         />
-        {clickCounter >= 5 && <Link href="/admin">Dashboard</Link>}
+        {(clickCounter >= 5 || user) && <Link href="/admin">Adminboard</Link>}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -202,7 +204,7 @@ export default function Home() {
                     .questions.map(
                       (
                         question: { question: string; example: string },
-                        i: number,
+                        i: number
                       ) => {
                         return (
                           <label key={i}>
@@ -214,7 +216,7 @@ export default function Home() {
                                 ? {
                                     "aria-invalid": Object.hasOwn(
                                       errors,
-                                      `question${i + 1}`,
+                                      `question${i + 1}`
                                     ),
                                   }
                                 : {})}
@@ -233,7 +235,7 @@ export default function Home() {
                             )}
                           </label>
                         );
-                      },
+                      }
                     )}
               </article>
             </div>
