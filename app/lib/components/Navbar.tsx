@@ -62,9 +62,9 @@ export default function Navbar({ user }: { user: any }) {
         </li>
         {user && (
           <>
-            <li className="hidden md:block">
+            <div className="hidden md:block">
               <NavContent />
-            </li>
+            </div>
             <li className="md:hidden">
               <details className="dropdown">
                 <summary role="button">

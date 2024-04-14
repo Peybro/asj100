@@ -22,8 +22,8 @@ export default function EinsendungenComponent() {
   const [showAsList, setShowAsList] = useState(true);
 
   useEffect(() => {
-    if (value.docs.length === 0) setEditMode(false);
-  }, [value.docs]);
+    if (value?.docs?.length === 0) setEditMode(false);
+  }, [value?.docs]);
 
   /**
    * Builds the answer string for a person in a readable format
@@ -67,7 +67,7 @@ ${buildAnswerString(interview.answers)}
     const link = document.createElement("a");
 
     let content = "";
-    value?.docs.forEach((interview) => {
+    (value?.docs).forEach((interview) => {
       content += addPerson(
         interview.data() as {
           id: string;
