@@ -4,7 +4,7 @@ import { db } from "@/app/lib/firebase-config";
 import { collection } from "firebase/firestore";
 import InterviewCard from "@/app/lib/components/InterviewCard";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
 import Toolbar from "@/app/lib/components/Toolbar";
@@ -20,6 +20,10 @@ export default function EinsendungenComponent() {
 
   const [editMode, setEditMode] = useState(false);
   const [showAsList, setShowAsList] = useState(true);
+
+  useEffect(() => {
+    if (value.docs.length === 0) setEditMode(false);
+  }, [value.docs]);
 
   /**
    * Builds the answer string for a person in a readable format
