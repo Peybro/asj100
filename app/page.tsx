@@ -293,7 +293,11 @@ export default function Home() {
 
         <input
           type="submit"
-          value={uploading ? "Lade hoch..." : "Abschicken"}
+          value={
+            uploading
+              ? `Lade hoch... ${snapshot.bytesTransferred > 0 ? ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(0) + "%" : ""}`
+              : "Abschicken"
+          }
           disabled={uploading || !settingsValue}
         />
       </form>

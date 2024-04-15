@@ -6,19 +6,17 @@ import Login from "@/app/lib/components/Login";
 import Navbar from "@/app/lib/components/Navbar";
 import { ReactNode } from "react";
 
-export default function AdminLayout({
-  children,
-}: Readonly<{
+type AdminLayoutProps = {
   children: ReactNode;
-}>) {
-  const [user, loading, error] = useAuthState(auth);
+};
+
+export default function AdminLayout({ children }: AdminLayoutProps) {
+  const [user, userLoading, userError] = useAuthState(auth);
 
   return (
     <>
       <Navbar user={user} />
-
-      {!user && <Login user={user} loading={loading} error={error} />}
-
+      {!user && <Login user={user} loading={userLoading} error={userError} />}
       {user && children}
     </>
   );

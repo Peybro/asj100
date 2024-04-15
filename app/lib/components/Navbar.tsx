@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@/app/lib/firebase-config";
-import { signOut } from "firebase/auth";
+import { signOut, User } from "firebase/auth";
+
+type NavbarProps = {
+  user: User;
+};
 
 /**
  * Displays the admin navbar
  */
-export default function Navbar({ user }: { user: any }) {
+export default function Navbar({ user }: NavbarProps) {
   const router = useRouter();
   const path = usePathname();
 

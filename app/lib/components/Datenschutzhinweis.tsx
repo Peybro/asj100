@@ -7,6 +7,12 @@ import { db } from "@/app/lib/firebase-config";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import Link from "next/link";
 import ErrorIndicator from "./ErrorIndicator";
+import { Datenschutz } from "@/app/lib/types/Datenschutz";
+
+type DatenschutzhinweisComponentProps = {
+  open: boolean;
+  closable?: boolean;
+};
 
 /**
  * Displays the privacy policy
@@ -14,15 +20,14 @@ import ErrorIndicator from "./ErrorIndicator";
 export default function DatenschutzhinweisComponent({
   open,
   closable = true,
-}: {
-  open: boolean;
-  closable?: boolean;
-}) {
-  const [openState, setOpenState] = useState(open);
-
-  const [value, loading, error] = useDocumentOnce(
+}: DatenschutzhinweisComponentProps) {
+  // Firebase hooks
+  const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
     doc(db, "settings", "settings"),
   );
+
+  // Local state
+  const [openState, setOpenState] = useState(open);
 
   return (
     <>
@@ -53,24 +58,26 @@ export default function DatenschutzhinweisComponent({
               <strong>Datenschutzhinweis</strong>
             </p>
           </header>
-          {error && <ErrorIndicator error={error} />}
-          {loading && (
+          {settingsError && <ErrorIndicator error={settingsError} />}
+          {settingsLoading && (
             <LoadingSpinner>Lade Datenschutzhinweis...</LoadingSpinner>
           )}
-          {!loading && value && (
+          {!settingsLoading && settingsValue && (
             <>
-              {value?.data()!.datenschutzhinweis.length === 0 && (
+              {settingsValue?.data()!.datenschutzhinweis.length === 0 && (
                 <p>Noch keine Datenschutzbestimmungen angegeben...</p>
               )}
-              {value?.data()!.datenschutzhinweis.length > 0 &&
-                value?.data()!.datenschutzhinweis.map((hinweis) => {
-                  return (
-                    <>
-                      <h4>{hinweis.title}</h4>
-                      <p>{hinweis.text}</p>
-                    </>
-                  );
-                })}
+              {settingsValue?.data()!.datenschutzhinweis.length > 0 &&
+                settingsValue
+                  ?.data()!
+                  .datenschutzhinweis.map((hinweis: Datenschutz, i: number) => {
+                    return (
+                      <div key={`hinweis${i}`}>
+                        <h4>{hinweis.title}</h4>
+                        <p>{hinweis.text}</p>
+                      </div>
+                    );
+                  })}
             </>
           )}
           <footer>

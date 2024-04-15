@@ -1,35 +1,31 @@
-"use client";
-
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { db, storage } from "@/app/lib/firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
 import ErrorIndicator from "./ErrorIndicator";
+import { Interview } from "@/app/lib/types/Interview";
+
+type InterviewCardProps = {
+  interview: Interview;
+  editMode: boolean;
+  onRemove: () => void;
+  showAsList: boolean;
+};
 
 /**
  * Displays a card with the information of an interview
  */
 export default function InterviewCard({
-  id,
-  imgPath,
-  name,
-  age,
-  answers,
+  interview,
   editMode,
+  onRemove,
   showAsList,
-}: {
-  id: string;
-  imgPath: string;
-  name: string;
-  age: number;
-  answers: Answer[];
-  editMode: boolean;
-  showAsList: boolean;
-}) {
-  const storageRef = ref(storage, `portraits/${imgPath}`);
+}: InterviewCardProps) {
+  const { id, name, age, picture, answers } = interview;
 
-  const [url, loading, error] = useDownloadURL(storageRef);
+  const storageRef = ref(storage, `portraits/${picture}`);
+  const [url, urlLoading, urlError] = useDownloadURL(storageRef);
 
   /**
    * Builds the answer string for a person in a readable format
@@ -52,7 +48,7 @@ export default function InterviewCard({
   async function download() {
     const link = document.createElement("a");
     const content = `Name: ${name}, Alter: ${age}
-Bild: ${imgPath}
+Bild: ${picture}
 
 ${buildAnswerString()}`;
 
@@ -70,6 +66,7 @@ ${buildAnswerString()}`;
     try {
       await deleteDoc(doc(db, "kurzinterviews", id));
       await deleteObject(storageRef);
+      onRemove();
     } catch (error) {
       console.error(error);
     }
@@ -83,14 +80,14 @@ ${buildAnswerString()}`;
     return (
       <article>
         <header>
-          {error && (
-            <ErrorIndicator error={error}>
+          {urlError && (
+            <ErrorIndicator error={urlError}>
               <p>Fehler beim Laden des Bildes</p>
             </ErrorIndicator>
           )}
-          {loading && <p>Lade bild...</p>}
+          {urlLoading && <p>Lade bild...</p>}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {!loading && url && <img src={url} alt={`Bild von ${name}`} />}
+          {!urlLoading && url && <img src={url} alt={`Bild von ${name}`} />}
         </header>
 
         <p>

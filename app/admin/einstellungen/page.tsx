@@ -33,8 +33,11 @@ function Close() {
 
 interface IFormData {
   [key: `question${number}`]: string;
+
   [key: `example${number}`]: string;
+
   [key: `ds-title${number}`]: string;
+
   [key: `ds-text${number}`]: string;
 }
 
@@ -43,22 +46,24 @@ export default function Einstellungen() {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<IFormData>();
 
-  const [value, loading, error] = useDocumentOnce(
+  // Firestore hooks
+  const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
     doc(db, "settings", "settings"),
   );
 
+  // Local state
   const [questions, setQuestions] = useState<Question[]>([]);
   const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
 
   useEffect(() => {
-    setQuestions(value?.data()!.questions as Question[]);
-    setDatenschutz(value?.data()!.datenschutzhinweis as Datenschutz[]);
+    if (settingsLoading) return;
+    setQuestions(settingsValue?.data()!.questions as Question[]);
+    setDatenschutz(settingsValue?.data()!.datenschutzhinweis as Datenschutz[]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [settingsLoading]);
 
   /**
    * Save settings to Firestore
@@ -147,15 +152,17 @@ export default function Einstellungen() {
       <h1>Einstellungen</h1>
 
       <Toolbar>
-        <button form="settingsForm" disabled={loading} className="">
+        <button form="settingsForm" disabled={settingsLoading} className="">
           Speichern
         </button>
       </Toolbar>
 
-      {error && <ErrorIndicator error={error} />}
-      {loading && <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>}
+      {settingsError && <ErrorIndicator error={settingsError} />}
+      {settingsLoading && (
+        <LoadingSpinner>Lade Einstellungen...</LoadingSpinner>
+      )}
 
-      {!loading && questions && datenschutz && (
+      {!settingsLoading && questions && datenschutz && (
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
           <fieldset>
             <h3>Fragen</h3>

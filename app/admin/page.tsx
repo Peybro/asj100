@@ -7,17 +7,17 @@ import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 import EinsendungenComponent from "../lib/components/EinsendungenComponent";
 
 export default function Admin() {
-  const [user, loading, error] = useAuthState(auth);
+  const [user, userLoading, userError] = useAuthState(auth);
 
   return (
     <>
-      {error && (
-        <ErrorIndicator error={error}>
+      {userError && (
+        <ErrorIndicator error={userError}>
           <p>Fehler beim Laden des Nutzers</p>
         </ErrorIndicator>
       )}
-      {loading && <LoadingSpinner>Lade Nutzer...</LoadingSpinner>}
-      {!loading && user && <p>Angemeldet mit {user?.email}</p>}
+      {userLoading && <LoadingSpinner>Lade Nutzer...</LoadingSpinner>}
+      {!userLoading && user && <p>Angemeldet mit {user?.email}</p>}
 
       <EinsendungenComponent />
     </>

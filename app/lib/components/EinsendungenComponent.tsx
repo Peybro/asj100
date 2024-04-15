@@ -4,26 +4,25 @@ import { db } from "@/app/lib/firebase-config";
 import { collection } from "firebase/firestore";
 import InterviewCard from "@/app/lib/components/InterviewCard";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
 import Toolbar from "@/app/lib/components/Toolbar";
 import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
+import { Interview } from "../types/Interview";
 
 /**
  * Shows all interviews that have been submitted
  */
 export default function EinsendungenComponent() {
-  const [value, loading, error] = useCollection(
+  // Firebase hooks
+  const [interviewsValue, interviewsLoading, interviewsError] = useCollection(
     collection(db, "kurzinterviews"),
   );
 
+  // Local state
   const [editMode, setEditMode] = useState(false);
   const [showAsList, setShowAsList] = useState(true);
-
-  useEffect(() => {
-    if (value?.docs?.length === 0) setEditMode(false);
-  }, [value?.docs]);
 
   /**
    * Builds the answer string for a person in a readable format
@@ -67,7 +66,7 @@ ${buildAnswerString(interview.answers)}
     const link = document.createElement("a");
 
     let content = "";
-    (value?.docs).forEach((interview) => {
+    (interviewsValue?.docs).forEach((interview) => {
       content += addPerson(
         interview.data() as {
           id: string;
@@ -92,19 +91,16 @@ ${buildAnswerString(interview.answers)}
       <h1>Einsendungen</h1>
 
       <Toolbar>
-        {/* <Link href="/" role="button">
-          zum Formular
-        </Link>{" "} */}
         <button
           onClick={downloadAll}
-          disabled={value && value?.docs?.length === 0}
+          disabled={interviewsValue && interviewsValue?.docs?.length === 0}
         >
           Alle downloaden
         </button>{" "}
         <button
           className="secondary"
           onClick={() => setEditMode((prev) => !prev)}
-          disabled={value && value?.docs?.length === 0}
+          disabled={interviewsValue && interviewsValue?.docs?.length === 0}
         >
           {editMode ? "Fertig" : "Bearbeiten"}
         </button>
@@ -122,23 +118,27 @@ ${buildAnswerString(interview.answers)}
 
       <hr />
       <div>
-        {error && <ErrorIndicator error={error} />}
-        {loading && <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>}
+        {interviewsError && <ErrorIndicator error={interviewsError} />}
+        {interviewsLoading && (
+          <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>
+        )}
 
-        {value && (
-          <div className="grid">
-            {value.docs.length === 0 && <p>Keine Einsendungen</p>}
-            {value.docs.length > 0 &&
-              value.docs.map((interview) => {
+        {!interviewsLoading && interviewsValue && (
+          <div className="autogrid">
+            {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
+            {interviewsValue.docs.length > 0 &&
+              interviewsValue.docs.map((interviewData) => {
+                const interview = interviewData.data() as Interview;
+
                 return (
                   <InterviewCard
-                    key={interview.data().id as string}
-                    id={interview.data().id as string}
-                    imgPath={interview.data().picture as string}
-                    name={interview.data().name as string}
-                    age={interview.data().age as number}
-                    answers={interview.data().answers as Answer[]}
+                    key={interview.id}
+                    interview={interview}
                     editMode={editMode}
+                    onRemove={() => {
+                      if (interviewsValue?.docs?.length === 0)
+                        setEditMode(false);
+                    }}
                     showAsList={showAsList}
                   />
                 );

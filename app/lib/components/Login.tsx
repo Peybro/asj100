@@ -1,9 +1,14 @@
 import { auth } from "@/app/lib/firebase-config";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, User } from "firebase/auth";
 import { useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
 import { useForm } from "react-hook-form";
 import ErrorIndicator from "./ErrorIndicator";
+
+type LoginProps = {
+  user: User;
+  loading: boolean;
+  error: Error;
+};
 
 interface IFormData {
   email: string;
@@ -13,7 +18,7 @@ interface IFormData {
 /**
  * Displays a login form
  */
-export default function Login({ user, loading, error }) {
+export default function Login({ user, loading, error }: LoginProps) {
   // form-hooks
   const {
     register,
@@ -22,6 +27,7 @@ export default function Login({ user, loading, error }) {
     formState: { errors },
   } = useForm<IFormData>();
 
+  // Local state
   const [loginError, setLoginError] = useState(false);
 
   /**
