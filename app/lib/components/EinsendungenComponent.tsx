@@ -116,15 +116,14 @@ ${buildAnswerString(interview.answers)}
         Liste
       </label>
 
-      <hr />
-      <div>
+      <div className="mt-5">
         {interviewsError && <ErrorIndicator error={interviewsError} />}
         {interviewsLoading && (
           <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>
         )}
 
         {!interviewsLoading && interviewsValue && (
-          <div className="autogrid">
+          <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
             {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
             {interviewsValue.docs.length > 0 &&
               interviewsValue.docs.map((interviewData) => {

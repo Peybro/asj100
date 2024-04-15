@@ -207,7 +207,17 @@ export default function Home() {
                   <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
                 )}
                 {settingsLoading && (
-                  <LoadingSpinner>Lade Fragen</LoadingSpinner>
+                  <div className="article space-y-6">
+                    {Array.from({ length: 3 }).map((_, i) => {
+                      return (
+                        <div key={i} className="space-y-1 animate-pulse">
+                          <div className="h-5 w-full rounded-sm bg-slate-500"></div>
+                          <div className="h-5 w-full rounded-sm bg-slate-500"></div>
+                          <div className="h-14 w-full rounded-md border border-slate-600 bg-gray-800"></div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
                 {settingsValue?.data()!.questions.length === 0 && (
                   <p>
@@ -300,6 +310,16 @@ export default function Home() {
           }
           disabled={uploading || !settingsValue}
         />
+        {/* {uploading && snapshot.bytesTransferred > 0 && (
+          <progress
+            value={(
+              (snapshot.bytesTransferred / snapshot.totalBytes) *
+              100
+            ).toFixed(0)}
+            max="100"
+          />
+        )}
+        {uploading && snapshot.bytesTransferred === 0 && <progress />} */}
       </form>
     </main>
   );

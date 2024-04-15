@@ -5,6 +5,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import type { Answer } from "@/app/lib/types/Answer";
 import ErrorIndicator from "./ErrorIndicator";
 import { Interview } from "@/app/lib/types/Interview";
+import LoadingSpinner from "./LoadingSpinner";
 
 type InterviewCardProps = {
   interview: Interview;
@@ -85,9 +86,11 @@ ${buildAnswerString()}`;
               <p>Fehler beim Laden des Bildes</p>
             </ErrorIndicator>
           )}
-          {urlLoading && <p>Lade bild...</p>}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {!urlLoading && url && <img src={url} alt={`Bild von ${name}`} />}
+          {urlLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
+          {!urlLoading && url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt={`Bild von ${name}`} className="w-full" />
+          )}
         </header>
 
         <p>
@@ -106,8 +109,8 @@ ${buildAnswerString()}`;
           );
         })}
 
-        <footer>
-          <button onClick={download}>Download</button>{" "}
+        <footer className="grid md:grid-cols-1 sm:grid-cols-2">
+          <button onClick={download}>Download</button>
           {editMode && (
             <button className="bg-red-500 border-red-500" onClick={remove}>
               Löschen
