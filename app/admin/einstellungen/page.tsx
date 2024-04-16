@@ -40,6 +40,8 @@ export default function Einstellungen() {
   const {
     register,
     handleSubmit,
+    setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
@@ -52,12 +54,31 @@ export default function Einstellungen() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
 
+  // Set form values from Firestore to local state
   useEffect(() => {
     if (settingsLoading) return;
     setQuestions(settingsValue?.data()!.questions as Question[]);
     setDatenschutz(settingsValue?.data()!.datenschutzhinweis as Datenschutz[]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsLoading]);
+
+  // Set form values from local state to form
+  useEffect(() => {
+    questions.forEach((question, i) => {
+      setValue(`question${i + 1}`, question.question);
+      setValue(`example${i + 1}`, question.example);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questions]);
+
+  // Set form values from local state to form
+  useEffect(() => {
+    datenschutz.forEach((hinweis, i) => {
+      setValue(`ds-title${i + 1}`, hinweis.title);
+      setValue(`ds-text${i + 1}`, hinweis.text);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [datenschutz]);
 
   /**
    * Save settings to Firestore
@@ -97,7 +118,10 @@ export default function Einstellungen() {
         transition: Bounce,
       });
     } catch (error) {
-      console.error(error);
+      setError("root", {
+        message:
+          "Fehler beim Speichern der Einstellungen. Bitte versuche es erneut.",
+      });
     }
   };
 
@@ -149,6 +173,7 @@ export default function Einstellungen() {
         <button form="settingsForm" disabled={!settingsValue || isSubmitting}>
           {isSubmitting ? "Speichert..." : "Speichern"}
         </button>
+        {errors.root && <ErrorIndicator>{errors.root.message}</ErrorIndicator>}
       </Toolbar>
 
       {settingsError && <ErrorIndicator error={settingsError} />}
@@ -161,7 +186,7 @@ export default function Einstellungen() {
           <fieldset>
             <h3>Fragen</h3>
             <div className="autogrid">
-              {questions.map((question, i) => {
+              {questions.map((_, i) => {
                 return (
                   <article key={`question${i}`}>
                     <header className="flex justify-between">
@@ -175,7 +200,6 @@ export default function Einstellungen() {
                       Frage
                       <input
                         type="text"
-                        defaultValue={question.question}
                         {...(Object.hasOwn(errors, `question${i + 1}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
@@ -206,7 +230,6 @@ export default function Einstellungen() {
                       Beispiel
                       <input
                         type="text"
-                        defaultValue={question.example}
                         {...(Object.hasOwn(errors, `example${i + 1}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
@@ -234,13 +257,17 @@ export default function Einstellungen() {
               })}
             </div>
 
+            {questions.length === 0 && (
+              <p>Es wurden noch keine Fragen hinzugefügt.</p>
+            )}
+
             <button type="submit" className="secondary" onClick={addQuestion}>
               Neue Frage
             </button>
 
             <h3>Datenschutzhinweis</h3>
             <div className="autogrid">
-              {datenschutz.map((hinweis, i) => (
+              {datenschutz.map((_, i) => (
                 <article key={`hinweis${i}`}>
                   <header className="flex justify-between">
                     <p>Hinweis {i + 1}</p>
@@ -253,7 +280,6 @@ export default function Einstellungen() {
                     Titel
                     <input
                       type="text"
-                      defaultValue={hinweis.title}
                       {...(Object.hasOwn(errors, `ds-title${i + 1}`)
                         ? {
                             "aria-invalid": Object.hasOwn(
@@ -284,7 +310,6 @@ export default function Einstellungen() {
                   <label>
                     Text
                     <textarea
-                      defaultValue={hinweis.text}
                       {...(Object.hasOwn(errors, `ds-text${i + 1}`)
                         ? {
                             "aria-invalid": Object.hasOwn(
@@ -314,6 +339,10 @@ export default function Einstellungen() {
                 </article>
               ))}
             </div>
+
+            {datenschutz.length === 0 && (
+              <p>Es wurden noch keine Hinweise hinzugefügt.</p>
+            )}
 
             <button type="submit" className="secondary" onClick={addHinweis}>
               Neuer Hinweis
