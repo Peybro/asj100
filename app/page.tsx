@@ -300,7 +300,7 @@ export default function Home() {
           type="submit"
           value={
             isSubmitting
-              ? `Lade hoch... ${snapshot.bytesTransferred > 0 ? ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(0) + "%" : ""}`
+              ? `Lade hoch... ${snapshot?.bytesTransferred > 0 ? ((snapshot?.bytesTransferred / snapshot?.totalBytes) * 100).toFixed(0) + "%" : ""}`
               : "Abschicken"
           }
           disabled={isSubmitting || !settingsValue}
