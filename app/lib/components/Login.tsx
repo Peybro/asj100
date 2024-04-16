@@ -1,8 +1,6 @@
 import { auth } from "@/app/lib/firebase-config";
 import { signInWithEmailAndPassword, signOut, User } from "firebase/auth";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import ErrorIndicator from "./ErrorIndicator";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type LoginProps = {
   user: User;
@@ -10,10 +8,10 @@ type LoginProps = {
   error: Error;
 };
 
-interface IFormData {
+type FormData = {
   email: string;
   password: string;
-}
+};
 
 /**
  * Displays a login form
@@ -24,36 +22,29 @@ export default function Login({ user, loading, error }: LoginProps) {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
-  } = useForm<IFormData>();
-
-  // Local state
-  const [loginError, setLoginError] = useState(false);
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
   /**
    * Logs in a user
    * @param loginObject - The login object containing email and password
    */
-  async function login({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) {
+  const handleLogin: SubmitHandler<FormData> = async ({ email, password }) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      setLoginError(false);
       reset();
     } catch (error) {
-      setLoginError(true);
+      setError("root", {
+        message: "Falsche Anmeldedaten...",
+      });
     }
-  }
+  };
 
   /**
    * Logs out the current user
    */
-  const logout = () => {
+  const handleLogout = () => {
     signOut(auth);
   };
 
@@ -75,13 +66,13 @@ export default function Login({ user, loading, error }: LoginProps) {
     return (
       <div>
         <p>Aktueller Nutzer: {user.email}</p>
-        <button onClick={logout}>Abmelden</button>
+        <button onClick={handleLogout}>Abmelden</button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(login)}>
+    <form onSubmit={handleSubmit(handleLogin)}>
       <fieldset>
         <label>
           Email
@@ -97,12 +88,14 @@ export default function Login({ user, loading, error }: LoginProps) {
                 value: true,
                 message: "Bitte Email angeben",
               },
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: "Bitte gültige Email angeben",
+              },
             })}
           />
           {errors.email && (
-            <small id="valid-helper-email">
-              {errors.email?.message! as string}
-            </small>
+            <small id="valid-helper-email">{errors.email?.message}</small>
           )}
         </label>
 
@@ -123,19 +116,17 @@ export default function Login({ user, loading, error }: LoginProps) {
             })}
           />
           {errors.password && (
-            <small id="valid-helper-password">
-              {errors.password?.message! as string}
-            </small>
+            <small id="valid-helper-password">{errors.password?.message}</small>
           )}
         </label>
       </fieldset>
 
-      {loginError && (
-        <ErrorIndicator>
-          <p className="text-red-400">Falsche Anmeldedaten...</p>
-        </ErrorIndicator>
-      )}
-      <input type="submit" value="Anmelden" />
+      <input
+        type="submit"
+        value={isSubmitting ? "Meldet an..." : "Anmelden"}
+        disabled={isSubmitting}
+      />
+      {errors.root && <small aria-invalid="true">{errors.root?.message}</small>}
     </form>
   );
 }

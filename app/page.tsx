@@ -12,19 +12,18 @@ import { useUploadFile } from "react-firebase-hooks/storage";
 import DatenschutzhinweisComponent from "@/app/lib/components/Datenschutzhinweis";
 import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import type { Question } from "@/app/lib/types/Question";
 import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-interface IFormData {
+type FormData = {
   name: string;
   age: number;
   picture: (Blob | Uint8Array | ArrayBuffer)[];
-  terms: boolean;
-
   [key: `question${number}`]: string[];
-}
+  terms: boolean;
+};
 
 export default function Home() {
   // form-hooks
@@ -32,8 +31,8 @@ export default function Home() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
-  } = useForm<IFormData>();
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
   // firebase-hooks
   const [settingsValue, settingsLoading, settingsError] = useDocument(
@@ -47,10 +46,10 @@ export default function Home() {
   const [clickCounter, setClickCounter] = useState<number>(0);
 
   /**
-   * Submits the form data
-   * @param data - The form data
+   * Handles the form submission
+   * @param data
    */
-  async function onSubmit(data: IFormData) {
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     const name = data.name;
     const age = data.age;
     const picture = data.picture[0];
@@ -94,7 +93,7 @@ export default function Home() {
       theme: "dark",
       transition: Bounce,
     });
-  }
+  };
 
   return (
     <main>
@@ -137,9 +136,7 @@ export default function Home() {
                     })}
                   />
                   {errors.name && (
-                    <small id="valid-helper-name">
-                      {errors.name?.message! as string}
-                    </small>
+                    <small id="valid-helper-name">{errors.name?.message}</small>
                   )}
                 </label>
                 <label>
@@ -164,9 +161,7 @@ export default function Home() {
                     })}
                   />
                   {errors.age && (
-                    <small id="valid-helper-age">
-                      {errors.age?.message! as string}
-                    </small>
+                    <small id="valid-helper-age">{errors.age?.message}</small>
                   )}
                 </label>
                 <label>
@@ -189,7 +184,7 @@ export default function Home() {
                   />
                   {errors.picture ? (
                     <small id="valid-helper-picture">
-                      {errors.picture?.message! as string}
+                      {errors.picture?.message}
                     </small>
                   ) : (
                     <small id="picture-helper">
@@ -264,7 +259,7 @@ export default function Home() {
                             />
                             {errors[`question${i + 1}`] && (
                               <small id={`valid-helper-question${i + 1}`}>
-                                {errors[`question${i + 1}`]?.message! as string}
+                                {errors[`question${i + 1}`]?.message}
                               </small>
                             )}
                           </label>
@@ -296,7 +291,7 @@ export default function Home() {
           </label>
           {errors.terms && (
             <small id="valid-helper-terms" className="text-red-400">
-              {errors.terms?.message! as string}
+              {errors.terms?.message}
             </small>
           )}
         </fieldset>
@@ -304,11 +299,11 @@ export default function Home() {
         <input
           type="submit"
           value={
-            uploading
+            isSubmitting
               ? `Lade hoch... ${snapshot.bytesTransferred > 0 ? ((snapshot.bytesTransferred / snapshot.totalBytes) * 100).toFixed(0) + "%" : ""}`
               : "Abschicken"
           }
-          disabled={uploading || !settingsValue}
+          disabled={isSubmitting || !settingsValue}
         />
         {/* {uploading && snapshot.bytesTransferred > 0 && (
           <progress

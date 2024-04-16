@@ -5,7 +5,7 @@ import { db } from "@/app/lib/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import { MouseEvent, useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 import type { Question } from "@/app/lib/types/Question";
 import type { Datenschutz } from "@/app/lib/types/Datenschutz";
@@ -31,23 +31,17 @@ function Close() {
   );
 }
 
-interface IFormData {
-  [key: `question${number}`]: string;
-
-  [key: `example${number}`]: string;
-
-  [key: `ds-title${number}`]: string;
-
-  [key: `ds-text${number}`]: string;
-}
+type FormData = {
+  [key: `${"question" | "example" | "ds-title" | "ds-text"}${number}`]: string;
+};
 
 export default function Einstellungen() {
   // form-hooks
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<IFormData>();
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
   // Firestore hooks
   const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
@@ -69,7 +63,7 @@ export default function Einstellungen() {
    * Save settings to Firestore
    * @param data - Form data
    */
-  async function safeSettings(data: IFormData) {
+  const safeSettings: SubmitHandler<FormData> = async (data) => {
     const settings = {
       questions: [],
       datenschutzhinweis: [],
@@ -105,7 +99,7 @@ export default function Einstellungen() {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   /**
    * Add a new question to the form
@@ -152,8 +146,8 @@ export default function Einstellungen() {
       <h1>Einstellungen</h1>
 
       <Toolbar>
-        <button form="settingsForm" disabled={settingsLoading} className="">
-          Speichern
+        <button form="settingsForm" disabled={!settingsValue || isSubmitting}>
+          {isSubmitting ? "Speichert..." : "Speichern"}
         </button>
       </Toolbar>
 
@@ -204,7 +198,7 @@ export default function Einstellungen() {
                       />
                       {errors[`question${i + 1}`] && (
                         <small id={`valid-helper-question${i + 1}`}>
-                          {errors[`question${i + 1}`]?.message! as string}
+                          {errors[`question${i + 1}`]?.message}
                         </small>
                       )}
                     </label>
@@ -231,7 +225,7 @@ export default function Einstellungen() {
                       />
                       {errors[`example${i + 1}`] && (
                         <small id={`valid-helper-example${i + 1}`}>
-                          {errors[`example${i + 1}`]?.message! as string}
+                          {errors[`example${i + 1}`]?.message}
                         </small>
                       )}
                     </label>
@@ -282,7 +276,7 @@ export default function Einstellungen() {
                     />
                     {errors[`ds-title${i + 1}`] && (
                       <small id={`valid-helper-ds-title${i + 1}`}>
-                        {errors[`ds-title${i + 1}`]?.message! as string}
+                        {errors[`ds-title${i + 1}`]?.message}
                       </small>
                     )}
                   </label>
@@ -313,7 +307,7 @@ export default function Einstellungen() {
                     />
                     {errors[`ds-text${i + 1}`] && (
                       <small id={`valid-helper-ds-text${i + 1}`}>
-                        {errors[`ds-text${i + 1}`]?.message! as string}
+                        {errors[`ds-text${i + 1}`]?.message}
                       </small>
                     )}
                   </label>
