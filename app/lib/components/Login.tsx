@@ -1,6 +1,7 @@
 import { auth } from "@/app/lib/firebase-config";
 import { signInWithEmailAndPassword, signOut, User } from "firebase/auth";
 import { SubmitHandler, useForm } from "react-hook-form";
+import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 
 type LoginProps = {
   user: User;
@@ -56,23 +57,13 @@ export default function Login({ user, loading, error }: LoginProps) {
     );
   }
   if (error) {
-    return (
-      <div>
-        <p>Fehler: {error.message}</p>
-      </div>
-    );
-  }
-  if (user) {
-    return (
-      <div>
-        <p>Aktueller Nutzer: {user.email}</p>
-        <button onClick={handleLogout}>Abmelden</button>
-      </div>
-    );
+    return <ErrorIndicator error={error} />;
   }
 
   return (
     <article>
+      <h2>Login</h2>
+
       <form onSubmit={handleSubmit(handleLogin)}>
         <fieldset>
           <label>
