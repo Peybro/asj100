@@ -10,14 +10,13 @@ import { doc, setDoc } from "firebase/firestore";
 import { auth, db, storage } from "@/app/lib/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
 import DatenschutzhinweisComponent from "@/app/lib/components/Datenschutzhinweis";
-import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
 import { Bounce, toast } from "react-toastify";
 import { SubmitHandler, useForm } from "react-hook-form";
 import type { Question } from "@/app/lib/types/Question";
 import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
-import QuestionSkeletonLoader from "./lib/components/QuestionSkeletonLoader";
-
+import QuestionSkeletonLoader from "@/app/lib/components/QuestionSkeletonLoader";
+ 
 type FormData = {
   name: string;
   age: number;
