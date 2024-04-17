@@ -72,61 +72,67 @@ export default function Login({ user, loading, error }: LoginProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(handleLogin)}>
-      <fieldset>
-        <label>
-          Email
-          <input
-            type="email"
-            placeholder="Email"
-            {...(Object.hasOwn(errors, "email")
-              ? { "aria-invalid": Object.hasOwn(errors, "email") }
-              : {})}
-            aria-describedby="valid-helper-email"
-            {...register("email", {
-              required: {
-                value: true,
-                message: "Bitte Email angeben",
-              },
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                message: "Bitte gültige Email angeben",
-              },
-            })}
-          />
-          {errors.email && (
-            <small id="valid-helper-email">{errors.email?.message}</small>
-          )}
-        </label>
+    <article>
+      <form onSubmit={handleSubmit(handleLogin)}>
+        <fieldset>
+          <label>
+            Email
+            <input
+              type="email"
+              placeholder="Email"
+              {...(Object.hasOwn(errors, "email")
+                ? { "aria-invalid": Object.hasOwn(errors, "email") }
+                : {})}
+              aria-describedby="valid-helper-email"
+              {...register("email", {
+                required: {
+                  value: true,
+                  message: "Bitte Email angeben",
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                  message: "Bitte gültige Email angeben",
+                },
+              })}
+            />
+            {errors.email && (
+              <small id="valid-helper-email">{errors.email?.message}</small>
+            )}
+          </label>
 
-        <label>
-          Passwort
-          <input
-            type="password"
-            placeholder="Passwort"
-            {...(Object.hasOwn(errors, "password")
-              ? { "aria-invalid": Object.hasOwn(errors, "password") }
-              : {})}
-            aria-describedby="valid-helper-password"
-            {...register("password", {
-              required: {
-                value: true,
-                message: "Bitte Passwort angeben",
-              },
-            })}
-          />
-          {errors.password && (
-            <small id="valid-helper-password">{errors.password?.message}</small>
-          )}
-        </label>
-      </fieldset>
+          <label>
+            Passwort
+            <input
+              type="password"
+              placeholder="Passwort"
+              {...(Object.hasOwn(errors, "password")
+                ? { "aria-invalid": Object.hasOwn(errors, "password") }
+                : {})}
+              aria-describedby="valid-helper-password"
+              {...register("password", {
+                required: {
+                  value: true,
+                  message: "Bitte Passwort angeben",
+                },
+              })}
+            />
+            {errors.password && (
+              <small id="valid-helper-password">
+                {errors.password?.message}
+              </small>
+            )}
+          </label>
+        </fieldset>
 
-      <input
-        type="submit"
-        value={isSubmitting ? "Meldet an..." : "Anmelden"}
-        disabled={isSubmitting}
-      />
-      {errors.root && <small aria-invalid="true">{errors.root?.message}</small>}
-    </form>
+        <input
+          type="submit"
+          value={isSubmitting ? "Meldet an..." : "Anmelden"}
+          disabled={isSubmitting}
+        />
+        {errors.root && (
+          <small aria-invalid="true">{errors.root?.message}</small>
+        )}
+      </form>
+    </article>
   );
 }
