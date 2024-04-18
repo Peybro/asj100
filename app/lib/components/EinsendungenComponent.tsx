@@ -17,7 +17,7 @@ import { Interview } from "../types/Interview";
 export default function EinsendungenComponent() {
   // Firebase hooks
   const [interviewsValue, interviewsLoading, interviewsError] = useCollection(
-    collection(db, "kurzinterviews"),
+    collection(db, "kurzinterviews")
   );
 
   // Local state
@@ -74,7 +74,7 @@ ${buildAnswerString(interview.answers)}
           age: number;
           picture: string;
           answers: Answer[];
-        },
+        }
       );
     });
 
@@ -93,14 +93,14 @@ ${buildAnswerString(interview.answers)}
       <Toolbar>
         <button
           onClick={downloadAll}
-          disabled={interviewsValue && interviewsValue?.docs?.length === 0}
+          disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
         >
           Alle downloaden
         </button>{" "}
         <button
           className="secondary"
           onClick={() => setEditMode((prev) => !prev)}
-          disabled={interviewsValue && interviewsValue?.docs?.length === 0}
+          disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
         >
           {editMode ? "Fertig" : "Bearbeiten"}
         </button>
