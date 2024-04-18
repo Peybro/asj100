@@ -1,7 +1,7 @@
-import { auth } from "@/app/lib/firebase-config";
+import { auth } from "@/firebase-config";
 import { signInWithEmailAndPassword, signOut, User } from "firebase/auth";
 import { SubmitHandler, useForm } from "react-hook-form";
-import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
+import ErrorIndicator from "@/components/ErrorIndicator";
 
 type LoginProps = {
   user: User;

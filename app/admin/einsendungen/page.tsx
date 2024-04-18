@@ -1,4 +1,4 @@
-import EinsendungenComponent from "@/app/lib/components/EinsendungenComponent";
+import EinsendungenComponent from "@/components/EinsendungenComponent";
 
 export default function EinsendungsPage() {
   return <EinsendungenComponent />;

@@ -1,10 +1,10 @@
 "use client";
 
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/app/lib/firebase-config";
-import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
-import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
-import EinsendungenComponent from "../lib/components/EinsendungenComponent";
+import { auth } from "@/firebase-config";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import ErrorIndicator from "@/components/ErrorIndicator";
+import EinsendungenComponent from "@/components/EinsendungenComponent";
 
 export default function Admin() {
   const [user, userLoading, userError] = useAuthState(auth);

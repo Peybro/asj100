@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { auth } from "@/app/lib/firebase-config";
+import { auth } from "@/firebase-config";
 import { signOut, User } from "firebase/auth";
 
 type NavbarProps = {

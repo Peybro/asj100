@@ -1,16 +1,16 @@
 "use client";
 
-import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
-import { db } from "@/app/lib/firebase-config";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import { db } from "@/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import { MouseEvent, useEffect, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
-import type { Question } from "@/app/lib/types/Question";
-import type { Datenschutz } from "@/app/lib/types/Datenschutz";
-import Toolbar from "@/app/lib/components/Toolbar";
-import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
+import type { Question } from "@/types/Question";
+import type { Datenschutz } from "@/types/Datenschutz";
+import Toolbar from "@/components/Toolbar";
+import ErrorIndicator from "@/components/ErrorIndicator";
 
 function Close() {
   return (
@@ -329,6 +329,7 @@ export default function Einstellungen() {
                           message: `Der Hinweis muss mindestens 10 Zeichen lang sein.`,
                         },
                       })}
+                      rows={5}
                     />
                     {errors[`ds-text${i + 1}`] && (
                       <small id={`valid-helper-ds-text${i + 1}`}>

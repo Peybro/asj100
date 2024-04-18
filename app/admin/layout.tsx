@@ -1,16 +1,12 @@
 "use client";
 
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/app/lib/firebase-config";
-import Login from "@/app/lib/components/Login";
-import Navbar from "@/app/lib/components/Navbar";
+import { auth } from "@/firebase-config";
+import Login from "@/components/Login";
+import Navbar from "@/components/Navbar";
 import { ReactNode } from "react";
 
-type AdminLayoutProps = {
-  children: ReactNode;
-};
-
-export default function AdminLayout({ children }: AdminLayoutProps) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   const [user, userLoading, userError] = useAuthState(auth);
 
   return (

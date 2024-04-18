@@ -1,10 +1,10 @@
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
-import { db, storage } from "@/app/lib/firebase-config";
+import { db, storage } from "@/firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
-import type { Answer } from "@/app/lib/types/Answer";
+import type { Answer } from "@/types/Answer";
 import ErrorIndicator from "./ErrorIndicator";
-import { Interview } from "@/app/lib/types/Interview";
+import { Interview } from "@/types/Interview";
 import LoadingSpinner from "./LoadingSpinner";
 
 type InterviewCardProps = {

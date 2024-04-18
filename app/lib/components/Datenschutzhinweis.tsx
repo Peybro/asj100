@@ -3,11 +3,11 @@
 import { doc } from "firebase/firestore";
 import { useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
-import { db } from "@/app/lib/firebase-config";
-import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
+import { db } from "@/firebase-config";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import Link from "next/link";
 import ErrorIndicator from "./ErrorIndicator";
-import { Datenschutz } from "@/app/lib/types/Datenschutz";
+import { Datenschutz } from "@/types/Datenschutz";
 
 type DatenschutzhinweisComponentProps = {
   open: boolean;
@@ -41,7 +41,7 @@ export default function DatenschutzhinweisComponent({
         Datenschutzhinweis
       </span>
 
-      <dialog open={openState} className="modal-is-opening modal-is-closing">
+      <dialog open={openState}>
         <article>
           <header>
             {closable && (

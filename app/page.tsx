@@ -7,16 +7,16 @@ import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
 import { doc, setDoc } from "firebase/firestore";
-import { auth, db, storage } from "@/app/lib/firebase-config";
+import { auth, db, storage } from "@/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
-import DatenschutzhinweisComponent from "@/app/lib/components/Datenschutzhinweis";
+import DatenschutzhinweisComponent from "@/components/Datenschutzhinweis";
 import { Bounce, toast } from "react-toastify";
 import { SubmitHandler, useForm } from "react-hook-form";
-import type { Question } from "@/app/lib/types/Question";
-import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
+import type { Question } from "@/types/Question";
+import ErrorIndicator from "@/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
-import QuestionSkeletonLoader from "@/app/lib/components/QuestionSkeletonLoader";
- 
+import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
+
 type FormData = {
   name: string;
   age: number;

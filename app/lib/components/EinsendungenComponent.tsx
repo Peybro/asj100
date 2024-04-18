@@ -1,14 +1,14 @@
 "use client";
 
-import { db } from "@/app/lib/firebase-config";
+import { db } from "@/firebase-config";
 import { collection } from "firebase/firestore";
-import InterviewCard from "@/app/lib/components/InterviewCard";
-import LoadingSpinner from "@/app/lib/components/LoadingSpinner";
+import InterviewCard from "@/components/InterviewCard";
+import LoadingSpinner from "@/components/LoadingSpinner";
 import { useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
-import type { Answer } from "@/app/lib/types/Answer";
-import Toolbar from "@/app/lib/components/Toolbar";
-import ErrorIndicator from "@/app/lib/components/ErrorIndicator";
+import type { Answer } from "@/types/Answer";
+import Toolbar from "@/components/Toolbar";
+import ErrorIndicator from "@/components/ErrorIndicator";
 import { Interview } from "../types/Interview";
 
 /**
@@ -17,7 +17,7 @@ import { Interview } from "../types/Interview";
 export default function EinsendungenComponent() {
   // Firebase hooks
   const [interviewsValue, interviewsLoading, interviewsError] = useCollection(
-    collection(db, "kurzinterviews")
+    collection(db, "kurzinterviews"),
   );
 
   // Local state
@@ -45,13 +45,7 @@ export default function EinsendungenComponent() {
    * @param interview Person to add
    * @returns String with all information of the person
    */
-  function addPerson(interview: {
-    id: string;
-    name: string;
-    age: number;
-    picture: string;
-    answers: Answer[];
-  }) {
+  function addPerson(interview: Interview) {
     return `Name: ${interview.name}, Alter: ${interview.age}
 Bild: ${interview.picture}
 
@@ -66,16 +60,9 @@ ${buildAnswerString(interview.answers)}
     const link = document.createElement("a");
 
     let content = "";
-    (interviewsValue?.docs).forEach((interview) => {
-      content += addPerson(
-        interview.data() as {
-          id: string;
-          name: string;
-          age: number;
-          picture: string;
-          answers: Answer[];
-        }
-      );
+    (interviewsValue?.docs).forEach((interviewData) => {
+      const interview = interviewData.data() as Interview;
+      content += addPerson(interview);
     });
 
     const file = new Blob([content], { type: "text/plain" });
