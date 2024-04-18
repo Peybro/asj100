@@ -23,6 +23,7 @@ type FormData = {
   picture: (Blob | Uint8Array | ArrayBuffer)[];
   [key: `question${number}`]: string[];
   terms: boolean;
+  securityQuestion: string;
 };
 
 export default function Home() {
@@ -50,6 +51,10 @@ export default function Home() {
    * @param data
    */
   const onSubmit: SubmitHandler<FormData> = async (data) => {
+    if (data.securityQuestion !== "") {
+      return;
+    }
+
     const name = data.name;
     const age = data.age;
     const picture = data.picture[0];
@@ -282,6 +287,18 @@ export default function Home() {
               {errors.terms?.message}
             </small>
           )}
+
+          <label className="sr-only">
+            <input
+              type="text"
+              {...register("securityQuestion", {
+                required: {
+                  value: false,
+                  message: "Bitte beantworte diese Frage",
+                },
+              })}
+            />
+          </label>
         </fieldset>
 
         <input
