@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write . --plugin=prettier-plugin-tailwindcss"
   },
   "dependencies": {
     "@picocss/pico": "^2.0.6",
@@ -30,6 +30,7 @@
     "eslint-config-prettier": "^9.1.0",
     "postcss": "^8",
     "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.14",
     "sass": "^1.74.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
