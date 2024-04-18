@@ -109,10 +109,10 @@ ${buildAnswerString()}`;
           );
         })}
 
-        <footer className="grid md:grid-cols-1 sm:grid-cols-2">
+        <footer className="grid sm:grid-cols-2 md:grid-cols-1">
           <button onClick={download}>Download</button>
           {editMode && (
-            <button className="bg-red-500 border-red-500" onClick={remove}>
+            <button className="border-red-500 bg-red-500" onClick={remove}>
               Löschen
             </button>
           )}

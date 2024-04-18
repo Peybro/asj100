@@ -110,7 +110,7 @@ ${buildAnswerString(interview.answers)}
         )}
 
         {!interviewsLoading && interviewsValue && (
-          <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
             {interviewsValue.docs.length > 0 &&
               interviewsValue.docs.map((interviewData) => {

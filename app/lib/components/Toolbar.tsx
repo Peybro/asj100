@@ -12,7 +12,7 @@ export default function ToolBar({ children }: ToolbarProps) {
   return (
     <>
       <div className="bleed sticky top-0 pt-5 backdrop-blur-md">
-        <div className="grid mb-2 container">{children}</div>
+        <div className="container mb-2 grid">{children}</div>
         <hr />
       </div>
     </>
