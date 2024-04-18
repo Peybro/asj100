@@ -141,8 +141,7 @@ export default function Einstellungen() {
    * @param index - Index of the question
    */
   function removeQuestion(index: number) {
-    // setQuestions((prev) => [...prev.toSpliced(index, 1)]);
-    setQuestions((prev) => prev.filter((_, i) => i !== index));
+    setQuestions((prev) => [...prev.toSpliced(index, 1)]);
   }
 
   /**
@@ -161,8 +160,7 @@ export default function Einstellungen() {
    * @param index - Index of the Hinweis
    */
   function removeHinweis(index: number) {
-    // setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
-    setDatenschutz((prev) => prev.filter((_, i) => i !== index));
+    setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
   }
 
   return (
