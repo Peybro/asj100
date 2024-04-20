@@ -222,7 +222,7 @@ export default function Home() {
                         i: number,
                       ) => {
                         return (
-                          <label key={i}>
+                          <label key={`question-key-${i}`}>
                             {!settingsLoading &&
                               settingsValue &&
                               question.question}

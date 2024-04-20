@@ -4,7 +4,7 @@ import { auth } from "@/firebase-config";
 import { signOut, User } from "firebase/auth";
 
 type NavbarProps = {
-  user: User;
+  user: User | null | undefined;
 };
 
 /**

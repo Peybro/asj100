@@ -4,9 +4,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import ErrorIndicator from "@/components/ErrorIndicator";
 
 type LoginProps = {
-  user: User;
+  user: User | null | undefined;
   loading: boolean;
-  error: Error;
+  error: Error | undefined;
 };
 
 type FormData = {

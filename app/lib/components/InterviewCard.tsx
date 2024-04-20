@@ -101,7 +101,7 @@ ${buildAnswerString()}`;
         </p>
         {answers.map((answer: Answer, i: number) => {
           return (
-            <div key={i} className="mb-3">
+            <div key={`answer-key-${i}`} className="mb-3">
               <span className="font-bold">{answer.question}</span>
               <br />
               <span>{answer.answer}</span>
