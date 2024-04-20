@@ -57,28 +57,27 @@ export default function Einstellungen() {
   // Set form values from Firestore to local state
   useEffect(() => {
     if (settingsLoading) return;
-    setQuestions(settingsValue?.data()!.questions as Question[]);
-    setDatenschutz(settingsValue?.data()!.datenschutzhinweis as Datenschutz[]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settingsLoading]);
 
-  // Set form values from local state to form
-  useEffect(() => {
-    questions.forEach((question, i) => {
+    const firebaseData = settingsValue?.data();
+    const questionData = firebaseData?.questions as Question[];
+    const datenschutzData = firebaseData?.datenschutzhinweis as Datenschutz[];
+
+    // Set form values with data from Firestore
+    questionData.forEach((question, i) => {
       setValue(`question${i + 1}`, question.question);
       setValue(`example${i + 1}`, question.example);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions]);
 
-  // Set form values from local state to form
-  useEffect(() => {
-    datenschutz.forEach((hinweis, i) => {
+    datenschutzData.forEach((hinweis, i) => {
       setValue(`ds-title${i + 1}`, hinweis.title);
       setValue(`ds-text${i + 1}`, hinweis.text);
     });
+
+    // Set local state
+    setQuestions(questionData);
+    setDatenschutz(datenschutzData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [datenschutz]);
+  }, [settingsLoading]);
 
   /**
    * Save settings to Firestore
