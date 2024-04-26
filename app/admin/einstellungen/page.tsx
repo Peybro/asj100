@@ -11,6 +11,7 @@ import type { Question } from "@/types/Question";
 import type { Datenschutz } from "@/types/Datenschutz";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
+import { set } from "firebase/database";
 
 function Close() {
   return (
@@ -140,7 +141,14 @@ export default function Einstellungen() {
    * @param index - Index of the question
    */
   function removeQuestion(index: number) {
-    setQuestions((prev) => [...prev.toSpliced(index, 1)]);
+    // Set values of the following questions to the previous question because of the way react-hook-form gives the values to the inputs
+    questions.forEach((question, i) => {
+      if (i <= index) return;
+      setValue(`question${i}`, question.question);
+      setValue(`example${i}`, question.example);
+    });
+
+    setQuestions((prev) => prev.filter((_, i) => i !== index));
   }
 
   /**
@@ -159,6 +167,13 @@ export default function Einstellungen() {
    * @param index - Index of the Hinweis
    */
   function removeHinweis(index: number) {
+    // Set values of the following Hinweise to the previous Hinweis because of the way react-hook-form gives the values to the inputs
+    datenschutz.forEach((hinweis, i) => {
+      if (i <= index) return;
+      setValue(`ds-title${i}`, hinweis.title);
+      setValue(`ds-text${i}`, hinweis.text);
+    });
+
     setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
   }
 
@@ -180,171 +195,181 @@ export default function Einstellungen() {
 
       {!settingsLoading && questions && datenschutz && (
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
-          <fieldset>
-            <h3>Fragen</h3>
-            <div className="autogrid">
-              {questions.map((_, i) => {
-                return (
-                  <article key={`question${i}`}>
+          <fieldset className="grid sm:grid-cols-1 lg:grid-cols-2">
+            <div>
+              <h3>Fragen ({questions.length})</h3>
+
+              <button
+                type="submit"
+                className="secondary flex items-center justify-center"
+                onClick={addQuestion}
+              >
+                Neue Frage
+              </button>
+
+              {questions.length === 0 && (
+                <p>Es wurden noch keine Fragen hinzugefügt.</p>
+              )}
+
+              <div className="autogrid">
+                {questions.map((_, i) => {
+                  return (
+                    <article key={`question${i}`}>
+                      <header className="flex justify-between">
+                        <p>Frage {i + 1}</p>
+                        <span onClick={() => removeQuestion(i)}>
+                          <Close />
+                        </span>
+                      </header>
+
+                      <label>
+                        Frage
+                        <textarea
+                          {...(Object.hasOwn(errors, `question${i + 1}`)
+                            ? {
+                                "aria-invalid": Object.hasOwn(
+                                  errors,
+                                  `question${i + 1}`,
+                                ),
+                              }
+                            : {})}
+                          aria-describedby={`valid-helper-question${i + 1}`}
+                          {...register(`question${i + 1}`, {
+                            required: {
+                              value: true,
+                              message: "Bitte eine Frage angeben.",
+                            },
+                            minLength: {
+                              value: 5,
+                              message: `Die Frage muss mindestens 5 Zeichen lang sein.`,
+                            },
+                          })}
+                        />
+                        {errors[`question${i + 1}`] && (
+                          <small id={`valid-helper-question${i + 1}`}>
+                            {errors[`question${i + 1}`]?.message}
+                          </small>
+                        )}
+                      </label>
+                      <label>
+                        Beispiel
+                        <textarea
+                          className="resize-none"
+                          {...(Object.hasOwn(errors, `example${i + 1}`)
+                            ? {
+                                "aria-invalid": Object.hasOwn(
+                                  errors,
+                                  `example${i + 1}`,
+                                ),
+                              }
+                            : {})}
+                          aria-describedby={`valid-helper-example${i + 1}`}
+                          {...register(`example${i + 1}`, {
+                            required: {
+                              value: false,
+                              message: `Bitte ein Beispiel für Frage ${i + 1} angeben.`,
+                            },
+                          })}
+                        />
+                        {errors[`example${i + 1}`] && (
+                          <small id={`valid-helper-example${i + 1}`}>
+                            {errors[`example${i + 1}`]?.message}
+                          </small>
+                        )}
+                      </label>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="hyphens-manual">
+                Daten&shy;schutz&shy;hinweis ({datenschutz.length})
+              </h3>
+
+              <button type="submit" className="secondary" onClick={addHinweis}>
+                Neuer Hinweis
+              </button>
+
+              {datenschutz.length === 0 && (
+                <p>Es wurden noch keine Hinweise hinzugefügt.</p>
+              )}
+
+              <div className="autogrid">
+                {datenschutz.map((_, i) => (
+                  <article key={`hinweis${i}`}>
                     <header className="flex justify-between">
-                      <p>Frage {i + 1}</p>
-                      <span onClick={() => removeQuestion(i)}>
+                      <p>Hinweis {i + 1}</p>
+                      <span onClick={() => removeHinweis(i)}>
                         <Close />
                       </span>
                     </header>
 
                     <label>
-                      Frage
-                      <input
-                        type="text"
-                        {...(Object.hasOwn(errors, `question${i + 1}`)
+                      Titel
+                      <textarea
+                        {...(Object.hasOwn(errors, `ds-title${i + 1}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `question${i + 1}`,
+                                `ds-title${i + 1}`,
                               ),
                             }
                           : {})}
-                        aria-describedby={`valid-helper-question${i + 1}`}
-                        {...register(`question${i + 1}`, {
+                        aria-describedby={`valid-helper-ds-title${i + 1}`}
+                        {...register(`ds-title${i + 1}`, {
                           required: {
                             value: true,
-                            message: "Bitte eine Frage angeben.",
+                            message: `Bitte einen Titel für den Hinweis angeben.`,
                           },
                           minLength: {
-                            value: 5,
-                            message: `Die Frage muss mindestens 5 Zeichen lang sein.`,
+                            value: 10,
+                            message: `Der Titel muss mindestens 10 Zeichen lang sein.`,
                           },
                         })}
                       />
-                      {errors[`question${i + 1}`] && (
-                        <small id={`valid-helper-question${i + 1}`}>
-                          {errors[`question${i + 1}`]?.message}
+                      {errors[`ds-title${i + 1}`] && (
+                        <small id={`valid-helper-ds-title${i + 1}`}>
+                          {errors[`ds-title${i + 1}`]?.message}
                         </small>
                       )}
                     </label>
+
                     <label>
-                      Beispiel
-                      <input
-                        type="text"
-                        {...(Object.hasOwn(errors, `example${i + 1}`)
+                      Text
+                      <textarea
+                        {...(Object.hasOwn(errors, `ds-text${i + 1}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `example${i + 1}`,
+                                `ds-text${i + 1}`,
                               ),
                             }
                           : {})}
-                        aria-describedby={`valid-helper-example${i + 1}`}
-                        {...register(`example${i + 1}`, {
+                        aria-describedby={`valid-helper-ds-text${i + 1}`}
+                        {...register(`ds-text${i + 1}`, {
                           required: {
-                            value: false,
-                            message: `Bitte ein Beispiel für Frage ${i + 1} angeben.`,
+                            value: true,
+                            message: `Bitte eine Beschreibung für den Hinweis angeben.`,
+                          },
+                          minLength: {
+                            value: 10,
+                            message: `Der Hinweis muss mindestens 10 Zeichen lang sein.`,
                           },
                         })}
+                        rows={5}
                       />
-                      {errors[`example${i + 1}`] && (
-                        <small id={`valid-helper-example${i + 1}`}>
-                          {errors[`example${i + 1}`]?.message}
+                      {errors[`ds-text${i + 1}`] && (
+                        <small id={`valid-helper-ds-text${i + 1}`}>
+                          {errors[`ds-text${i + 1}`]?.message}
                         </small>
                       )}
                     </label>
                   </article>
-                );
-              })}
+                ))}
+              </div>
             </div>
-
-            {questions.length === 0 && (
-              <p>Es wurden noch keine Fragen hinzugefügt.</p>
-            )}
-
-            <button type="submit" className="secondary" onClick={addQuestion}>
-              Neue Frage
-            </button>
-
-            <h3>Datenschutzhinweis</h3>
-            <div className="autogrid">
-              {datenschutz.map((_, i) => (
-                <article key={`hinweis${i}`}>
-                  <header className="flex justify-between">
-                    <p>Hinweis {i + 1}</p>
-                    <span onClick={() => removeHinweis(i)}>
-                      <Close />
-                    </span>
-                  </header>
-
-                  <label>
-                    Titel
-                    <input
-                      type="text"
-                      {...(Object.hasOwn(errors, `ds-title${i + 1}`)
-                        ? {
-                            "aria-invalid": Object.hasOwn(
-                              errors,
-                              `ds-title${i + 1}`,
-                            ),
-                          }
-                        : {})}
-                      aria-describedby={`valid-helper-ds-title${i + 1}`}
-                      {...register(`ds-title${i + 1}`, {
-                        required: {
-                          value: true,
-                          message: `Bitte einen Titel für den Hinweis angeben.`,
-                        },
-                        minLength: {
-                          value: 10,
-                          message: `Der Titel muss mindestens 10 Zeichen lang sein.`,
-                        },
-                      })}
-                    />
-                    {errors[`ds-title${i + 1}`] && (
-                      <small id={`valid-helper-ds-title${i + 1}`}>
-                        {errors[`ds-title${i + 1}`]?.message}
-                      </small>
-                    )}
-                  </label>
-
-                  <label>
-                    Text
-                    <textarea
-                      {...(Object.hasOwn(errors, `ds-text${i + 1}`)
-                        ? {
-                            "aria-invalid": Object.hasOwn(
-                              errors,
-                              `ds-text${i + 1}`,
-                            ),
-                          }
-                        : {})}
-                      aria-describedby={`valid-helper-ds-text${i + 1}`}
-                      {...register(`ds-text${i + 1}`, {
-                        required: {
-                          value: true,
-                          message: `Bitte eine Beschreibung für den Hinweis angeben.`,
-                        },
-                        minLength: {
-                          value: 10,
-                          message: `Der Hinweis muss mindestens 10 Zeichen lang sein.`,
-                        },
-                      })}
-                      rows={5}
-                    />
-                    {errors[`ds-text${i + 1}`] && (
-                      <small id={`valid-helper-ds-text${i + 1}`}>
-                        {errors[`ds-text${i + 1}`]?.message}
-                      </small>
-                    )}
-                  </label>
-                </article>
-              ))}
-            </div>
-
-            {datenschutz.length === 0 && (
-              <p>Es wurden noch keine Hinweise hinzugefügt.</p>
-            )}
-
-            <button type="submit" className="secondary" onClick={addHinweis}>
-              Neuer Hinweis
-            </button>
           </fieldset>
         </form>
       )}
