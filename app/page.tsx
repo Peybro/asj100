@@ -21,7 +21,7 @@ type FormData = {
   name: string;
   age: number;
   picture: (Blob | Uint8Array | ArrayBuffer)[];
-  [key: `question${number}`]: string[];
+  [key: `question-${number}`]: string[];
   terms: boolean;
   securityQuestion: string;
 };
@@ -216,51 +216,46 @@ export default function Home() {
                 )}
 
                 {settingsValue?.data()!.questions.length > 0 &&
-                  settingsValue
-                    ?.data()!
-                    .questions.map(
-                      (
-                        question: { question: string; example: string },
-                        i: number,
-                      ) => {
-                        return (
-                          <label key={`question-key-${i}`}>
-                            {!settingsLoading &&
-                              settingsValue &&
-                              question.question}
-                            <textarea
-                              className="resize-none"
-                              placeholder={question.example}
-                              {...(Object.hasOwn(errors, `question${i + 1}`)
-                                ? {
-                                    "aria-invalid": Object.hasOwn(
-                                      errors,
-                                      `question${i + 1}`,
-                                    ),
-                                  }
-                                : {})}
-                              aria-describedby={`valid-helper-question${i + 1}`}
-                              {...register(`question${i + 1}`, {
-                                required: {
-                                  value: true,
-                                  message: "Bitte beantworte diese Frage.",
-                                },
-                                minLength: {
-                                  value: 5,
-                                  message:
-                                    "Deine Antwort sollte mindestens 5 Zeichen lang sein.",
-                                },
-                              })}
-                            />
-                            {errors[`question${i + 1}`] && (
-                              <small id={`valid-helper-question${i + 1}`}>
-                                {errors[`question${i + 1}`]?.message}
-                              </small>
-                            )}
-                          </label>
-                        );
-                      },
-                    )}
+                  (settingsValue?.data()!.questions as Question[]).map(
+                    (question, i: number) => {
+                      return (
+                        <label key={`question-key-${i}`}>
+                          {!settingsLoading &&
+                            settingsValue &&
+                            question.question}
+                          <textarea
+                            className="resize-none"
+                            placeholder={question.example}
+                            {...(Object.hasOwn(errors, `question-${i + 1}`)
+                              ? {
+                                  "aria-invalid": Object.hasOwn(
+                                    errors,
+                                    `question-${i + 1}`,
+                                  ),
+                                }
+                              : {})}
+                            aria-describedby={`valid-helper-question-${i + 1}`}
+                            {...register(`question-${i + 1}`, {
+                              required: {
+                                value: true,
+                                message: "Bitte beantworte diese Frage.",
+                              },
+                              minLength: {
+                                value: 5,
+                                message:
+                                  "Deine Antwort sollte mindestens 5 Zeichen lang sein.",
+                              },
+                            })}
+                          />
+                          {errors[`question-${i + 1}`] && (
+                            <small id={`valid-helper-question-${i + 1}`}>
+                              {errors[`question-${i + 1}`]?.message}
+                            </small>
+                          )}
+                        </label>
+                      );
+                    },
+                  )}
               </article>
             </div>
           </div>

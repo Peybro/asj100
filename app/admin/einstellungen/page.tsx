@@ -60,13 +60,15 @@ export default function Einstellungen() {
     if (settingsLoading) return;
 
     const firebaseData = settingsValue?.data();
-    const questionData = (firebaseData?.questions as Question[]).map((q) => ({
-      ...q,
-      uuid: uuid(),
-    }));
+    const questionData = (firebaseData?.questions as Question[]).map(
+      (question) => ({
+        ...question,
+        uuid: uuid(),
+      }),
+    );
     const datenschutzData = (
       firebaseData?.datenschutzhinweis as Datenschutz[]
-    ).map((d) => ({ ...d, uuid: uuid() }));
+    ).map((hinweis) => ({ ...hinweis, uuid: uuid() }));
 
     // Set form values with data from Firestore
     questionData.forEach((question, i) => {
@@ -90,22 +92,27 @@ export default function Einstellungen() {
    * @param data - Form data
    */
   const safeSettings: SubmitHandler<FormData> = async (data) => {
-    const settings = {
+    type Setting = {
+      questions: Question[];
+      datenschutzhinweis: Datenschutz[];
+    };
+
+    const settings: Setting = {
       questions: [],
       datenschutzhinweis: [],
     };
 
-    questions.forEach((q, i) => {
+    questions.forEach((question) => {
       settings.questions.push({
-        question: data[`question${q.uuid}`],
-        example: data[`example${q.uuid}`],
+        question: data[`question${question.uuid}`],
+        example: data[`example${question.uuid}`],
       });
     });
 
-    datenschutz.forEach((h, i) => {
+    datenschutz.forEach((hinweis) => {
       settings.datenschutzhinweis.push({
-        title: data[`ds-title${h.uuid}`],
-        text: data[`ds-text${h.uuid}`],
+        title: data[`ds-title${hinweis.uuid}`],
+        text: data[`ds-text${hinweis.uuid}`],
       });
     });
 
