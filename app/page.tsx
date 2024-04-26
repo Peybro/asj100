@@ -207,12 +207,14 @@ export default function Home() {
                   <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
                 )}
                 {settingsLoading && <QuestionSkeletonLoader />}
+                
                 {settingsValue?.data()!.questions.length === 0 && (
                   <p>
                     Keine Fragen?? Komm zu einem späteren Zeitpunkt bitte
                     wieder...
                   </p>
                 )}
+
                 {settingsValue?.data()!.questions.length > 0 &&
                   settingsValue
                     ?.data()!
@@ -226,8 +228,8 @@ export default function Home() {
                             {!settingsLoading &&
                               settingsValue &&
                               question.question}
-                            <input
-                              type="text"
+                            <textarea
+                              className="resize-none"
                               placeholder={question.example}
                               {...(Object.hasOwn(errors, `question${i + 1}`)
                                 ? {
