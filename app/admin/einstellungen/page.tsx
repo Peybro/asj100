@@ -177,12 +177,22 @@ export default function Einstellungen() {
     setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
   }
 
+  const dataHasChanged = !(
+    JSON.stringify(settingsValue?.data()?.questions) ===
+      JSON.stringify(questions) &&
+    JSON.stringify(settingsValue?.data()?.datenschutzhinweis) ===
+      JSON.stringify(datenschutz)
+  );
+
   return (
     <>
       <h1>Einstellungen</h1>
 
-      <Toolbar>
-        <button form="settingsForm" disabled={!settingsValue || isSubmitting}>
+      <Toolbar sticky={dataHasChanged}>
+        <button
+          form="settingsForm"
+          disabled={!settingsValue || isSubmitting || !dataHasChanged}
+        >
           {isSubmitting ? "Speichert..." : "Speichern"}
         </button>
         {errors.root && <ErrorIndicator>{errors.root.message}</ErrorIndicator>}
@@ -196,14 +206,10 @@ export default function Einstellungen() {
       {!settingsLoading && questions && datenschutz && (
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
           <fieldset className="grid sm:grid-cols-1 lg:grid-cols-2">
-            <div>
-              <h3>Fragen ({questions.length})</h3>
+            <details open>
+              <summary>Fragen ({questions.length})</summary>
 
-              <button
-                type="submit"
-                className="secondary flex items-center justify-center"
-                onClick={addQuestion}
-              >
+              <button type="submit" className="secondary" onClick={addQuestion}>
                 Neue Frage
               </button>
 
@@ -281,12 +287,12 @@ export default function Einstellungen() {
                   );
                 })}
               </div>
-            </div>
+            </details>
 
-            <div>
-              <h3 className="hyphens-manual">
+            <details open>
+              <summary className="hyphens-manual">
                 Daten&shy;schutz&shy;hinweis ({datenschutz.length})
-              </h3>
+              </summary>
 
               <button type="submit" className="secondary" onClick={addHinweis}>
                 Neuer Hinweis
@@ -369,7 +375,7 @@ export default function Einstellungen() {
                   </article>
                 ))}
               </div>
-            </div>
+            </details>
           </fieldset>
         </form>
       )}
