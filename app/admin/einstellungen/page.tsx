@@ -11,7 +11,6 @@ import type { Question } from "@/types/Question";
 import type { Datenschutz } from "@/types/Datenschutz";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
-import { set } from "firebase/database";
 
 function Close() {
   return (
@@ -44,7 +43,9 @@ export default function Einstellungen() {
     setValue,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    shouldUnregister: true,
+  });
 
   // Firestore hooks
   const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
@@ -207,7 +208,7 @@ export default function Einstellungen() {
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
           <fieldset className="grid sm:grid-cols-1 lg:grid-cols-2">
             <details open>
-              <summary>Fragen ({questions.length})</summary>
+              <summary className="text-xl">Fragen ({questions.length})</summary>
 
               <button type="submit" className="secondary" onClick={addQuestion}>
                 Neue Frage
@@ -231,6 +232,7 @@ export default function Einstellungen() {
                       <label>
                         Frage
                         <textarea
+                          className="resize-none"
                           {...(Object.hasOwn(errors, `question${i + 1}`)
                             ? {
                                 "aria-invalid": Object.hasOwn(
@@ -290,7 +292,7 @@ export default function Einstellungen() {
             </details>
 
             <details open>
-              <summary className="hyphens-manual">
+              <summary className="hyphens-manual text-xl">
                 Daten&shy;schutz&shy;hinweis ({datenschutz.length})
               </summary>
 
@@ -315,6 +317,7 @@ export default function Einstellungen() {
                     <label>
                       Titel
                       <textarea
+                        className="resize-none"
                         {...(Object.hasOwn(errors, `ds-title${i + 1}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
@@ -345,6 +348,7 @@ export default function Einstellungen() {
                     <label>
                       Text
                       <textarea
+                        className="resize-none"
                         {...(Object.hasOwn(errors, `ds-text${i + 1}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
