@@ -222,7 +222,7 @@ export default function Einstellungen() {
                 {questions.map((_, i) => {
                   return (
                     <article key={`question${i}`}>
-                      <header className="flex justify-between">
+                      <header className="flex h-12 justify-between text-lg">
                         <p>Frage {i + 1}</p>
                         <span onClick={() => removeQuestion(i)}>
                           <Close />
@@ -307,7 +307,7 @@ export default function Einstellungen() {
               <div className="autogrid">
                 {datenschutz.map((_, i) => (
                   <article key={`hinweis${i}`}>
-                    <header className="flex justify-between">
+                    <header className="flex h-12 justify-between text-lg">
                       <p>Hinweis {i + 1}</p>
                       <span onClick={() => removeHinweis(i)}>
                         <Close />
