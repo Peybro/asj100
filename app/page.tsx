@@ -207,7 +207,7 @@ export default function Home() {
                   <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
                 )}
                 {settingsLoading && <QuestionSkeletonLoader />}
-                
+
                 {settingsValue?.data()!.questions.length === 0 && (
                   <p>
                     Keine Fragen?? Komm zu einem späteren Zeitpunkt bitte
