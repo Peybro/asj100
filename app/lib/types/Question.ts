@@ -1,1 +1,1 @@
-export type Question = { question: string; example: string };
+export type Question = { uuid?: string; question: string; example: string };

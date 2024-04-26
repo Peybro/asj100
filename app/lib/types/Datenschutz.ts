@@ -1,1 +1,1 @@
-export type Datenschutz = { title: string; text: string };
+export type Datenschutz = { uuid?: string; title: string; text: string };

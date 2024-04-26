@@ -11,6 +11,7 @@ import type { Question } from "@/types/Question";
 import type { Datenschutz } from "@/types/Datenschutz";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
+import { v4 as uuid } from "uuid";
 
 function Close() {
   return (
@@ -32,7 +33,7 @@ function Close() {
 }
 
 type FormData = {
-  [key: `${"question" | "example" | "ds-title" | "ds-text"}${number}`]: string;
+  [key: `${"question" | "example" | "ds-title" | "ds-text"}-${string}`]: string;
 };
 
 export default function Einstellungen() {
@@ -43,9 +44,7 @@ export default function Einstellungen() {
     setValue,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    shouldUnregister: true,
-  });
+  } = useForm<FormData>();
 
   // Firestore hooks
   const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
@@ -61,18 +60,23 @@ export default function Einstellungen() {
     if (settingsLoading) return;
 
     const firebaseData = settingsValue?.data();
-    const questionData = firebaseData?.questions as Question[];
-    const datenschutzData = firebaseData?.datenschutzhinweis as Datenschutz[];
+    const questionData = (firebaseData?.questions as Question[]).map((q) => ({
+      ...q,
+      uuid: uuid(),
+    }));
+    const datenschutzData = (
+      firebaseData?.datenschutzhinweis as Datenschutz[]
+    ).map((d) => ({ ...d, uuid: uuid() }));
 
     // Set form values with data from Firestore
     questionData.forEach((question, i) => {
-      setValue(`question${i + 1}`, question.question);
-      setValue(`example${i + 1}`, question.example);
+      setValue(`question-${question.uuid}`, question.question);
+      setValue(`example-${question.uuid}`, question.example);
     });
 
     datenschutzData.forEach((hinweis, i) => {
-      setValue(`ds-title${i + 1}`, hinweis.title);
-      setValue(`ds-text${i + 1}`, hinweis.text);
+      setValue(`ds-title-${hinweis.uuid}`, hinweis.title);
+      setValue(`ds-text-${hinweis.uuid}`, hinweis.text);
     });
 
     // Set local state
@@ -91,17 +95,17 @@ export default function Einstellungen() {
       datenschutzhinweis: [],
     };
 
-    questions.forEach((_, i) => {
+    questions.forEach((q, i) => {
       settings.questions.push({
-        question: data[`question${i + 1}`],
-        example: data[`example${i + 1}`],
+        question: data[`question${q.uuid}`],
+        example: data[`example${q.uuid}`],
       });
     });
 
-    datenschutz.forEach((_, i) => {
+    datenschutz.forEach((h, i) => {
       settings.datenschutzhinweis.push({
-        title: data[`ds-title${i + 1}`],
-        text: data[`ds-text${i + 1}`],
+        title: data[`ds-title${h.uuid}`],
+        text: data[`ds-text${h.uuid}`],
       });
     });
 
@@ -133,7 +137,7 @@ export default function Einstellungen() {
   function addQuestion(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
-    const newQuestion: Question = { question: "", example: "" };
+    const newQuestion: Question = { uuid: uuid(), question: "", example: "" };
     setQuestions((prev) => [...prev, newQuestion]);
   }
 
@@ -142,14 +146,7 @@ export default function Einstellungen() {
    * @param index - Index of the question
    */
   function removeQuestion(index: number) {
-    // Set values of the following questions to the previous question because of the way react-hook-form gives the values to the inputs
-    questions.forEach((question, i) => {
-      if (i <= index) return;
-      setValue(`question${i}`, question.question);
-      setValue(`example${i}`, question.example);
-    });
-
-    setQuestions((prev) => prev.filter((_, i) => i !== index));
+    setQuestions((prev) => prev.toSpliced(index, 1));
   }
 
   /**
@@ -159,7 +156,7 @@ export default function Einstellungen() {
   function addHinweis(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
-    const newHinweis: Datenschutz = { title: "", text: "" };
+    const newHinweis: Datenschutz = { uuid: uuid(), title: "", text: "" };
     setDatenschutz((prev) => [...prev, newHinweis]);
   }
 
@@ -168,14 +165,7 @@ export default function Einstellungen() {
    * @param index - Index of the Hinweis
    */
   function removeHinweis(index: number) {
-    // Set values of the following Hinweise to the previous Hinweis because of the way react-hook-form gives the values to the inputs
-    datenschutz.forEach((hinweis, i) => {
-      if (i <= index) return;
-      setValue(`ds-title${i}`, hinweis.title);
-      setValue(`ds-text${i}`, hinweis.text);
-    });
-
-    setDatenschutz((prev) => [...prev.toSpliced(index, 1)]);
+    setDatenschutz((prev) => prev.toSpliced(index, 1));
   }
 
   const dataHasChanged = !(
@@ -219,9 +209,9 @@ export default function Einstellungen() {
               )}
 
               <div className="autogrid">
-                {questions.map((_, i) => {
+                {questions.map((question, i) => {
                   return (
-                    <article key={`question${i}`}>
+                    <article key={`question${question.uuid}`}>
                       <header className="flex h-12 justify-between text-lg">
                         <p>Frage {i + 1}</p>
                         <span onClick={() => removeQuestion(i)}>
@@ -233,16 +223,16 @@ export default function Einstellungen() {
                         Frage
                         <textarea
                           className="resize-none"
-                          {...(Object.hasOwn(errors, `question${i + 1}`)
+                          {...(Object.hasOwn(errors, `question${question.uuid}`)
                             ? {
                                 "aria-invalid": Object.hasOwn(
                                   errors,
-                                  `question${i + 1}`,
+                                  `question${question.uuid}`,
                                 ),
                               }
                             : {})}
-                          aria-describedby={`valid-helper-question${i + 1}`}
-                          {...register(`question${i + 1}`, {
+                          aria-describedby={`valid-helper-question${question.uuid}`}
+                          {...register(`question-${question.uuid}`, {
                             required: {
                               value: true,
                               message: "Bitte eine Frage angeben.",
@@ -253,9 +243,9 @@ export default function Einstellungen() {
                             },
                           })}
                         />
-                        {errors[`question${i + 1}`] && (
-                          <small id={`valid-helper-question${i + 1}`}>
-                            {errors[`question${i + 1}`]?.message}
+                        {errors[`question${question.uuid}`] && (
+                          <small id={`valid-helper-question${question.uuid}`}>
+                            {errors[`question${question.uuid}`]?.message}
                           </small>
                         )}
                       </label>
@@ -263,25 +253,25 @@ export default function Einstellungen() {
                         Beispiel
                         <textarea
                           className="resize-none"
-                          {...(Object.hasOwn(errors, `example${i + 1}`)
+                          {...(Object.hasOwn(errors, `example${question.uuid}`)
                             ? {
                                 "aria-invalid": Object.hasOwn(
                                   errors,
-                                  `example${i + 1}`,
+                                  `example${question.uuid}`,
                                 ),
                               }
                             : {})}
-                          aria-describedby={`valid-helper-example${i + 1}`}
-                          {...register(`example${i + 1}`, {
+                          aria-describedby={`valid-helper-example${question.uuid}`}
+                          {...register(`example-${question.uuid}`, {
                             required: {
                               value: false,
-                              message: `Bitte ein Beispiel für Frage ${i + 1} angeben.`,
+                              message: `Bitte ein Beispiel für Frage ${question.uuid} angeben.`,
                             },
                           })}
                         />
-                        {errors[`example${i + 1}`] && (
-                          <small id={`valid-helper-example${i + 1}`}>
-                            {errors[`example${i + 1}`]?.message}
+                        {errors[`example${question.uuid}`] && (
+                          <small id={`valid-helper-example${question.uuid}`}>
+                            {errors[`example${question.uuid}`]?.message}
                           </small>
                         )}
                       </label>
@@ -305,8 +295,8 @@ export default function Einstellungen() {
               )}
 
               <div className="autogrid">
-                {datenschutz.map((_, i) => (
-                  <article key={`hinweis${i}`}>
+                {datenschutz.map((hinweis, i) => (
+                  <article key={`hinweis${hinweis.uuid}`}>
                     <header className="flex h-12 justify-between text-lg">
                       <p>Hinweis {i + 1}</p>
                       <span onClick={() => removeHinweis(i)}>
@@ -318,16 +308,16 @@ export default function Einstellungen() {
                       Titel
                       <textarea
                         className="resize-none"
-                        {...(Object.hasOwn(errors, `ds-title${i + 1}`)
+                        {...(Object.hasOwn(errors, `ds-title${hinweis.uuid}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `ds-title${i + 1}`,
+                                `ds-title${hinweis.uuid}`,
                               ),
                             }
                           : {})}
-                        aria-describedby={`valid-helper-ds-title${i + 1}`}
-                        {...register(`ds-title${i + 1}`, {
+                        aria-describedby={`valid-helper-ds-title${hinweis.uuid}`}
+                        {...register(`ds-title-${hinweis.uuid}`, {
                           required: {
                             value: true,
                             message: `Bitte einen Titel für den Hinweis angeben.`,
@@ -338,9 +328,9 @@ export default function Einstellungen() {
                           },
                         })}
                       />
-                      {errors[`ds-title${i + 1}`] && (
-                        <small id={`valid-helper-ds-title${i + 1}`}>
-                          {errors[`ds-title${i + 1}`]?.message}
+                      {errors[`ds-title${hinweis.uuid}`] && (
+                        <small id={`valid-helper-ds-title${hinweis.uuid}`}>
+                          {errors[`ds-title${hinweis.uuid}`]?.message}
                         </small>
                       )}
                     </label>
@@ -349,16 +339,16 @@ export default function Einstellungen() {
                       Text
                       <textarea
                         className="resize-none"
-                        {...(Object.hasOwn(errors, `ds-text${i + 1}`)
+                        {...(Object.hasOwn(errors, `ds-text${hinweis.uuid}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `ds-text${i + 1}`,
+                                `ds-text${hinweis.uuid}`,
                               ),
                             }
                           : {})}
-                        aria-describedby={`valid-helper-ds-text${i + 1}`}
-                        {...register(`ds-text${i + 1}`, {
+                        aria-describedby={`valid-helper-ds-text${hinweis.uuid}`}
+                        {...register(`ds-text-${hinweis.uuid}`, {
                           required: {
                             value: true,
                             message: `Bitte eine Beschreibung für den Hinweis angeben.`,
@@ -370,9 +360,9 @@ export default function Einstellungen() {
                         })}
                         rows={5}
                       />
-                      {errors[`ds-text${i + 1}`] && (
-                        <small id={`valid-helper-ds-text${i + 1}`}>
-                          {errors[`ds-text${i + 1}`]?.message}
+                      {errors[`ds-text${hinweis.uuid}`] && (
+                        <small id={`valid-helper-ds-text${hinweis.uuid}`}>
+                          {errors[`ds-text${hinweis.uuid}`]?.message}
                         </small>
                       )}
                     </label>
