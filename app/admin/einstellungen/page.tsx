@@ -54,6 +54,19 @@ export default function Einstellungen() {
   // Local state
   const [questions, setQuestions] = useState<Question[]>([]);
   const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  useEffect(() => {
+    window.addEventListener("resize", () => setWindowWidth(window.innerWidth));
+    return () => window.removeEventListener("resize", () => setWindowWidth(0));
+  });
+
+  const dataHasChanged = !(
+    JSON.stringify(settingsValue?.data()?.questions) ===
+      JSON.stringify(questions.map(({ uuid: _, ...question }) => question)) &&
+    JSON.stringify(settingsValue?.data()?.datenschutzhinweis) ===
+      JSON.stringify(datenschutz.map(({ uuid: _, ...hinweis }) => hinweis))
+  );
 
   // Set form values from Firestore to local state
   useEffect(() => {
@@ -174,19 +187,6 @@ export default function Einstellungen() {
   function removeHinweis(index: number) {
     setDatenschutz((prev) => prev.toSpliced(index, 1));
   }
-
-  const dataHasChanged = !(
-    JSON.stringify(settingsValue?.data()?.questions) ===
-      JSON.stringify(questions.map(({ uuid: _, ...question }) => question)) &&
-    JSON.stringify(settingsValue?.data()?.datenschutzhinweis) ===
-      JSON.stringify(datenschutz.map(({ uuid: _, ...hinweis }) => hinweis))
-  );
-
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  useEffect(() => {
-    window.addEventListener("resize", () => setWindowWidth(window.innerWidth));
-    return () => window.removeEventListener("resize", () => setWindowWidth(0));
-  });
 
   return (
     <>
