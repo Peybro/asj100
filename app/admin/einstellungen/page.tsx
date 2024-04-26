@@ -182,6 +182,12 @@ export default function Einstellungen() {
       JSON.stringify(datenschutz.map(({ uuid: _, ...hinweis }) => hinweis))
   );
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    window.addEventListener("resize", () => setWindowWidth(window.innerWidth));
+    return () => window.removeEventListener("resize", () => setWindowWidth(0));
+  });
+
   return (
     <>
       <h1>Einstellungen</h1>
@@ -204,7 +210,7 @@ export default function Einstellungen() {
       {!settingsLoading && questions && datenschutz && (
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
           <fieldset className="grid sm:grid-cols-1 lg:grid-cols-2">
-            <details open>
+            <details open={windowWidth >= 1024}>
               <summary className="text-xl">Fragen ({questions.length})</summary>
 
               <button type="submit" className="secondary" onClick={addQuestion}>
@@ -288,7 +294,7 @@ export default function Einstellungen() {
               </div>
             </details>
 
-            <details open>
+            <details open={windowWidth >= 1024}>
               <summary className="hyphens-manual text-xl">
                 Daten&shy;schutz&shy;hinweis ({datenschutz.length})
               </summary>
