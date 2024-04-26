@@ -177,9 +177,9 @@ export default function Einstellungen() {
 
   const dataHasChanged = !(
     JSON.stringify(settingsValue?.data()?.questions) ===
-      JSON.stringify(questions) &&
+      JSON.stringify(questions.map(({ uuid: _, ...question }) => question)) &&
     JSON.stringify(settingsValue?.data()?.datenschutzhinweis) ===
-      JSON.stringify(datenschutz)
+      JSON.stringify(datenschutz.map(({ uuid: _, ...hinweis }) => hinweis))
   );
 
   return (
