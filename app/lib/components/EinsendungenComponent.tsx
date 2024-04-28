@@ -46,7 +46,7 @@ export default function EinsendungenComponent() {
    * @returns String with all information of the person
    */
   function addPerson(interview: Interview) {
-    return `Name: ${interview.name}, Alter: ${interview.age}
+    return `Name: ${interview.name}, Alter: ${interview.age}, Ort: ${interview.location},
 Bild: ${interview.picture}
 
 ${buildAnswerString(interview.answers)}

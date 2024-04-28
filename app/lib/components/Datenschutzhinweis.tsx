@@ -1,7 +1,7 @@
 "use client";
 
 import { doc } from "firebase/firestore";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { db } from "@/firebase-config";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -12,6 +12,7 @@ import { Datenschutz } from "@/types/Datenschutz";
 type DatenschutzhinweisComponentProps = {
   open: boolean;
   closable?: boolean;
+  onAccept?: (e: MouseEvent<HTMLButtonElement>) => void;
 };
 
 /**
@@ -20,6 +21,7 @@ type DatenschutzhinweisComponentProps = {
 export default function DatenschutzhinweisComponent({
   open,
   closable = true,
+  onAccept,
 }: DatenschutzhinweisComponentProps) {
   // Firebase hooks
   const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
@@ -32,7 +34,7 @@ export default function DatenschutzhinweisComponent({
   return (
     <>
       <span
-        className="text-blue-400 underline"
+        className="cursor-pointer text-blue-500 underline"
         onClick={(e) => {
           e.preventDefault();
           setOpenState(true);
@@ -82,16 +84,26 @@ export default function DatenschutzhinweisComponent({
           )}
           <footer>
             {closable && (
-              <button
-                aria-label="Close"
-                className="secondary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setOpenState(false);
-                }}
-              >
-                Schließen
-              </button>
+              <>
+                <button
+                  onClick={(e) => {
+                    onAccept(e);
+                    setOpenState(false);
+                  }}
+                >
+                  Akzeptieren
+                </button>
+                <button
+                  aria-label="Close"
+                  className="secondary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpenState(false);
+                  }}
+                >
+                  Schließen
+                </button>
+              </>
             )}
             {!closable && (
               <Link href="/" passHref legacyBehavior>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import asj100 from "/public/100JahreASJLogo_RGB_4zu3.png";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
@@ -34,6 +34,7 @@ export default function Home() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
@@ -103,6 +104,12 @@ export default function Home() {
       transition: Bounce,
     });
   };
+
+  function acceptTerms(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    setValue("terms", true);
+    setValue("terms2", true);
+  }
 
   return (
     <main>
@@ -298,7 +305,14 @@ export default function Home() {
               </article>
             </div>
           </div>
-
+          <div className="mb-2">
+            Ich habe den{" "}
+            <DatenschutzhinweisComponent
+              open={false}
+              onAccept={(e) => acceptTerms(e)}
+            />{" "}
+            gelesen...
+          </div>
           <label>
             <input
               type="checkbox"
@@ -315,15 +329,13 @@ export default function Home() {
                 },
               })}
             />
-            Ich habe den <DatenschutzhinweisComponent open={false} /> gelesen
-            und bin mit dem Speichern meiner Daten einverstanden.
+            ... und bin mit dem Speichern meiner Daten einverstanden.
           </label>
           {errors.terms && (
-            <small id="valid-helper-terms" className="text-red-400">
+            <small id="valid-helper-terms" className="text-red-500">
               {errors.terms?.message}
             </small>
           )}
-
           <label>
             <input
               type="checkbox"
@@ -340,14 +352,13 @@ export default function Home() {
                 },
               })}
             />
-            Ich bin mit der Verarbeitung meiner Daten einverstanden.
+            ... und bin mit der Verarbeitung meiner Daten einverstanden.
           </label>
           {errors.terms2 && (
-            <small id="valid-helper-terms2" className="text-red-400">
+            <small id="valid-helper-terms2" className="text-red-500">
               {errors.terms2?.message}
             </small>
           )}
-
           <label className="sr-only">
             <input
               type="text"
