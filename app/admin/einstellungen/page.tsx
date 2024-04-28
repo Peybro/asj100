@@ -4,7 +4,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { db } from "@/firebase-config";
 import { doc, setDoc } from "firebase/firestore";
 import { MouseEvent, useEffect, useState } from "react";
-import { useDocument } from "react-firebase-hooks/firestore";
+import { useDocumentOnce } from "react-firebase-hooks/firestore";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 import type { Question } from "@/types/Question";
@@ -51,7 +51,7 @@ export default function Einstellungen() {
   } = useForm<FormData>();
 
   // Firestore hooks
-  const [settingsValue, settingsLoading, settingsError] = useDocument(
+  const [settingsValue, settingsLoading, settingsError] = useDocumentOnce(
     doc(db, "settings", "settings"),
   );
 
