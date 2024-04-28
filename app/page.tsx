@@ -63,6 +63,7 @@ export default function Home() {
     const name = data.name;
     const age = data.age;
     const location = data.location;
+    const email = data.email;
     const picture = data.picture[0];
 
     const now = new Date().getTime().toString();
@@ -85,6 +86,7 @@ export default function Home() {
       name,
       age,
       location,
+      email,
       answers,
       picture: pictureName,
     });
@@ -265,7 +267,7 @@ export default function Home() {
                 <label>
                   Deine Email
                   <input
-                    type="mail"
+                    type="email"
                     placeholder="Email"
                     {...(Object.hasOwn(errors, "email")
                       ? { "aria-invalid": Object.hasOwn(errors, "email") }
