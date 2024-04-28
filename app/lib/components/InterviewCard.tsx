@@ -23,7 +23,7 @@ export default function InterviewCard({
   onRemove,
   showAsList,
 }: InterviewCardProps) {
-  const { id, name, age, location, picture, answers } = interview;
+  const { id, name, age, location, email, picture, answers } = interview;
 
   const storageRef = ref(storage, `portraits/${picture}`);
   const [url, urlLoading, urlError] = useDownloadURL(storageRef);
@@ -49,6 +49,7 @@ export default function InterviewCard({
   async function download() {
     const link = document.createElement("a");
     const content = `Name: ${name}, Alter: ${age}, Ort: ${location}
+Email: ${email}
 Bild: ${picture}
 
 ${buildAnswerString()}`;

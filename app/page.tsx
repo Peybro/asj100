@@ -16,11 +16,13 @@ import type { Question } from "@/types/Question";
 import ErrorIndicator from "@/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
 import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
+import { DescriptionTexts } from "./lib/types/DescriptionTexts";
 
 type FormData = {
   name: string;
   age: number;
   location: string;
+  email: string;
   picture: (Blob | Uint8Array | ArrayBuffer)[];
   [key: `question-${number}`]: string[];
   terms: boolean;
@@ -125,9 +127,25 @@ export default function Home() {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <fieldset>
+          {!settingsLoading && (
+            <p>
+              {
+                (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
+                  ?.welcomeText
+              }
+            </p>
+          )}
+
           <div className="autogrid">
             <div>
               <h3>Über dich</h3>
+
+              <p>
+                {
+                  (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
+                    ?.aboutYouDescription
+                }
+              </p>
 
               <article>
                 <label>
@@ -216,7 +234,7 @@ export default function Home() {
                 </label>
 
                 <label>
-                  Bild
+                  Ein Bild von dir
                   <input
                     type="file"
                     accept="image/png, image/gif, image/jpeg"
@@ -243,11 +261,53 @@ export default function Home() {
                     </small>
                   )}
                 </label>
+
+                <label>
+                  Deine Email
+                  <input
+                    type="mail"
+                    placeholder="Email"
+                    {...(Object.hasOwn(errors, "email")
+                      ? { "aria-invalid": Object.hasOwn(errors, "email") }
+                      : {})}
+                    aria-describedby="valid-helper-email"
+                    {...register("email", {
+                      required: {
+                        value: true,
+                        message:
+                          "Bitte gib deine Email-Adresse an für eventuelle Rückfragen",
+                      },
+                      pattern: {
+                        value:
+                          // eslint-disable-next-line no-useless-escape
+                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                        message: "Bitte gib eine gültige Email-Adresse an",
+                      },
+                    })}
+                  />
+                  {errors.email ? (
+                    <small id="valid-helper-email">
+                      {errors.email?.message}
+                    </small>
+                  ) : (
+                    <small id="email-helper">
+                      Für evtl. Rückfragen zur Datennutzung
+                    </small>
+                  )}
+                </label>
               </article>
             </div>
 
             <div>
               <h3>Fragen</h3>
+
+              <p>
+                {
+                  (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
+                    ?.questionsDescription
+                }
+              </p>
+
               <article>
                 {settingsError && (
                   <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
@@ -305,6 +365,7 @@ export default function Home() {
               </article>
             </div>
           </div>
+
           <div className="mb-2">
             Ich habe den{" "}
             <DatenschutzhinweisComponent
@@ -352,7 +413,8 @@ export default function Home() {
                 },
               })}
             />
-            ... und bin mit der Verarbeitung meiner Daten einverstanden.
+            ... und ich bin der Verarbeitung und Veröffentlichung meiner Daten
+            einverstanden.
           </label>
           {errors.terms2 && (
             <small id="valid-helper-terms2" className="text-red-500">

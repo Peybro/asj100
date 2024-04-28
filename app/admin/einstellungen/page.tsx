@@ -12,6 +12,7 @@ import type { Datenschutz } from "@/types/Datenschutz";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
 import { v4 as uuid } from "uuid";
+import { DescriptionTexts } from "@/types/DescriptionTexts";
 
 function Close() {
   return (
@@ -33,6 +34,9 @@ function Close() {
 }
 
 type FormData = {
+  welcomeText: string;
+  aboutYouDescription: string;
+  questionsDescription: string;
   [key: `${"question" | "example" | "ds-title" | "ds-text"}-${string}`]: string;
 };
 
@@ -52,6 +56,11 @@ export default function Einstellungen() {
   );
 
   // Local state
+  const [descriptions, setDescriptions] = useState<DescriptionTexts>({
+    welcomeText: "",
+    aboutYouDescription: "",
+    questionsDescription: "",
+  });
   const [questions, setQuestions] = useState<Question[]>([]);
   const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -62,6 +71,12 @@ export default function Einstellungen() {
   });
 
   const dataHasChanged = !(
+    (settingsValue?.data()?.descriptionTexts as DescriptionTexts)
+      ?.welcomeText === descriptions.welcomeText &&
+    (settingsValue?.data()?.descriptionTexts as DescriptionTexts)
+      ?.aboutYouDescription === descriptions.aboutYouDescription &&
+    (settingsValue?.data()?.descriptionTexts as DescriptionTexts)
+      ?.questionsDescription === descriptions.questionsDescription &&
     JSON.stringify(settingsValue?.data()?.questions) ===
       JSON.stringify(questions.map(({ uuid: _, ...question }) => question)) &&
     JSON.stringify(settingsValue?.data()?.datenschutzhinweis) ===
@@ -73,6 +88,7 @@ export default function Einstellungen() {
     if (settingsLoading) return;
 
     const firebaseData = settingsValue?.data();
+    const descriptionData = firebaseData?.descriptionTexts as DescriptionTexts;
     const questionData = (firebaseData?.questions as Question[]).map(
       (question) => ({
         ...question,
@@ -84,6 +100,10 @@ export default function Einstellungen() {
     ).map((hinweis) => ({ ...hinweis, uuid: uuid() }));
 
     // Set form values with data from Firestore
+    setValue("welcomeText", descriptionData.welcomeText);
+    setValue("aboutYouDescription", descriptionData.aboutYouDescription);
+    setValue("questionsDescription", descriptionData.questionsDescription);
+
     questionData.forEach((question, i) => {
       setValue(`question-${question.uuid}`, question.question);
       setValue(`example-${question.uuid}`, question.example);
@@ -95,6 +115,7 @@ export default function Einstellungen() {
     });
 
     // Set local state
+    setDescriptions(descriptionData);
     setQuestions(questionData);
     setDatenschutz(datenschutzData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -106,26 +127,28 @@ export default function Einstellungen() {
    */
   const safeSettings: SubmitHandler<FormData> = async (data) => {
     type Setting = {
+      descriptionTexts: DescriptionTexts;
       questions: Question[];
       datenschutzhinweis: Datenschutz[];
     };
 
     const settings: Setting = {
+      descriptionTexts: descriptions,
       questions: [],
       datenschutzhinweis: [],
     };
 
     questions.forEach((question) => {
       settings.questions.push({
-        question: data[`question${question.uuid}`],
-        example: data[`example${question.uuid}`],
+        question: data[`question-${question.uuid}`],
+        example: data[`example-${question.uuid}`],
       });
     });
 
     datenschutz.forEach((hinweis) => {
       settings.datenschutzhinweis.push({
-        title: data[`ds-title${hinweis.uuid}`],
-        text: data[`ds-text${hinweis.uuid}`],
+        title: data[`ds-title-${hinweis.uuid}`],
+        text: data[`ds-text-${hinweis.uuid}`],
       });
     });
 
@@ -211,6 +234,52 @@ export default function Einstellungen() {
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
           <fieldset className="grid sm:grid-cols-1 lg:grid-cols-2">
             <details open={windowWidth >= 1024}>
+              <summary className="text-xl">Beschreibungen</summary>
+
+              <label>
+                Begrüßungstext
+                <textarea
+                  {...register("welcomeText")}
+                  onChange={(e) => {
+                    const value = e.currentTarget.value;
+                    setDescriptions((prev) => ({
+                      ...prev,
+                      welcomeText: value,
+                    }));
+                  }}
+                />
+              </label>
+
+              <label>
+                {'"Über dich"'}
+                <textarea
+                  {...register("aboutYouDescription")}
+                  onChange={(e) => {
+                    const value = e.currentTarget.value;
+                    setDescriptions((prev) => ({
+                      ...prev,
+                      aboutYouDescription: value,
+                    }));
+                  }}
+                />
+              </label>
+
+              <label>
+                Fragen
+                <textarea
+                  {...register("questionsDescription")}
+                  onChange={(e) => {
+                    const value = e.currentTarget.value;
+                    setDescriptions((prev) => ({
+                      ...prev,
+                      questionsDescription: value,
+                    }));
+                  }}
+                />
+              </label>
+            </details>
+
+            <details open={windowWidth >= 1024}>
               <summary className="text-xl">Fragen ({questions.length})</summary>
 
               <button type="submit" className="secondary" onClick={addQuestion}>
@@ -224,7 +293,7 @@ export default function Einstellungen() {
               <div className="autogrid">
                 {questions.map((question, i) => {
                   return (
-                    <article key={`question${question.uuid}`}>
+                    <article key={`question-${question.uuid}`}>
                       <header className="flex h-12 justify-between text-lg">
                         <p>Frage {i + 1}</p>
                         <span onClick={() => removeQuestion(i)}>
@@ -235,16 +304,18 @@ export default function Einstellungen() {
                       <label>
                         Frage
                         <textarea
-                          className="resize-none"
-                          {...(Object.hasOwn(errors, `question${question.uuid}`)
+                          {...(Object.hasOwn(
+                            errors,
+                            `question-${question.uuid}`,
+                          )
                             ? {
                                 "aria-invalid": Object.hasOwn(
                                   errors,
-                                  `question${question.uuid}`,
+                                  `question-${question.uuid}`,
                                 ),
                               }
                             : {})}
-                          aria-describedby={`valid-helper-question${question.uuid}`}
+                          aria-describedby={`valid-helper-question-${question.uuid}`}
                           {...register(`question-${question.uuid}`, {
                             required: {
                               value: true,
@@ -255,36 +326,51 @@ export default function Einstellungen() {
                               message: `Die Frage muss mindestens 5 Zeichen lang sein.`,
                             },
                           })}
+                          onChange={(e) => {
+                            setQuestions((prev) =>
+                              prev.toSpliced(i, 1, {
+                                ...question,
+                                question: e.target.value,
+                              }),
+                            );
+                          }}
                         />
-                        {errors[`question${question.uuid}`] && (
-                          <small id={`valid-helper-question${question.uuid}`}>
-                            {errors[`question${question.uuid}`]?.message}
+                        {errors[`question-${question.uuid}`] && (
+                          <small id={`valid-helper-question-${question.uuid}`}>
+                            {errors[`question-${question.uuid}`]?.message}
                           </small>
                         )}
                       </label>
                       <label>
                         Beispiel
                         <textarea
-                          className="resize-none"
-                          {...(Object.hasOwn(errors, `example${question.uuid}`)
+                          {...(Object.hasOwn(errors, `example-${question.uuid}`)
                             ? {
                                 "aria-invalid": Object.hasOwn(
                                   errors,
-                                  `example${question.uuid}`,
+                                  `example-${question.uuid}`,
                                 ),
                               }
                             : {})}
-                          aria-describedby={`valid-helper-example${question.uuid}`}
+                          aria-describedby={`valid-helper-example-${question.uuid}`}
                           {...register(`example-${question.uuid}`, {
                             required: {
                               value: false,
                               message: `Bitte ein Beispiel für Frage ${question.uuid} angeben.`,
                             },
                           })}
+                          onChange={(e) => {
+                            setQuestions((prev) =>
+                              prev.toSpliced(i, 1, {
+                                ...question,
+                                example: e.target.value,
+                              }),
+                            );
+                          }}
                         />
-                        {errors[`example${question.uuid}`] && (
-                          <small id={`valid-helper-example${question.uuid}`}>
-                            {errors[`example${question.uuid}`]?.message}
+                        {errors[`example-${question.uuid}`] && (
+                          <small id={`valid-helper-example-${question.uuid}`}>
+                            {errors[`example-${question.uuid}`]?.message}
                           </small>
                         )}
                       </label>
@@ -320,16 +406,15 @@ export default function Einstellungen() {
                     <label>
                       Titel
                       <textarea
-                        className="resize-none"
-                        {...(Object.hasOwn(errors, `ds-title${hinweis.uuid}`)
+                        {...(Object.hasOwn(errors, `ds-title-${hinweis.uuid}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `ds-title${hinweis.uuid}`,
+                                `ds-title-${hinweis.uuid}`,
                               ),
                             }
                           : {})}
-                        aria-describedby={`valid-helper-ds-title${hinweis.uuid}`}
+                        aria-describedby={`valid-helper-ds-title-${hinweis.uuid}`}
                         {...register(`ds-title-${hinweis.uuid}`, {
                           required: {
                             value: true,
@@ -340,10 +425,18 @@ export default function Einstellungen() {
                             message: `Der Titel muss mindestens 10 Zeichen lang sein.`,
                           },
                         })}
+                        onChange={(e) => {
+                          setDatenschutz((prev) =>
+                            prev.toSpliced(i, 1, {
+                              ...hinweis,
+                              title: e.target.value,
+                            }),
+                          );
+                        }}
                       />
-                      {errors[`ds-title${hinweis.uuid}`] && (
-                        <small id={`valid-helper-ds-title${hinweis.uuid}`}>
-                          {errors[`ds-title${hinweis.uuid}`]?.message}
+                      {errors[`ds-title-${hinweis.uuid}`] && (
+                        <small id={`valid-helper-ds-title-${hinweis.uuid}`}>
+                          {errors[`ds-title-${hinweis.uuid}`]?.message}
                         </small>
                       )}
                     </label>
@@ -351,16 +444,15 @@ export default function Einstellungen() {
                     <label>
                       Text
                       <textarea
-                        className="resize-none"
-                        {...(Object.hasOwn(errors, `ds-text${hinweis.uuid}`)
+                        {...(Object.hasOwn(errors, `ds-text-${hinweis.uuid}`)
                           ? {
                               "aria-invalid": Object.hasOwn(
                                 errors,
-                                `ds-text${hinweis.uuid}`,
+                                `ds-text-${hinweis.uuid}`,
                               ),
                             }
                           : {})}
-                        aria-describedby={`valid-helper-ds-text${hinweis.uuid}`}
+                        aria-describedby={`valid-helper-ds-text-${hinweis.uuid}`}
                         {...register(`ds-text-${hinweis.uuid}`, {
                           required: {
                             value: true,
@@ -372,10 +464,18 @@ export default function Einstellungen() {
                           },
                         })}
                         rows={5}
+                        onChange={(e) => {
+                          setDatenschutz((prev) =>
+                            prev.toSpliced(i, 1, {
+                              ...hinweis,
+                              text: e.target.value,
+                            }),
+                          );
+                        }}
                       />
-                      {errors[`ds-text${hinweis.uuid}`] && (
-                        <small id={`valid-helper-ds-text${hinweis.uuid}`}>
-                          {errors[`ds-text${hinweis.uuid}`]?.message}
+                      {errors[`ds-text-${hinweis.uuid}`] && (
+                        <small id={`valid-helper-ds-text-${hinweis.uuid}`}>
+                          {errors[`ds-text-${hinweis.uuid}`]?.message}
                         </small>
                       )}
                     </label>
