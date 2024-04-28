@@ -95,17 +95,13 @@ ${buildAnswerString()}`;
         </header>
 
         <p>
-          {name} ({age}) aus {location}
-        </p>
-        {/* <p>
-          <span className="font-bold">Name:</span> {name}
-        </p>
-        <p className={age < 18 ? "bg-red-500" : ""}>
-          <span className="font-bold">Alter:</span> {age}
+          {name} (<span className={age < 18 ? "text-red-500" : ""}>{age}</span>)
+          aus {location}
         </p>
         <p>
-          <span className="font-bold">Ort:</span> {location}
-        </p> */}
+          <a href={`mailto:${email}`}>{email}</a>
+        </p>
+
         {answers.map((answer: Answer, i: number) => {
           return (
             <div key={`answer-key-${i}`} className="mb-3">
