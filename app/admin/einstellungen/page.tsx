@@ -55,7 +55,7 @@ export default function Einstellungen() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [datenschutz, setDatenschutz] = useState<Datenschutz[]>([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
+
   useEffect(() => {
     window.addEventListener("resize", () => setWindowWidth(window.innerWidth));
     return () => window.removeEventListener("resize", () => setWindowWidth(0));

@@ -23,7 +23,7 @@ export default function InterviewCard({
   onRemove,
   showAsList,
 }: InterviewCardProps) {
-  const { id, name, age, picture, answers } = interview;
+  const { id, name, age, location, picture, answers } = interview;
 
   const storageRef = ref(storage, `portraits/${picture}`);
   const [url, urlLoading, urlError] = useDownloadURL(storageRef);
@@ -48,7 +48,7 @@ export default function InterviewCard({
    */
   async function download() {
     const link = document.createElement("a");
-    const content = `Name: ${name}, Alter: ${age}
+    const content = `Name: ${name}, Alter: ${age}, Ort: ${location}
 Bild: ${picture}
 
 ${buildAnswerString()}`;
@@ -94,11 +94,17 @@ ${buildAnswerString()}`;
         </header>
 
         <p>
+          {name} ({age}) aus {location}
+        </p>
+        {/* <p>
           <span className="font-bold">Name:</span> {name}
         </p>
         <p className={age < 18 ? "bg-red-500" : ""}>
           <span className="font-bold">Alter:</span> {age}
         </p>
+        <p>
+          <span className="font-bold">Ort:</span> {location}
+        </p> */}
         {answers.map((answer: Answer, i: number) => {
           return (
             <div key={`answer-key-${i}`} className="mb-3">

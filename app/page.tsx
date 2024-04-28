@@ -20,9 +20,11 @@ import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
 type FormData = {
   name: string;
   age: number;
+  location: string;
   picture: (Blob | Uint8Array | ArrayBuffer)[];
   [key: `question-${number}`]: string[];
   terms: boolean;
+  terms2: boolean;
   securityQuestion: string;
 };
 
@@ -57,6 +59,7 @@ export default function Home() {
 
     const name = data.name;
     const age = data.age;
+    const location = data.location;
     const picture = data.picture[0];
 
     const now = new Date().getTime().toString();
@@ -68,7 +71,7 @@ export default function Home() {
       (question: Question, i: number) => {
         answers.push({
           question: question.question,
-          answer: data[`question${i + 1}`],
+          answer: data[`question-${i + 1}`],
         });
       },
     );
@@ -78,6 +81,7 @@ export default function Home() {
       id: now,
       name,
       age,
+      location,
       answers,
       picture: pictureName,
     });
@@ -117,6 +121,7 @@ export default function Home() {
           <div className="autogrid">
             <div>
               <h3>Über dich</h3>
+
               <article>
                 <label>
                   Wie heißt du?
@@ -144,6 +149,7 @@ export default function Home() {
                     <small id="valid-helper-name">{errors.name?.message}</small>
                   )}
                 </label>
+
                 <label>
                   Wie alt bist du?
                   <input
@@ -163,12 +169,45 @@ export default function Home() {
                         value: 3,
                         message: "Du musst mindestens 3 Jahre alt sein.",
                       },
+                      max: {
+                        value: 120,
+                        message: "Du bist höchstwahrscheinlich nicht so alt.",
+                      },
                     })}
                   />
                   {errors.age && (
                     <small id="valid-helper-age">{errors.age?.message}</small>
                   )}
                 </label>
+
+                <label>
+                  Wo kommst du her?
+                  <input
+                    type="string"
+                    placeholder="Ort"
+                    {...(Object.hasOwn(errors, "location")
+                      ? { "aria-invalid": Object.hasOwn(errors, "location") }
+                      : {})}
+                    aria-describedby="valid-helper-location"
+                    {...register("location", {
+                      required: {
+                        value: true,
+                        message: "Bitte gib deinen Wohnort an.",
+                      },
+                      minLength: {
+                        value: 2,
+                        message:
+                          "Dein Wohnort muss mindestens 2 Zeichen lang sein.",
+                      },
+                    })}
+                  />
+                  {errors.location && (
+                    <small id="valid-helper-age">
+                      {errors.location?.message}
+                    </small>
+                  )}
+                </label>
+
                 <label>
                   Bild
                   <input
@@ -282,6 +321,30 @@ export default function Home() {
           {errors.terms && (
             <small id="valid-helper-terms" className="text-red-400">
               {errors.terms?.message}
+            </small>
+          )}
+
+          <label>
+            <input
+              type="checkbox"
+              role="switch"
+              aria-describedby="valid-helper-terms2"
+              {...(Object.hasOwn(errors, "terms2")
+                ? { "aria-invalid": Object.hasOwn(errors, "terms2") }
+                : {})}
+              {...register("terms2", {
+                required: {
+                  value: true,
+                  message:
+                    "Bitte bestätige, dass du mit der Verarbeitung deiner Daten einverstanden bist.",
+                },
+              })}
+            />
+            Ich bin mit der Verarbeitung meiner Daten einverstanden.
+          </label>
+          {errors.terms2 && (
+            <small id="valid-helper-terms2" className="text-red-400">
+              {errors.terms2?.message}
             </small>
           )}
 
