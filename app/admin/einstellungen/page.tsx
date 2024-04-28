@@ -232,7 +232,7 @@ export default function Einstellungen() {
 
       {!settingsLoading && questions && datenschutz && (
         <form id="settingsForm" onSubmit={handleSubmit(safeSettings)}>
-          <fieldset className="grid sm:grid-cols-1 lg:grid-cols-2">
+          <fieldset className="grid sm:grid-cols-1 lg:grid-cols-3">
             <details open={windowWidth >= 1024}>
               <summary className="text-xl">Beschreibungen</summary>
 

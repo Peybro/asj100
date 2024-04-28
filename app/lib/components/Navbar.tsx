@@ -31,7 +31,7 @@ export default function Navbar({ user }: NavbarProps) {
         <li>
           <Link href="/admin/einsendungen" passHref legacyBehavior>
             <a
-              className={`${path.includes("einsendungen") || path.endsWith("admin") ? "text-blue-400" : ""}`}
+              className={`${path.includes("einsendungen") || path.endsWith("admin") ? "text-blue-500" : ""}`}
             >
               Einsendungen
             </a>
@@ -40,7 +40,7 @@ export default function Navbar({ user }: NavbarProps) {
         <li>
           <Link href="/admin/einstellungen" passHref legacyBehavior>
             <a
-              className={`${path.includes("einstellungen") ? "text-blue-400" : ""}`}
+              className={`${path.includes("einstellungen") ? "text-blue-500" : ""}`}
             >
               Einstellungen
             </a>

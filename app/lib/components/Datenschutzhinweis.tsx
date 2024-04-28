@@ -107,7 +107,7 @@ export default function DatenschutzhinweisComponent({
             )}
             {!closable && (
               <Link href="/" passHref legacyBehavior>
-                <a className="text-blue-400 underline">zum Formular</a>
+                <a className="text-blue-500 underline">zum Formular</a>
               </Link>
             )}
           </footer>
