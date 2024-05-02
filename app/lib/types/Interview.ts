@@ -3,8 +3,8 @@ import { Answer } from "./Answer";
 export type Interview = {
   id: string;
   picture: string;
+  datenschutzErklaerung: string;
   name: string;
-  email: string;
   location: string;
   age: number;
   answers: Answer[];

@@ -16,15 +16,16 @@ import type { Question } from "@/types/Question";
 import ErrorIndicator from "@/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
 import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
-import { DescriptionTexts } from "./lib/types/DescriptionTexts";
+import { DescriptionTexts } from "@/types/DescriptionTexts";
+import { Datenschutz } from "./lib/types/Datenschutz";
 
 type FormData = {
   name: string;
   age: number;
   location: string;
-  email: string;
   picture: (Blob | Uint8Array | ArrayBuffer)[];
   [key: `question-${number}`]: string[];
+  datenschutzErklaerung: (Blob | Uint8Array | ArrayBuffer)[];
   terms: boolean;
   terms2: boolean;
   securityQuestion: string;
@@ -50,6 +51,7 @@ export default function Home() {
   // states
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
+  const [whatsUploading, setWhatsUploading] = useState<string>("");
 
   /**
    * Handles the form submission
@@ -63,12 +65,13 @@ export default function Home() {
     const name = data.name;
     const age = data.age;
     const location = data.location;
-    const email = data.email;
     const picture = data.picture[0];
+    const datenschutzErklaerung = data.datenschutzErklaerung[0] ?? null;
 
     const now = new Date().getTime().toString();
 
     const pictureName = `${name}_${now}.jpg`;
+    const datenschutzErklaerungName = `${name}_${now}_datenschutz.pdf`;
 
     const answers = [];
     (settingsValue.data()!.questions as Question[]).forEach(
@@ -86,14 +89,31 @@ export default function Home() {
       name,
       age,
       location,
-      email,
       answers,
       picture: pictureName,
+      datenschutzErklaerung: datenschutzErklaerung
+        ? datenschutzErklaerungName
+        : false,
     });
 
+    setWhatsUploading("Bild");
     await uploadFile(storageRef(storage, `portraits/${pictureName}`), picture, {
       contentType: "image/jpeg",
     });
+
+    if (datenschutzErklaerung !== null) {
+      setWhatsUploading("Datenschutzerklärung");
+      await uploadFile(
+        storageRef(
+          storage,
+          `datenschutzzustimmungen/${datenschutzErklaerungName}`,
+        ),
+        datenschutzErklaerung,
+        {
+          contentType: "application/pdf",
+        },
+      );
+    }
 
     reset();
     toast.success("Vielen Dank für deine Teilnahme!", {
@@ -138,7 +158,7 @@ export default function Home() {
             </p>
           )}
 
-          <div className="autogrid">
+          <div className="grid">
             <div>
               <h3>Über dich</h3>
 
@@ -176,7 +196,6 @@ export default function Home() {
                     <small id="valid-helper-name">{errors.name?.message}</small>
                   )}
                 </label>
-
                 <label>
                   Wie alt bist du?
                   <input
@@ -206,7 +225,6 @@ export default function Home() {
                     <small id="valid-helper-age">{errors.age?.message}</small>
                   )}
                 </label>
-
                 <label>
                   Wo kommst du her?
                   <input
@@ -234,7 +252,6 @@ export default function Home() {
                     </small>
                   )}
                 </label>
-
                 <label>
                   Ein Bild von dir
                   <input
@@ -260,40 +277,6 @@ export default function Home() {
                   ) : (
                     <small id="picture-helper">
                       Zeig uns dein schönstes Lächeln!
-                    </small>
-                  )}
-                </label>
-
-                <label>
-                  Deine Email
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    {...(Object.hasOwn(errors, "email")
-                      ? { "aria-invalid": Object.hasOwn(errors, "email") }
-                      : {})}
-                    aria-describedby="valid-helper-email"
-                    {...register("email", {
-                      required: {
-                        value: true,
-                        message:
-                          "Bitte gib deine Email-Adresse an für eventuelle Rückfragen",
-                      },
-                      pattern: {
-                        value:
-                          // eslint-disable-next-line no-useless-escape
-                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                        message: "Bitte gib eine gültige Email-Adresse an",
-                      },
-                    })}
-                  />
-                  {errors.email ? (
-                    <small id="valid-helper-email">
-                      {errors.email?.message}
-                    </small>
-                  ) : (
-                    <small id="email-helper">
-                      Für evtl. Rückfragen zur Datennutzung
                     </small>
                   )}
                 </label>
@@ -368,79 +351,123 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mb-2">
-            Ich habe den{" "}
-            <DatenschutzhinweisComponent
-              open={false}
-              onAccept={(e) => acceptTerms(e)}
-            />{" "}
-            gelesen...
+          <div>
+            <h3>Datenschutz</h3>
+
+            <div className="grid">
+              <article>
+                <label>
+                  Solltest du noch keine Einverständniserklärung ausgefüllt
+                  haben nutze bitte{" "}
+                  <a
+                    href="https://tms.aloom.de/files/659d6da2f07f91.52148902/EE_Foto-Film_U18_Festival.pdf"
+                    target="_blank"
+                    className="text-blue-500 underline"
+                  >
+                    diesen Link
+                  </a>{" "}
+                  und lade uns das ausgefüllte Formular hier hoch!
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    aria-describedby="valid-helper-datenschutzErklaerung"
+                    {...(Object.hasOwn(errors, "datenschutzErklaerung")
+                      ? {
+                          "aria-invalid": Object.hasOwn(
+                            errors,
+                            "datenschutzErklaerung",
+                          ),
+                        }
+                      : {})}
+                    {...register("datenschutzErklaerung", {
+                      required: false,
+                    })}
+                  />
+                  {errors.datenschutzErklaerung && (
+                    <small id="valid-helper-datenschutzErklaerung">
+                      {errors.datenschutzErklaerung?.message}
+                    </small>
+                  )}
+                </label>
+              </article>
+
+              <article>
+                <div className="mb-2">
+                  Ich habe den{" "}
+                  <DatenschutzhinweisComponent
+                    open={false}
+                    onAccept={(e) => acceptTerms(e)}
+                  />{" "}
+                  gelesen...
+                </div>
+                <label>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    aria-describedby="valid-helper-terms"
+                    {...(Object.hasOwn(errors, "terms")
+                      ? { "aria-invalid": Object.hasOwn(errors, "terms") }
+                      : {})}
+                    {...register("terms", {
+                      required: {
+                        value: true,
+                        message:
+                          "Bitte lies und akzeptiere den Datenschutzhinweis bevor du dein Interview abschicken kannst.",
+                      },
+                    })}
+                  />
+                  ... und bin mit dem Speichern meiner Daten einverstanden.
+                </label>
+                {errors.terms && (
+                  <small id="valid-helper-terms" className="text-red-500">
+                    {errors.terms?.message}
+                  </small>
+                )}
+                <label>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    aria-describedby="valid-helper-terms2"
+                    {...(Object.hasOwn(errors, "terms2")
+                      ? { "aria-invalid": Object.hasOwn(errors, "terms2") }
+                      : {})}
+                    {...register("terms2", {
+                      required: {
+                        value: true,
+                        message:
+                          "Bitte bestätige, dass du mit der Verarbeitung deiner Daten einverstanden bist.",
+                      },
+                    })}
+                  />
+                  ... und ich bin der Verarbeitung und Veröffentlichung meiner
+                  Daten einverstanden.
+                </label>
+                {errors.terms2 && (
+                  <small id="valid-helper-terms2" className="text-red-500">
+                    {errors.terms2?.message}
+                  </small>
+                )}
+                <label className="sr-only">
+                  <input
+                    type="text"
+                    {...register("securityQuestion", {
+                      required: {
+                        value: false,
+                        message: "Bitte beantworte diese Frage",
+                      },
+                    })}
+                  />
+                </label>
+              </article>
+            </div>
           </div>
-          <label>
-            <input
-              type="checkbox"
-              role="switch"
-              aria-describedby="valid-helper-terms"
-              {...(Object.hasOwn(errors, "terms")
-                ? { "aria-invalid": Object.hasOwn(errors, "terms") }
-                : {})}
-              {...register("terms", {
-                required: {
-                  value: true,
-                  message:
-                    "Bitte lies und akzeptiere den Datenschutzhinweis bevor du dein Interview abschicken kannst.",
-                },
-              })}
-            />
-            ... und bin mit dem Speichern meiner Daten einverstanden.
-          </label>
-          {errors.terms && (
-            <small id="valid-helper-terms" className="text-red-500">
-              {errors.terms?.message}
-            </small>
-          )}
-          <label>
-            <input
-              type="checkbox"
-              role="switch"
-              aria-describedby="valid-helper-terms2"
-              {...(Object.hasOwn(errors, "terms2")
-                ? { "aria-invalid": Object.hasOwn(errors, "terms2") }
-                : {})}
-              {...register("terms2", {
-                required: {
-                  value: true,
-                  message:
-                    "Bitte bestätige, dass du mit der Verarbeitung deiner Daten einverstanden bist.",
-                },
-              })}
-            />
-            ... und ich bin der Verarbeitung und Veröffentlichung meiner Daten
-            einverstanden.
-          </label>
-          {errors.terms2 && (
-            <small id="valid-helper-terms2" className="text-red-500">
-              {errors.terms2?.message}
-            </small>
-          )}
-          <label className="sr-only">
-            <input
-              type="text"
-              {...register("securityQuestion", {
-                required: {
-                  value: false,
-                  message: "Bitte beantworte diese Frage",
-                },
-              })}
-            />
-          </label>
         </fieldset>
 
         <input
           type="submit"
           value={
             isSubmitting
-              ? `Lade hoch... ${snapshot?.bytesTransferred > 0 ? ((snapshot?.bytesTransferred / snapshot?.totalBytes) * 100).toFixed(0) + "%" : ""}`
+              ? `Lade ${whatsUploading + " "}hoch... ${snapshot?.bytesTransferred > 0 ? ((snapshot?.bytesTransferred / snapshot?.totalBytes) * 100).toFixed(0) + "%" : ""}`
               : "Abschicken"
           }
           disabled={isSubmitting || !settingsValue}

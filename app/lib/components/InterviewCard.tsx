@@ -23,10 +23,20 @@ export default function InterviewCard({
   onRemove,
   showAsList,
 }: InterviewCardProps) {
-  const { id, name, age, location, email, picture, answers } = interview;
+  const { id, name, age, location, picture, datenschutzErklaerung, answers } =
+    interview;
 
-  const storageRef = ref(storage, `portraits/${picture}`);
-  const [url, urlLoading, urlError] = useDownloadURL(storageRef);
+  const pictureStorageRef = ref(storage, `portraits/${picture}`);
+  const [pictureUrl, pictureLoading, pictureError] =
+    useDownloadURL(pictureStorageRef);
+
+  const datenschutzStorageRef = ref(
+    storage,
+    `datenschutzzustimmungen/${datenschutzErklaerung}`,
+  );
+  const [datenschutzUrl, datenschutzLoading, datenschutzError] = useDownloadURL(
+    datenschutzStorageRef,
+  );
 
   /**
    * Builds the answer string for a person in a readable format
@@ -49,8 +59,8 @@ export default function InterviewCard({
   async function download() {
     const link = document.createElement("a");
     const content = `Name: ${name}, Alter: ${age}, Ort: ${location}
-Email: ${email}
 Bild: ${picture}
+Einverständniserklärung: ${datenschutzErklaerung ? datenschutzErklaerung : "Nein"}
 
 ${buildAnswerString()}`;
 
@@ -67,7 +77,10 @@ ${buildAnswerString()}`;
   async function remove() {
     try {
       await deleteDoc(doc(db, "kurzinterviews", id));
-      await deleteObject(storageRef);
+      await deleteObject(pictureStorageRef);
+      if (datenschutzErklaerung) {
+        await deleteObject(datenschutzStorageRef);
+      }
       onRemove();
     } catch (error) {
       console.error(error);
@@ -82,24 +95,22 @@ ${buildAnswerString()}`;
     return (
       <article>
         <header>
-          {urlError && (
-            <ErrorIndicator error={urlError}>
+          {pictureError && (
+            <ErrorIndicator error={pictureError}>
               <p>Fehler beim Laden des Bildes</p>
             </ErrorIndicator>
           )}
-          {urlLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
-          {!urlLoading && url && (
+          {pictureLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
+          {!pictureLoading && pictureUrl && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt={`Bild von ${name}`} className="w-full" />
+            <img src={pictureUrl} alt={`Bild von ${name}`} className="w-full" />
           )}
         </header>
 
         <p>
-          {name} (<span className={age < 18 ? "text-red-500" : ""}>{age}</span>)
-          aus {location}
-        </p>
-        <p>
-          <a href={`mailto:${email}`}>{email}</a>
+          <span className="font-bold">{name}</span> (
+          <span className={age < 18 ? "text-red-500" : ""}>{age}</span>) aus{" "}
+          {location}
         </p>
 
         {answers.map((answer: Answer, i: number) => {
@@ -112,7 +123,27 @@ ${buildAnswerString()}`;
           );
         })}
 
-        <footer className="grid sm:grid-cols-2 md:grid-cols-1">
+        <hr />
+
+        <p>
+          <span className="font-bold">
+            Einverständniserklärung wurde extra hochgeladen?
+          </span>
+          <br />
+          {datenschutzErklaerung && (
+            <a
+              className="text-blue-500 underline"
+              href={datenschutzUrl}
+              download
+              target="_blank"
+            >
+              {datenschutzErklaerung}
+            </a>
+          )}
+          {!datenschutzErklaerung && "Nein"}
+        </p>
+
+        <footer className="grid grid-cols-1">
           <button onClick={download}>Download</button>
           {editMode && (
             <button className="border-red-500 bg-red-500" onClick={remove}>
@@ -129,7 +160,12 @@ ${buildAnswerString()}`;
       <>
         <details>
           <summary>
-            {name} {age < 18 && <span>({"< 18"})</span>}
+            {name}{" "}
+            {age < 18 && (
+              <>
+                (<span className="text-red-500">{"< 18"}</span>)
+              </>
+            )}
           </summary>
           <CardContent />
         </details>
