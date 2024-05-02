@@ -126,8 +126,9 @@ ${buildAnswerString()}`;
         <hr />
 
         <p>
-          <span className="font-bold">
-            Einverständniserklärung wurde extra hochgeladen?
+          <span className="hyphens-manual font-bold">
+            Ein&shy;ver&shy;ständ&shy;nis&shy;er&shy;klär&shy;ung wurde extra
+            hoch&shy;ge&shy;la&shy;den?
           </span>
           <br />
           {datenschutzErklaerung && (
