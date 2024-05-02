@@ -67,6 +67,26 @@ export default function Home() {
     const location = data.location;
     const picture = data.picture[0];
     const datenschutzErklaerung = data.datenschutzErklaerung[0] ?? null;
+    if (
+      datenschutzErklaerung &&
+      !datenschutzErklaerung.toString().endsWith(".pdf")
+    ) {
+      toast.error(
+        "Bitte lade die Einverständniserklärung nur als PDF-Datei hoch!",
+        {
+          position: "top-center",
+          autoClose: 8000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          transition: Bounce,
+        },
+      );
+      return;
+    }
 
     const now = new Date().getTime().toString();
 
@@ -169,7 +189,7 @@ export default function Home() {
                 }
               </p>
 
-              <article>
+              <div>
                 <label>
                   Wie heißt du?
                   <input
@@ -280,7 +300,7 @@ export default function Home() {
                     </small>
                   )}
                 </label>
-              </article>
+              </div>
             </div>
 
             <div>
@@ -293,7 +313,7 @@ export default function Home() {
                 }
               </p>
 
-              <article>
+              <div>
                 {settingsError && (
                   <ErrorIndicator>Konnte Fragen nicht laden</ErrorIndicator>
                 )}
@@ -347,11 +367,11 @@ export default function Home() {
                       );
                     },
                   )}
-              </article>
+              </div>
             </div>
           </div>
 
-          <div>
+          <div className="mt-4">
             <h3>Datenschutz</h3>
 
             <div className="grid">
@@ -391,7 +411,7 @@ export default function Home() {
                 </label>
               </article>
 
-              <article>
+              <div>
                 <div className="mb-2">
                   Ich habe den{" "}
                   <DatenschutzhinweisComponent
@@ -458,7 +478,7 @@ export default function Home() {
                     })}
                   />
                 </label>
-              </article>
+              </div>
             </div>
           </div>
         </fieldset>

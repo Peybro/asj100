@@ -329,15 +329,15 @@ export default function Einstellungen() {
                                 value: 5,
                                 message: `Die Frage muss mindestens 5 Zeichen lang sein.`,
                               },
+                              onChange(event) {
+                                setQuestions((prev) =>
+                                  prev.toSpliced(i, 1, {
+                                    ...question,
+                                    question: event.target.value,
+                                  }),
+                                );
+                              },
                             })}
-                            onChange={(e) => {
-                              setQuestions((prev) =>
-                                prev.toSpliced(i, 1, {
-                                  ...question,
-                                  question: e.target.value,
-                                }),
-                              );
-                            }}
                           />
                           {errors[`question-${question.uuid}`] && (
                             <small
@@ -367,15 +367,15 @@ export default function Einstellungen() {
                                 value: false,
                                 message: `Bitte ein Beispiel für Frage ${question.uuid} angeben.`,
                               },
+                              onChange(event) {
+                                setQuestions((prev) =>
+                                  prev.toSpliced(i, 1, {
+                                    ...question,
+                                    example: event.target.value,
+                                  }),
+                                );
+                              },
                             })}
-                            onChange={(e) => {
-                              setQuestions((prev) =>
-                                prev.toSpliced(i, 1, {
-                                  ...question,
-                                  example: e.target.value,
-                                }),
-                              );
-                            }}
                           />
                           {errors[`example-${question.uuid}`] && (
                             <small id={`valid-helper-example-${question.uuid}`}>
@@ -454,15 +454,15 @@ export default function Einstellungen() {
                               value: 10,
                               message: `Der Titel muss mindestens 10 Zeichen lang sein.`,
                             },
+                            onChange(event) {
+                              setDatenschutz((prev) =>
+                                prev.toSpliced(i, 1, {
+                                  ...hinweis,
+                                  title: event.target.value,
+                                }),
+                              );
+                            },
                           })}
-                          onChange={(e) => {
-                            setDatenschutz((prev) =>
-                              prev.toSpliced(i, 1, {
-                                ...hinweis,
-                                title: e.target.value,
-                              }),
-                            );
-                          }}
                         />
                         {errors[`ds-title-${hinweis.uuid}`] && (
                           <small id={`valid-helper-ds-title-${hinweis.uuid}`}>
@@ -492,16 +492,16 @@ export default function Einstellungen() {
                               value: 10,
                               message: `Der Hinweis muss mindestens 10 Zeichen lang sein.`,
                             },
+                            onChange(event) {
+                              setDatenschutz((prev) =>
+                                prev.toSpliced(i, 1, {
+                                  ...hinweis,
+                                  text: event.target.value,
+                                }),
+                              );
+                            },
                           })}
                           rows={5}
-                          onChange={(e) => {
-                            setDatenschutz((prev) =>
-                              prev.toSpliced(i, 1, {
-                                ...hinweis,
-                                text: e.target.value,
-                              }),
-                            );
-                          }}
                         />
                         {errors[`ds-text-${hinweis.uuid}`] && (
                           <small id={`valid-helper-ds-text-${hinweis.uuid}`}>
