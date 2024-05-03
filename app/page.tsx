@@ -52,6 +52,7 @@ export default function Home() {
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
   const [whatsUploading, setWhatsUploading] = useState<string>("");
+  const [onFestival, setOnFestival] = useState<boolean>(true);
 
   /**
    * Handles the form submission
@@ -374,42 +375,54 @@ export default function Home() {
           <div className="mt-4">
             <h3>Datenschutz</h3>
 
+            <label className={onFestival ? "mb-6" : ""}>
+              Bist du gerade auf dem Festival?{" "}
+              <input
+                type="checkbox"
+                checked={onFestival}
+                onChange={() => setOnFestival(!onFestival)}
+              />{" "}
+              {onFestival ? "Ja" : "Nein"}
+            </label>
+
             <div className="grid">
-              <article>
-                <label>
-                  Solltest du noch keine Einverständniserklärung ausgefüllt
-                  haben nutze bitte{" "}
-                  <a
-                    href="https://tms.aloom.de/files/659d6da2f07f91.52148902/EE_Foto-Film_U18_Festival.pdf"
-                    target="_blank"
-                    className="text-blue-500 underline"
-                  >
-                    diesen Link
-                  </a>{" "}
-                  und lade uns das ausgefüllte Formular hier hoch!
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    aria-describedby="valid-helper-datenschutzErklaerung"
-                    {...(Object.hasOwn(errors, "datenschutzErklaerung")
-                      ? {
-                          "aria-invalid": Object.hasOwn(
-                            errors,
-                            "datenschutzErklaerung",
-                          ),
-                        }
-                      : {})}
-                    {...register("datenschutzErklaerung", {
-                      required: false,
-                    })}
-                  />
-                  {errors.datenschutzErklaerung && (
-                    <small id="valid-helper-datenschutzErklaerung">
-                      {errors.datenschutzErklaerung?.message}
-                    </small>
-                  )}
-                </label>
-              </article>
+              {!onFestival && (
+                <article>
+                  <label>
+                    Solltest du noch keine Einverständniserklärung ausgefüllt
+                    haben nutze bitte{" "}
+                    <a
+                      href="https://tms.aloom.de/files/659d6da2f07f91.52148902/EE_Foto-Film_U18_Festival.pdf"
+                      target="_blank"
+                      className="text-blue-500 underline"
+                    >
+                      diesen Link
+                    </a>{" "}
+                    und lade uns das ausgefüllte Formular hier hoch!
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      aria-describedby="valid-helper-datenschutzErklaerung"
+                      {...(Object.hasOwn(errors, "datenschutzErklaerung")
+                        ? {
+                            "aria-invalid": Object.hasOwn(
+                              errors,
+                              "datenschutzErklaerung",
+                            ),
+                          }
+                        : {})}
+                      {...register("datenschutzErklaerung", {
+                        required: false,
+                      })}
+                    />
+                    {errors.datenschutzErklaerung && (
+                      <small id="valid-helper-datenschutzErklaerung">
+                        {errors.datenschutzErklaerung?.message}
+                      </small>
+                    )}
+                  </label>
+                </article>
+              )}
 
               <div>
                 <div className="mb-2">
