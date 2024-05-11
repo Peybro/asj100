@@ -126,22 +126,30 @@ ${buildAnswerString()}`;
         <hr />
 
         <p>
-          <span className="hyphens-manual font-bold">
-            Ein&shy;ver&shy;ständ&shy;nis&shy;er&shy;klär&shy;ung wurde extra
-            hoch&shy;ge&shy;la&shy;den?
-          </span>
-          <br />
           {datenschutzErklaerung && (
-            <a
-              className="text-blue-500 underline"
-              href={datenschutzUrl}
-              download
-              target="_blank"
-            >
-              {datenschutzErklaerung}
-            </a>
+            <>
+              <span className="hyphens-manual font-bold">
+                Ein&shy;ver&shy;ständ&shy;nis&shy;er&shy;klär&shy;ung wurde
+                extra hoch&shy;ge&shy;la&shy;den?
+                {name} war nicht auf dem Fes&shy;ti&shy;val ❌
+              </span>
+              <br />
+              <span className="font-bold">Einverständniserklärung:</span>{" "}
+              <a
+                className="text-blue-500 underline"
+                href={datenschutzUrl}
+                download
+                target="_blank"
+              >
+                {datenschutzErklaerung}
+              </a>
+            </>
           )}
-          {!datenschutzErklaerung && "Nein"}
+          {!datenschutzErklaerung && (
+            <span className="hyphens-manual font-bold">
+              {name} war auf dem Fes&shy;ti&shy;val ✅
+            </span>
+          )}
         </p>
 
         <footer className="grid grid-cols-1">
