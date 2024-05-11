@@ -68,26 +68,26 @@ export default function Home() {
     const location = data.location;
     const picture = data.picture[0];
     const datenschutzErklaerung = data.datenschutzErklaerung[0] ?? null;
-    if (
-      datenschutzErklaerung &&
-      !datenschutzErklaerung.toString().endsWith(".pdf")
-    ) {
-      toast.error(
-        "Bitte lade die Einverständniserklärung nur als PDF-Datei hoch!",
-        {
-          position: "top-center",
-          autoClose: 8000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-          transition: Bounce,
-        },
-      );
-      return;
-    }
+    // if (
+    //   datenschutzErklaerung &&
+    //   !datenschutzErklaerung.toString().endsWith(".pdf")
+    // ) {
+    //   toast.error(
+    //     "Bitte lade die Einverständniserklärung nur als PDF-Datei hoch!",
+    //     {
+    //       position: "top-center",
+    //       autoClose: 8000,
+    //       hideProgressBar: false,
+    //       closeOnClick: true,
+    //       pauseOnHover: true,
+    //       draggable: true,
+    //       progress: undefined,
+    //       theme: "dark",
+    //       transition: Bounce,
+    //     },
+    //   );
+    //   return;
+    // }
 
     const now = new Date().getTime().toString();
 
