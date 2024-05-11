@@ -4,7 +4,7 @@ import { db } from "@/firebase-config";
 import { collection } from "firebase/firestore";
 import InterviewCard from "@/components/InterviewCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/types/Answer";
 import Toolbar from "@/components/Toolbar";
@@ -93,8 +93,8 @@ ${buildAnswerString(answers)}
             editMode
               ? ""
               : editButtonClicked
-                ? "border-red-500 bg-red-500"
-                : "border-yellow-500 bg-yellow-500"
+                ? "border-yellow-500 bg-yellow-500"
+                : "secondary"
           }
           onClick={() => {
             if (!editMode) {
