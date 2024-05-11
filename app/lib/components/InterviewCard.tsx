@@ -129,8 +129,6 @@ ${buildAnswerString()}`;
           {datenschutzErklaerung && (
             <>
               <span className="hyphens-manual font-bold">
-                Ein&shy;ver&shy;ständ&shy;nis&shy;er&shy;klär&shy;ung wurde
-                extra hoch&shy;ge&shy;la&shy;den?
                 {name} war nicht auf dem Fes&shy;ti&shy;val ❌
               </span>
               <br />
