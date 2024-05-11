@@ -10,6 +10,7 @@ import type { Answer } from "@/types/Answer";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
 import { Interview } from "../types/Interview";
+import { time } from "console";
 
 /**
  * Shows all interviews that have been submitted
@@ -24,6 +25,31 @@ export default function EinsendungenComponent() {
   const [editMode, setEditMode] = useState(false);
   const [showAsList, setShowAsList] = useState(true);
   const [editButtonClicked, setEditButtonClicked] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(3);
+
+  // Timer for the edit button to confirm the deletion
+  useEffect(() => {
+    if (!editButtonClicked) return;
+
+    let timer = null;
+    timer = setInterval(() => {
+      if (editMode) {
+        clearInterval(timer);
+      }
+      if (timeRemaining === 0) {
+        clearInterval(timer);
+        setEditButtonClicked(false);
+        setTimeRemaining(3);
+      } else {
+        setTimeRemaining((prev) => prev - 1);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editButtonClicked, timeRemaining]);
 
   /**
    * Builds the answer string for a person in a readable format
@@ -79,7 +105,7 @@ ${buildAnswerString(answers)}
 
   return (
     <>
-      <h1>Einsendungen</h1>
+      <h1>Einsendungen ({interviewsValue?.docs?.length})</h1>
 
       <Toolbar>
         <button
@@ -106,6 +132,7 @@ ${buildAnswerString(answers)}
               }
             } else {
               setEditMode(false);
+              setTimeRemaining(3);
             }
           }}
           disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
@@ -113,7 +140,7 @@ ${buildAnswerString(answers)}
           {editMode
             ? "Fertig"
             : editButtonClicked
-              ? "Bestätigen"
+              ? `Bestätigen (${timeRemaining})`
               : "Bearbeiten"}
         </button>
       </Toolbar>
