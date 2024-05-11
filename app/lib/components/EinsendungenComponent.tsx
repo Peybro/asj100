@@ -23,6 +23,7 @@ export default function EinsendungenComponent() {
   // Local state
   const [editMode, setEditMode] = useState(false);
   const [showAsList, setShowAsList] = useState(true);
+  const [editButtonClicked, setEditButtonClicked] = useState(false);
 
   /**
    * Builds the answer string for a person in a readable format
@@ -88,11 +89,32 @@ ${buildAnswerString(answers)}
           Alle downloaden
         </button>{" "}
         <button
-          className="secondary"
-          onClick={() => setEditMode((prev) => !prev)}
+          className={
+            editMode
+              ? ""
+              : editButtonClicked
+                ? "border-red-500 bg-red-500"
+                : "border-yellow-500 bg-yellow-500"
+          }
+          onClick={() => {
+            if (!editMode) {
+              if (editButtonClicked) {
+                setEditMode(true);
+                setEditButtonClicked(false);
+              } else {
+                setEditButtonClicked(true);
+              }
+            } else {
+              setEditMode(false);
+            }
+          }}
           disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
         >
-          {editMode ? "Fertig" : "Bearbeiten"}
+          {editMode
+            ? "Fertig"
+            : editButtonClicked
+              ? "Bestätigen"
+              : "Bearbeiten"}
         </button>
       </Toolbar>
 
