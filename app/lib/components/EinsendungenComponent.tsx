@@ -75,9 +75,8 @@ export default function EinsendungenComponent() {
   function addPerson(interview: Interview) {
     const { name, age, location, picture, datenschutzErklaerung, answers } =
       interview;
-    return `Name: ${name}, Alter: ${age}, Ort: ${location},
+    return `Name: ${name},
 Bild: ${picture}
-Einverständniserklärung: ${datenschutzErklaerung ? datenschutzErklaerung : "Nein"}
 
 ${buildAnswerString(answers)}
 =============================================\n\n`;
