@@ -170,7 +170,7 @@ export default function Home() {
                     aria-describedby="valid-helper-name"
                     {...register("name", {
                       required: {
-                        value: true,
+                        value: false,
                         message:
                           "Bitte teil uns mit wie du heißt damit wir dich zuordnen können.",
                       },
@@ -197,7 +197,7 @@ export default function Home() {
                       : {})}
                     {...register("picture", {
                       required: {
-                        value: true,
+                        value: false,
                         message:
                           "Bitte lade ein Bild von dir hoch um deinem Interview ein Gesicht zu geben.",
                       },
@@ -254,9 +254,9 @@ export default function Home() {
                                 message: "Bitte beantworte diese Frage.",
                               },
                               minLength: {
-                                value: 5,
+                                value: 1,
                                 message:
-                                  "Deine Antwort sollte mindestens 5 Zeichen lang sein.",
+                                  "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
                               },
                             })}
                           />
