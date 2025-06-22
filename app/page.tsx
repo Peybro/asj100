@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import asj100 from "/public/100JahreASJLogo_RGB_4zu3.png";
+import asgLogo from "/public/asg-logo.jpg";
 import { MouseEvent, useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
@@ -17,7 +17,6 @@ import ErrorIndicator from "@/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
 import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
 import { DescriptionTexts } from "@/types/DescriptionTexts";
-import { Datenschutz } from "./lib/types/Datenschutz";
 
 type FormData = {
   name: string;
@@ -52,7 +51,6 @@ export default function Home() {
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
   const [whatsUploading, setWhatsUploading] = useState<string>("");
-  const [onFestival, setOnFestival] = useState<boolean>(true);
 
   /**
    * Handles the form submission
@@ -64,35 +62,11 @@ export default function Home() {
     }
 
     const name = data.name;
-    const age = data.age;
-    const location = data.location;
     const picture = data.picture[0];
-    const datenschutzErklaerung = data.datenschutzErklaerung[0] ?? null;
-    // if (
-    //   datenschutzErklaerung &&
-    //   !datenschutzErklaerung.toString().endsWith(".pdf")
-    // ) {
-    //   toast.error(
-    //     "Bitte lade die Einverständniserklärung nur als PDF-Datei hoch!",
-    //     {
-    //       position: "top-center",
-    //       autoClose: 8000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "dark",
-    //       transition: Bounce,
-    //     },
-    //   );
-    //   return;
-    // }
 
     const now = new Date().getTime().toString();
 
     const pictureName = `${name}_${now}.jpg`;
-    const datenschutzErklaerungName = `${name}_${now}_datenschutz.pdf`;
 
     const answers = [];
     (settingsValue.data()!.questions as Question[]).forEach(
@@ -108,33 +82,14 @@ export default function Home() {
     await setDoc(interviewRef, {
       id: now,
       name,
-      age,
-      location,
       answers,
       picture: pictureName,
-      datenschutzErklaerung: datenschutzErklaerung
-        ? datenschutzErklaerungName
-        : false,
     });
 
     setWhatsUploading("Bild");
     await uploadFile(storageRef(storage, `portraits/${pictureName}`), picture, {
       contentType: "image/jpeg",
     });
-
-    if (datenschutzErklaerung !== null) {
-      setWhatsUploading("Datenschutzerklärung");
-      await uploadFile(
-        storageRef(
-          storage,
-          `datenschutzzustimmungen/${datenschutzErklaerungName}`,
-        ),
-        datenschutzErklaerung,
-        {
-          contentType: "application/pdf",
-        },
-      );
-    }
 
     reset();
     toast.success("Vielen Dank für deine Teilnahme!", {
@@ -158,9 +113,10 @@ export default function Home() {
 
   return (
     <main>
+      <h1 className="text-2xl">Klassentreffen Abi 2015</h1>
       <div className="flex justify-between">
         <Image
-          src={asj100}
+          src={asgLogo}
           alt="Logo für 100 Jahre ASJ"
           width={200}
           onClick={() => setClickCounter((prev) => prev + 1)}
@@ -180,13 +136,25 @@ export default function Home() {
           )}
 
           <div className="grid">
-            <div>
+            {/* <div>
               <h3>Über dich</h3>
 
               <p>
                 {
                   (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
                     ?.aboutYouDescription
+                }
+              </p>
+
+            </div> */}
+
+            <div>
+              <h3>Fragen</h3>
+
+              <p>
+                {
+                  (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
+                    ?.questionsDescription
                 }
               </p>
 
@@ -218,63 +186,7 @@ export default function Home() {
                   )}
                 </label>
                 <label>
-                  Wie alt bist du?
-                  <input
-                    type="number"
-                    placeholder="Alter"
-                    {...(Object.hasOwn(errors, "age")
-                      ? { "aria-invalid": Object.hasOwn(errors, "age") }
-                      : {})}
-                    aria-describedby="valid-helper-age"
-                    {...register("age", {
-                      required: {
-                        value: true,
-                        message:
-                          "Bitte gib dein Alter an. (siehe Datenschutzhinweis)",
-                      },
-                      min: {
-                        value: 3,
-                        message: "Du musst mindestens 3 Jahre alt sein.",
-                      },
-                      max: {
-                        value: 120,
-                        message: "Du bist höchstwahrscheinlich nicht so alt.",
-                      },
-                    })}
-                  />
-                  {errors.age && (
-                    <small id="valid-helper-age">{errors.age?.message}</small>
-                  )}
-                </label>
-                <label>
-                  Wo kommst du her?
-                  <input
-                    type="string"
-                    placeholder="Ort"
-                    {...(Object.hasOwn(errors, "location")
-                      ? { "aria-invalid": Object.hasOwn(errors, "location") }
-                      : {})}
-                    aria-describedby="valid-helper-location"
-                    {...register("location", {
-                      required: {
-                        value: true,
-                        message: "Bitte gib deinen Wohnort an.",
-                      },
-                      minLength: {
-                        value: 2,
-                        message:
-                          "Dein Wohnort muss mindestens 2 Zeichen lang sein.",
-                      },
-                    })}
-                  />
-                  {errors.location && (
-                    <small id="valid-helper-age">
-                      {errors.location?.message}
-                    </small>
-                  )}
-                </label>
-                <label>
-                  Ein Bild von dir
+                  Hast Du Lust ein aktuelles Foto mit uns zu teilen?
                   <input
                     type="file"
                     accept="image/png, image/gif, image/jpeg"
@@ -302,17 +214,6 @@ export default function Home() {
                   )}
                 </label>
               </div>
-            </div>
-
-            <div>
-              <h3>Fragen</h3>
-
-              <p>
-                {
-                  (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
-                    ?.questionsDescription
-                }
-              </p>
 
               <div>
                 {settingsError && (
@@ -349,7 +250,7 @@ export default function Home() {
                             aria-describedby={`valid-helper-question-${i + 1}`}
                             {...register(`question-${i + 1}`, {
                               required: {
-                                value: true,
+                                value: false,
                                 message: "Bitte beantworte diese Frage.",
                               },
                               minLength: {
@@ -375,7 +276,7 @@ export default function Home() {
           <div className="mt-4">
             <h3>Datenschutz</h3>
 
-            <label className={onFestival ? "mb-6" : ""}>
+            {/* <label className={onFestival ? "mb-6" : ""}>
               Bist du gerade auf dem Festival?{" "}
               <input
                 type="checkbox"
@@ -383,10 +284,10 @@ export default function Home() {
                 onChange={() => setOnFestival(!onFestival)}
               />{" "}
               {onFestival ? "Ja" : "Nein"}
-            </label>
+            </label> */}
 
             <div className="grid">
-              {!onFestival && (
+              {/* {!onFestival && (
                 <article>
                   <label>
                     Solltest du noch keine Einverständniserklärung ausgefüllt
@@ -422,7 +323,7 @@ export default function Home() {
                     )}
                   </label>
                 </article>
-              )}
+              )} */}
 
               <div>
                 <div className="mb-2">
@@ -472,8 +373,8 @@ export default function Home() {
                       },
                     })}
                   />
-                  ... und ich bin der Verarbeitung und Veröffentlichung meiner
-                  Daten einverstanden.
+                  ... und ich bin der Verarbeitung und Auswertung meiner Daten
+                  einverstanden.
                 </label>
                 {errors.terms2 && (
                   <small id="valid-helper-terms2" className="text-red-500">

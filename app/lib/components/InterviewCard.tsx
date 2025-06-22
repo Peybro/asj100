@@ -107,48 +107,18 @@ ${buildAnswerString()}`;
           )}
         </header>
 
-        <p>
-          <span className="font-bold">{name}</span> (
-          <span className={age < 18 ? "text-red-500" : ""}>{age}</span>) aus{" "}
-          {location}
-        </p>
+        <h3 className="font-bold">{name}</h3>
 
         {answers.map((answer: Answer, i: number) => {
           return (
             <div key={`answer-key-${i}`} className="mb-3">
               <span className="font-bold">{answer.question}</span>
               <br />
-              <span>{answer.answer}</span>
+              <span>{answer.answer === "" ? "-" : answer.answer}</span>
+              <hr />
             </div>
           );
         })}
-
-        <hr />
-
-        <p>
-          {datenschutzErklaerung && (
-            <>
-              <span className="hyphens-manual font-bold">
-                {name} war nicht auf dem Fes&shy;ti&shy;val ❌
-              </span>
-              <br />
-              <span className="font-bold">Einverständniserklärung:</span>{" "}
-              <a
-                className="text-blue-500 underline"
-                href={datenschutzUrl}
-                download
-                target="_blank"
-              >
-                {datenschutzErklaerung}
-              </a>
-            </>
-          )}
-          {!datenschutzErklaerung && (
-            <span className="hyphens-manual font-bold">
-              {name} war auf dem Fes&shy;ti&shy;val ✅
-            </span>
-          )}
-        </p>
 
         <footer className="grid grid-cols-1">
           <button onClick={download}>Download</button>

@@ -245,7 +245,7 @@ export default function Einstellungen() {
                 />
               </label>
 
-              <label>
+              {/* <label>
                 {'"Über dich"'}
                 <textarea
                   {...register("aboutYouDescription")}
@@ -257,7 +257,7 @@ export default function Einstellungen() {
                     }));
                   }}
                 />
-              </label>
+              </label> */}
 
               <label>
                 Fragen
