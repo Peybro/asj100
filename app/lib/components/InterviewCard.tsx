@@ -94,32 +94,44 @@ ${buildAnswerString()}`;
   function CardContent(): JSX.Element {
     return (
       <article>
-        <header>
-          {pictureError && (
-            <ErrorIndicator error={pictureError}>
-              <p>Fehler beim Laden des Bildes</p>
-            </ErrorIndicator>
-          )}
-          {pictureLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
-          {!pictureLoading && pictureUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={pictureUrl} alt={`Bild von ${name}`} className="w-full" />
-          )}
-        </header>
+        <details>
+          <summary>
+            <header>
+              {pictureError && (
+                <ErrorIndicator error={pictureError}>
+                  <p>Fehler beim Laden des Bildes</p>
+                </ErrorIndicator>
+              )}
+              {pictureLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
+              {!pictureLoading && pictureUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={pictureUrl}
+                  alt={`Bild von ${name}`}
+                  className="mb-2 w-full"
+                />
+              )}
+            </header>
 
-        <h3 className="font-bold">{name}</h3>
+            <span>Antworten</span>
+          </summary>
 
-        {answers.map((answer: Answer, i: number) => {
-          return (
-            <div key={`answer-key-${i}`} className="mb-3">
-              <span className="font-bold">{answer.question}</span>
-              <br />
-              <span>{answer.answer === "" ? "-" : answer.answer}</span>
-              <hr />
-            </div>
-          );
-        })}
-
+          {answers.map((answer: Answer, i: number) => {
+            return (
+              <div key={`answer-key-${i}`} className="mb-3">
+                <span className="font-bold">{answer.question}</span>
+                <br />
+                <span>
+                  {"> "}
+                  <span className="italic">
+                    {answer.answer === "" ? "-" : answer.answer}
+                  </span>
+                </span>
+                <hr />
+              </div>
+            );
+          })}
+        </details>
         <footer className="grid grid-cols-1">
           <button onClick={download}>Download</button>
           {editMode && (
@@ -136,14 +148,7 @@ ${buildAnswerString()}`;
     return (
       <>
         <details>
-          <summary>
-            {name}{" "}
-            {age < 18 && (
-              <>
-                (<span className="text-red-500">{"< 18"}</span>)
-              </>
-            )}
-          </summary>
+          <summary>{name}</summary>
           <CardContent />
         </details>
       </>

@@ -10,7 +10,6 @@ import type { Answer } from "@/types/Answer";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
 import { Interview } from "../types/Interview";
-import { time } from "console";
 
 /**
  * Shows all interviews that have been submitted

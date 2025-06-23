@@ -136,18 +136,6 @@ export default function Home() {
           )}
 
           <div className="grid">
-            {/* <div>
-              <h3>Über dich</h3>
-
-              <p>
-                {
-                  (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
-                    ?.aboutYouDescription
-                }
-              </p>
-
-            </div> */}
-
             <div>
               <h3>Fragen</h3>
 
@@ -170,9 +158,9 @@ export default function Home() {
                     aria-describedby="valid-helper-name"
                     {...register("name", {
                       required: {
-                        value: false,
+                        value: true,
                         message:
-                          "Bitte teil uns mit wie du heißt damit wir dich zuordnen können.",
+                          "Bitte teil uns mit wie du heißt damit wir wissen, dass hier kein Schundluder getrieben wird.",
                       },
                       minLength: {
                         value: 2,
@@ -236,30 +224,94 @@ export default function Home() {
                           {!settingsLoading &&
                             settingsValue &&
                             question.question}
-                          <textarea
-                            className="resize-none"
-                            placeholder={question.example}
-                            {...(Object.hasOwn(errors, `question-${i + 1}`)
-                              ? {
-                                  "aria-invalid": Object.hasOwn(
-                                    errors,
-                                    `question-${i + 1}`,
-                                  ),
-                                }
-                              : {})}
-                            aria-describedby={`valid-helper-question-${i + 1}`}
-                            {...register(`question-${i + 1}`, {
-                              required: {
-                                value: false,
-                                message: "Bitte beantworte diese Frage.",
-                              },
-                              minLength: {
-                                value: 1,
-                                message:
-                                  "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
-                              },
-                            })}
-                          />
+                          {question.type === "yesno" && (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                value="Ja"
+                                id={`question-${i + 1}-yes`}
+                                {...(Object.hasOwn(errors, `question-${i + 1}`)
+                                  ? {
+                                      "aria-invalid": Object.hasOwn(
+                                        errors,
+                                        `question-${i + 1}`,
+                                      ),
+                                    }
+                                  : {})}
+                                aria-describedby={`valid-helper-question-${i + 1}`}
+                                {...register(`question-${i + 1}`, {
+                                  required: {
+                                    value: false,
+                                    message: "Bitte beantworte diese Frage.",
+                                  },
+                                  minLength: {
+                                    value: 1,
+                                    message:
+                                      "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
+                                  },
+                                })}
+                              />
+                              <label htmlFor={`question-${i + 1}-yes`}>
+                                Ja
+                              </label>
+                              <input
+                                type="radio"
+                                value="Nein"
+                                id={`question-${i + 1}-no`}
+                                {...(Object.hasOwn(errors, `question-${i + 1}`)
+                                  ? {
+                                      "aria-invalid": Object.hasOwn(
+                                        errors,
+                                        `question-${i + 1}`,
+                                      ),
+                                    }
+                                  : {})}
+                                aria-describedby={`valid-helper-question-${i + 1}`}
+                                {...register(`question-${i + 1}`, {
+                                  required: {
+                                    value: false,
+                                    message: "Bitte beantworte diese Frage.",
+                                  },
+                                  minLength: {
+                                    value: 1,
+                                    message:
+                                      "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
+                                  },
+                                })}
+                              />
+                              <label htmlFor={`question-${i + 1}-no`}>
+                                Nein
+                              </label>
+                            </div>
+                          )}
+
+                          {(question.type === "text" ||
+                            question.type === undefined) && (
+                            <textarea
+                              className="resize-none"
+                              placeholder={question.example}
+                              {...(Object.hasOwn(errors, `question-${i + 1}`)
+                                ? {
+                                    "aria-invalid": Object.hasOwn(
+                                      errors,
+                                      `question-${i + 1}`,
+                                    ),
+                                  }
+                                : {})}
+                              aria-describedby={`valid-helper-question-${i + 1}`}
+                              {...register(`question-${i + 1}`, {
+                                required: {
+                                  value: false,
+                                  message: "Bitte beantworte diese Frage.",
+                                },
+                                minLength: {
+                                  value: 1,
+                                  message:
+                                    "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
+                                },
+                              })}
+                            />
+                          )}
                           {errors[`question-${i + 1}`] && (
                             <small id={`valid-helper-question-${i + 1}`}>
                               {errors[`question-${i + 1}`]?.message}
