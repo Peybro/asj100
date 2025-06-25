@@ -1,17 +1,13 @@
-import { useDownloadURL } from "react-firebase-hooks/storage";
-import { deleteObject, ref } from "firebase/storage";
-import { db, storage } from "@/firebase-config";
+import { db } from "@/firebase-config";
 import { deleteDoc, doc } from "firebase/firestore";
 import type { Answer } from "@/types/Answer";
-import ErrorIndicator from "./ErrorIndicator";
 import { Interview } from "@/types/Interview";
-import LoadingSpinner from "./LoadingSpinner";
 
 type InterviewCardProps = {
   interview: Interview;
   editMode: boolean;
   onRemove: () => void;
-  showAsList: boolean;
+  index: number;
 };
 
 /**
@@ -21,22 +17,9 @@ export default function InterviewCard({
   interview,
   editMode,
   onRemove,
-  showAsList,
+  index,
 }: InterviewCardProps) {
-  const { id, name, age, location, picture, datenschutzErklaerung, answers } =
-    interview;
-
-  const pictureStorageRef = ref(storage, `portraits/${picture}`);
-  const [pictureUrl, pictureLoading, pictureError] =
-    useDownloadURL(pictureStorageRef);
-
-  const datenschutzStorageRef = ref(
-    storage,
-    `datenschutzzustimmungen/${datenschutzErklaerung}`,
-  );
-  const [datenschutzUrl, datenschutzLoading, datenschutzError] = useDownloadURL(
-    datenschutzStorageRef,
-  );
+  const { id, name, answers } = interview;
 
   /**
    * Builds the answer string for a person in a readable format
@@ -58,15 +41,13 @@ export default function InterviewCard({
    */
   async function download() {
     const link = document.createElement("a");
-    const content = `Name: ${name}, Alter: ${age}, Ort: ${location}
-Bild: ${picture}
-Einverständniserklärung: ${datenschutzErklaerung ? datenschutzErklaerung : "Nein"}
+    const content = `Name: ${name ? name : "Anonym"}
 
 ${buildAnswerString()}`;
 
     const file = new Blob([content], { type: "text/plain" });
     link.href = URL.createObjectURL(file);
-    link.download = `${name}_${id}.txt`;
+    link.download = `${id}.txt`;
     link.click();
     URL.revokeObjectURL(link.href);
   }
@@ -77,10 +58,7 @@ ${buildAnswerString()}`;
   async function remove() {
     try {
       await deleteDoc(doc(db, "kurzinterviews", id));
-      await deleteObject(pictureStorageRef);
-      if (datenschutzErklaerung) {
-        await deleteObject(datenschutzStorageRef);
-      }
+      // await deleteObject(pictureStorageRef);
       onRemove();
     } catch (error) {
       console.error(error);
@@ -95,26 +73,7 @@ ${buildAnswerString()}`;
     return (
       <article>
         <details>
-          <summary>
-            <header>
-              {pictureError && (
-                <ErrorIndicator error={pictureError}>
-                  <p>Fehler beim Laden des Bildes</p>
-                </ErrorIndicator>
-              )}
-              {pictureLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
-              {!pictureLoading && pictureUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={pictureUrl}
-                  alt={`Bild von ${name}`}
-                  className="mb-2 w-full"
-                />
-              )}
-            </header>
-
-            <span>Antworten</span>
-          </summary>
+          <summary>{index + 1}. Antwortbogen</summary>
 
           {answers.map((answer: Answer, i: number) => {
             return (
@@ -144,16 +103,5 @@ ${buildAnswerString()}`;
     );
   }
 
-  if (showAsList) {
-    return (
-      <>
-        <details>
-          <summary>{name}</summary>
-          <CardContent />
-        </details>
-      </>
-    );
-  } else {
-    return <CardContent />;
-  }
+  return <CardContent />;
 }

@@ -6,7 +6,7 @@ import { MouseEvent, useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db, storage } from "@/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
 import DatenschutzhinweisComponent from "@/components/Datenschutzhinweis";
@@ -17,6 +17,8 @@ import ErrorIndicator from "@/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
 import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
 import { DescriptionTexts } from "@/types/DescriptionTexts";
+import { v4 as uuidv4 } from "uuid";
+import { log } from "console";
 
 type FormData = {
   name: string;
@@ -61,12 +63,13 @@ export default function Home() {
       return;
     }
 
-    const name = data.name;
+    const name = uuidv4().slice(0, 8);
     const picture = data.picture[0];
 
     const now = new Date().getTime().toString();
 
-    const pictureName = `${name}_${now}.jpg`;
+    const pictureUUID = uuidv4();
+    const pictureName = `${pictureUUID}.jpg`;
 
     const answers = [];
     (settingsValue.data()!.questions as Question[]).forEach(
@@ -78,13 +81,19 @@ export default function Home() {
       },
     );
 
-    const interviewRef = doc(db, "kurzinterviews", now);
-    await setDoc(interviewRef, {
-      id: now,
-      name,
-      answers,
-      picture: pictureName,
-    });
+    if (
+      !answers.every((answer) => answer.answer === "" || answer.answer === null)
+    ) {
+      const interviewRef = doc(db, "kurzinterviews", now);
+      await setDoc(interviewRef, {
+        id: now,
+        name,
+        answers,
+      });
+    }
+
+    const pictureLinkRef = doc(db, "portraitLinks", pictureUUID);
+    await setDoc(pictureLinkRef, { pictureName });
 
     setWhatsUploading("Bild");
     await uploadFile(storageRef(storage, `portraits/${pictureName}`), picture, {
@@ -145,63 +154,6 @@ export default function Home() {
                     ?.questionsDescription
                 }
               </p>
-
-              <div>
-                <label>
-                  Wie heißt du?
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    {...(Object.hasOwn(errors, "name")
-                      ? { "aria-invalid": Object.hasOwn(errors, "name") }
-                      : {})}
-                    aria-describedby="valid-helper-name"
-                    {...register("name", {
-                      required: {
-                        value: true,
-                        message:
-                          "Bitte teil uns mit wie du heißt damit wir wissen, dass hier kein Schundluder getrieben wird.",
-                      },
-                      minLength: {
-                        value: 2,
-                        message:
-                          "Dein Name muss mindestens 2 Zeichen lang sein.",
-                      },
-                    })}
-                  />
-                  {errors.name && (
-                    <small id="valid-helper-name">{errors.name?.message}</small>
-                  )}
-                </label>
-                <label>
-                  Hast Du Lust ein aktuelles Foto mit uns zu teilen?
-                  <input
-                    type="file"
-                    accept="image/png, image/gif, image/jpeg"
-                    {...(directCam ? { capture: "environment" } : {})}
-                    aria-describedby="valid-helper-picture"
-                    {...(Object.hasOwn(errors, "picture")
-                      ? { "aria-invalid": Object.hasOwn(errors, "picture") }
-                      : {})}
-                    {...register("picture", {
-                      required: {
-                        value: false,
-                        message:
-                          "Bitte lade ein Bild von dir hoch um deinem Interview ein Gesicht zu geben.",
-                      },
-                    })}
-                  />
-                  {errors.picture ? (
-                    <small id="valid-helper-picture">
-                      {errors.picture?.message}
-                    </small>
-                  ) : (
-                    <small id="picture-helper">
-                      Zeig uns dein schönstes Lächeln!
-                    </small>
-                  )}
-                </label>
-              </div>
 
               <div>
                 {settingsError && (
@@ -325,58 +277,51 @@ export default function Home() {
             </div>
           </div>
 
+          <hr />
+
+          <label>
+            <span>Hast Du Lust ein aktuelles Foto mit uns zu teilen?</span>
+            <br />
+            <small className="text-red-500">
+              Das Foto wird unabhängig von deinen Antworten gespeichert, sodass
+              diese anonym bleiben!
+            </small>
+            <br />
+            <small>
+              Wenn wir genug Bilder zusammen bekommen, werden wir versuchen eine
+              kleine Collage von allen Bildern zu erstellen
+            </small>
+            <input
+              type="file"
+              accept="image/png, image/gif, image/jpeg"
+              {...(directCam ? { capture: "environment" } : {})}
+              aria-describedby="valid-helper-picture"
+              {...(Object.hasOwn(errors, "picture")
+                ? { "aria-invalid": Object.hasOwn(errors, "picture") }
+                : {})}
+              {...register("picture", {
+                required: {
+                  value: false,
+                  message:
+                    "Bitte lade ein Bild von dir hoch um deinem Interview ein Gesicht zu geben.",
+                },
+              })}
+            />
+            {errors.picture ? (
+              <small id="valid-helper-picture">{errors.picture?.message}</small>
+            ) : (
+              <small id="picture-helper">
+                Zeig uns dein schönstes Lächeln!
+              </small>
+            )}
+          </label>
+
+          <hr />
+
           <div className="mt-4">
             <h3>Datenschutz</h3>
 
-            {/* <label className={onFestival ? "mb-6" : ""}>
-              Bist du gerade auf dem Festival?{" "}
-              <input
-                type="checkbox"
-                checked={onFestival}
-                onChange={() => setOnFestival(!onFestival)}
-              />{" "}
-              {onFestival ? "Ja" : "Nein"}
-            </label> */}
-
             <div className="grid">
-              {/* {!onFestival && (
-                <article>
-                  <label>
-                    Solltest du noch keine Einverständniserklärung ausgefüllt
-                    haben nutze bitte{" "}
-                    <a
-                      href="https://tms.aloom.de/files/659d6da2f07f91.52148902/EE_Foto-Film_U18_Festival.pdf"
-                      target="_blank"
-                      className="text-blue-500 underline"
-                    >
-                      diesen Link
-                    </a>{" "}
-                    und lade uns das ausgefüllte Formular hier hoch!
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      aria-describedby="valid-helper-datenschutzErklaerung"
-                      {...(Object.hasOwn(errors, "datenschutzErklaerung")
-                        ? {
-                            "aria-invalid": Object.hasOwn(
-                              errors,
-                              "datenschutzErklaerung",
-                            ),
-                          }
-                        : {})}
-                      {...register("datenschutzErklaerung", {
-                        required: false,
-                      })}
-                    />
-                    {errors.datenschutzErklaerung && (
-                      <small id="valid-helper-datenschutzErklaerung">
-                        {errors.datenschutzErklaerung?.message}
-                      </small>
-                    )}
-                  </label>
-                </article>
-              )} */}
-
               <div>
                 <div className="mb-2">
                   Ich habe den{" "}

@@ -1,6 +1,6 @@
 "use client";
 
-import { db } from "@/firebase-config";
+import { db, storage } from "@/firebase-config";
 import { collection } from "firebase/firestore";
 import InterviewCard from "@/components/InterviewCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -10,6 +10,9 @@ import type { Answer } from "@/types/Answer";
 import Toolbar from "@/components/Toolbar";
 import ErrorIndicator from "@/components/ErrorIndicator";
 import { Interview } from "../types/Interview";
+import { useDownloadURL } from "react-firebase-hooks/storage";
+import { deleteObject, ref } from "firebase/storage";
+import { deleteDoc, doc } from "firebase/firestore";
 
 /**
  * Shows all interviews that have been submitted
@@ -20,9 +23,11 @@ export default function EinsendungenComponent() {
     collection(db, "kurzinterviews"),
   );
 
+  const [pictureLinksValue, pictureLinksLoading, pictureLinksError] =
+    useCollection(collection(db, "portraitLinks"));
+
   // Local state
   const [editMode, setEditMode] = useState(false);
-  const [showAsList, setShowAsList] = useState(true);
   const [editButtonClicked, setEditButtonClicked] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(3);
 
@@ -35,7 +40,7 @@ export default function EinsendungenComponent() {
       if (editMode) {
         clearInterval(timer);
       }
-      if (timeRemaining === 0) {
+      if (timeRemaining === 1) {
         clearInterval(timer);
         setEditButtonClicked(false);
         setTimeRemaining(3);
@@ -72,10 +77,8 @@ export default function EinsendungenComponent() {
    * @returns String with all information of the person
    */
   function addPerson(interview: Interview) {
-    const { name, age, location, picture, datenschutzErklaerung, answers } =
-      interview;
-    return `Name: ${name},
-Bild: ${picture}
+    const { name, answers } = interview;
+    return `Name: ${name ? name : "Anonym"}
 
 ${buildAnswerString(answers)}
 =============================================\n\n`;
@@ -99,6 +102,49 @@ ${buildAnswerString(answers)}
     link.download = `alle-Teilnehmer_${now.toLocaleDateString()}.txt`;
     link.click();
     URL.revokeObjectURL(link.href);
+  }
+
+  async function remove(pictureLink: string) {
+    const pictureStorageRef = ref(storage, `portraits/${pictureLink}`);
+    try {
+      await deleteDoc(doc(db, "portraitLinks", pictureLink.split(".")[0]));
+      await deleteObject(pictureStorageRef);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function Picture({ pictureLink }: { pictureLink: string }): JSX.Element {
+    const pictureStorageRef = ref(storage, `portraits/${pictureLink}`);
+    const [pictureUrl, pictureLoading, pictureError] =
+      useDownloadURL(pictureStorageRef);
+
+    return (
+      <>
+        {pictureError && (
+          <ErrorIndicator error={pictureError}>
+            <p>Fehler beim Laden des Bildes</p>
+          </ErrorIndicator>
+        )}
+        {pictureLoading && <LoadingSpinner>Lade Bild...</LoadingSpinner>}
+        {!pictureLoading && pictureUrl && (
+          <article>
+            {/* <header>Header</header> */}
+            <img src={pictureUrl} alt={`Bild`} className="mb-2 w-full" />
+            {editMode && (
+              <footer>
+                <button
+                  className="border-red-500 bg-red-500"
+                  onClick={() => remove(pictureLink)}
+                >
+                  Löschen
+                </button>
+              </footer>
+            )}
+          </article>
+        )}
+      </>
+    );
   }
 
   return (
@@ -143,45 +189,67 @@ ${buildAnswerString(answers)}
         </button>
       </Toolbar>
 
-      <label>
-        <input
-          type="checkbox"
-          role="switch"
-          checked={showAsList}
-          onChange={() => setShowAsList((prev) => !prev)}
-        />
-        Liste
-      </label>
+      <details>
+        <summary>Antworten</summary>
 
-      <div className="mt-5">
-        {interviewsError && <ErrorIndicator error={interviewsError} />}
-        {interviewsLoading && (
-          <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>
-        )}
+        <div className="mt-5">
+          {interviewsError && <ErrorIndicator error={interviewsError} />}
+          {interviewsLoading && (
+            <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>
+          )}
 
-        {!interviewsLoading && interviewsValue && (
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
-            {interviewsValue.docs.length > 0 &&
-              interviewsValue.docs.map((interviewData) => {
-                const interview = interviewData.data() as Interview;
+          {!interviewsLoading && interviewsValue && (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
+              {interviewsValue.docs.length > 0 &&
+                interviewsValue.docs.map((interviewData, i) => {
+                  const interview = interviewData.data() as Interview;
 
-                return (
-                  <InterviewCard
-                    key={interview.id}
-                    interview={interview}
-                    editMode={editMode}
-                    onRemove={() => {
-                      if (interviewsValue?.docs?.length === 0)
-                        setEditMode(false);
-                    }}
-                    showAsList={showAsList}
-                  />
-                );
-              })}
-          </div>
-        )}
-      </div>
+                  return (
+                    <InterviewCard
+                      key={interview.id}
+                      interview={interview}
+                      editMode={editMode}
+                      onRemove={() => {
+                        if (interviewsValue?.docs?.length === 0)
+                          setEditMode(false);
+                      }}
+                      index={i}
+                    />
+                  );
+                })}
+            </div>
+          )}
+        </div>
+      </details>
+
+      <details>
+        <summary>Bilder</summary>
+
+        <div className="mt-5">
+          {pictureLinksError && <ErrorIndicator error={pictureLinksError} />}
+          {pictureLinksLoading && (
+            <LoadingSpinner>Lade Bilder...</LoadingSpinner>
+          )}
+
+          {!pictureLinksLoading && pictureLinksValue && (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
+              {pictureLinksValue.docs.length > 0 &&
+                pictureLinksValue.docs.map((pictureLinkData) => {
+                  const pictureLink = pictureLinkData.data();
+
+                  return (
+                    <Picture
+                      key={pictureLinkData.id}
+                      pictureLink={pictureLink.pictureName}
+                    />
+                  );
+                })}
+            </div>
+          )}
+        </div>
+      </details>
     </>
   );
 }
