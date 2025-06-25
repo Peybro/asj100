@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import asj100 from "/public/100JahreASJLogo_RGB_4zu3.png";
+import asgLogo from "/public/asg-logo.jpg";
 import { MouseEvent, useState } from "react";
 import Link from "next/link";
 import { ref as storageRef } from "firebase/storage";
 import { useDocument } from "react-firebase-hooks/firestore";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db, storage } from "@/firebase-config";
 import { useUploadFile } from "react-firebase-hooks/storage";
 import DatenschutzhinweisComponent from "@/components/Datenschutzhinweis";
@@ -17,7 +17,8 @@ import ErrorIndicator from "@/components/ErrorIndicator";
 import { useAuthState } from "react-firebase-hooks/auth";
 import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
 import { DescriptionTexts } from "@/types/DescriptionTexts";
-import { Datenschutz } from "./lib/types/Datenschutz";
+import { v4 as uuidv4 } from "uuid";
+import { log } from "console";
 
 type FormData = {
   name: string;
@@ -52,7 +53,6 @@ export default function Home() {
   const [directCam, setDirectCam] = useState(false);
   const [clickCounter, setClickCounter] = useState<number>(0);
   const [whatsUploading, setWhatsUploading] = useState<string>("");
-  const [onFestival, setOnFestival] = useState<boolean>(true);
 
   /**
    * Handles the form submission
@@ -63,36 +63,13 @@ export default function Home() {
       return;
     }
 
-    const name = data.name;
-    const age = data.age;
-    const location = data.location;
+    const name = uuidv4().slice(0, 8);
     const picture = data.picture[0];
-    const datenschutzErklaerung = data.datenschutzErklaerung[0] ?? null;
-    // if (
-    //   datenschutzErklaerung &&
-    //   !datenschutzErklaerung.toString().endsWith(".pdf")
-    // ) {
-    //   toast.error(
-    //     "Bitte lade die Einverständniserklärung nur als PDF-Datei hoch!",
-    //     {
-    //       position: "top-center",
-    //       autoClose: 8000,
-    //       hideProgressBar: false,
-    //       closeOnClick: true,
-    //       pauseOnHover: true,
-    //       draggable: true,
-    //       progress: undefined,
-    //       theme: "dark",
-    //       transition: Bounce,
-    //     },
-    //   );
-    //   return;
-    // }
 
     const now = new Date().getTime().toString();
 
-    const pictureName = `${name}_${now}.jpg`;
-    const datenschutzErklaerungName = `${name}_${now}_datenschutz.pdf`;
+    const pictureUUID = uuidv4();
+    const pictureName = `${pictureUUID}.jpg`;
 
     const answers = [];
     (settingsValue.data()!.questions as Question[]).forEach(
@@ -104,37 +81,24 @@ export default function Home() {
       },
     );
 
-    const interviewRef = doc(db, "kurzinterviews", now);
-    await setDoc(interviewRef, {
-      id: now,
-      name,
-      age,
-      location,
-      answers,
-      picture: pictureName,
-      datenschutzErklaerung: datenschutzErklaerung
-        ? datenschutzErklaerungName
-        : false,
-    });
+    if (
+      !answers.every((answer) => answer.answer === "" || answer.answer === null)
+    ) {
+      const interviewRef = doc(db, "kurzinterviews", now);
+      await setDoc(interviewRef, {
+        id: now,
+        name,
+        answers,
+      });
+    }
+
+    const pictureLinkRef = doc(db, "portraitLinks", pictureUUID);
+    await setDoc(pictureLinkRef, { pictureName });
 
     setWhatsUploading("Bild");
     await uploadFile(storageRef(storage, `portraits/${pictureName}`), picture, {
       contentType: "image/jpeg",
     });
-
-    if (datenschutzErklaerung !== null) {
-      setWhatsUploading("Datenschutzerklärung");
-      await uploadFile(
-        storageRef(
-          storage,
-          `datenschutzzustimmungen/${datenschutzErklaerungName}`,
-        ),
-        datenschutzErklaerung,
-        {
-          contentType: "application/pdf",
-        },
-      );
-    }
 
     reset();
     toast.success("Vielen Dank für deine Teilnahme!", {
@@ -158,9 +122,10 @@ export default function Home() {
 
   return (
     <main>
+      <h1 className="text-2xl">Klassentreffen Abi 2015</h1>
       <div className="flex justify-between">
         <Image
-          src={asj100}
+          src={asgLogo}
           alt="Logo für 100 Jahre ASJ"
           width={200}
           onClick={() => setClickCounter((prev) => prev + 1)}
@@ -180,130 +145,6 @@ export default function Home() {
           )}
 
           <div className="grid">
-            <div>
-              <h3>Über dich</h3>
-
-              <p>
-                {
-                  (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
-                    ?.aboutYouDescription
-                }
-              </p>
-
-              <div>
-                <label>
-                  Wie heißt du?
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    {...(Object.hasOwn(errors, "name")
-                      ? { "aria-invalid": Object.hasOwn(errors, "name") }
-                      : {})}
-                    aria-describedby="valid-helper-name"
-                    {...register("name", {
-                      required: {
-                        value: true,
-                        message:
-                          "Bitte teil uns mit wie du heißt damit wir dich zuordnen können.",
-                      },
-                      minLength: {
-                        value: 2,
-                        message:
-                          "Dein Name muss mindestens 2 Zeichen lang sein.",
-                      },
-                    })}
-                  />
-                  {errors.name && (
-                    <small id="valid-helper-name">{errors.name?.message}</small>
-                  )}
-                </label>
-                <label>
-                  Wie alt bist du?
-                  <input
-                    type="number"
-                    placeholder="Alter"
-                    {...(Object.hasOwn(errors, "age")
-                      ? { "aria-invalid": Object.hasOwn(errors, "age") }
-                      : {})}
-                    aria-describedby="valid-helper-age"
-                    {...register("age", {
-                      required: {
-                        value: true,
-                        message:
-                          "Bitte gib dein Alter an. (siehe Datenschutzhinweis)",
-                      },
-                      min: {
-                        value: 3,
-                        message: "Du musst mindestens 3 Jahre alt sein.",
-                      },
-                      max: {
-                        value: 120,
-                        message: "Du bist höchstwahrscheinlich nicht so alt.",
-                      },
-                    })}
-                  />
-                  {errors.age && (
-                    <small id="valid-helper-age">{errors.age?.message}</small>
-                  )}
-                </label>
-                <label>
-                  Wo kommst du her?
-                  <input
-                    type="string"
-                    placeholder="Ort"
-                    {...(Object.hasOwn(errors, "location")
-                      ? { "aria-invalid": Object.hasOwn(errors, "location") }
-                      : {})}
-                    aria-describedby="valid-helper-location"
-                    {...register("location", {
-                      required: {
-                        value: true,
-                        message: "Bitte gib deinen Wohnort an.",
-                      },
-                      minLength: {
-                        value: 2,
-                        message:
-                          "Dein Wohnort muss mindestens 2 Zeichen lang sein.",
-                      },
-                    })}
-                  />
-                  {errors.location && (
-                    <small id="valid-helper-age">
-                      {errors.location?.message}
-                    </small>
-                  )}
-                </label>
-                <label>
-                  Ein Bild von dir
-                  <input
-                    type="file"
-                    accept="image/png, image/gif, image/jpeg"
-                    {...(directCam ? { capture: "environment" } : {})}
-                    aria-describedby="valid-helper-picture"
-                    {...(Object.hasOwn(errors, "picture")
-                      ? { "aria-invalid": Object.hasOwn(errors, "picture") }
-                      : {})}
-                    {...register("picture", {
-                      required: {
-                        value: true,
-                        message:
-                          "Bitte lade ein Bild von dir hoch um deinem Interview ein Gesicht zu geben.",
-                      },
-                    })}
-                  />
-                  {errors.picture ? (
-                    <small id="valid-helper-picture">
-                      {errors.picture?.message}
-                    </small>
-                  ) : (
-                    <small id="picture-helper">
-                      Zeig uns dein schönstes Lächeln!
-                    </small>
-                  )}
-                </label>
-              </div>
-            </div>
-
             <div>
               <h3>Fragen</h3>
 
@@ -335,30 +176,94 @@ export default function Home() {
                           {!settingsLoading &&
                             settingsValue &&
                             question.question}
-                          <textarea
-                            className="resize-none"
-                            placeholder={question.example}
-                            {...(Object.hasOwn(errors, `question-${i + 1}`)
-                              ? {
-                                  "aria-invalid": Object.hasOwn(
-                                    errors,
-                                    `question-${i + 1}`,
-                                  ),
-                                }
-                              : {})}
-                            aria-describedby={`valid-helper-question-${i + 1}`}
-                            {...register(`question-${i + 1}`, {
-                              required: {
-                                value: true,
-                                message: "Bitte beantworte diese Frage.",
-                              },
-                              minLength: {
-                                value: 5,
-                                message:
-                                  "Deine Antwort sollte mindestens 5 Zeichen lang sein.",
-                              },
-                            })}
-                          />
+                          {question.type === "yesno" && (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                value="Ja"
+                                id={`question-${i + 1}-yes`}
+                                {...(Object.hasOwn(errors, `question-${i + 1}`)
+                                  ? {
+                                      "aria-invalid": Object.hasOwn(
+                                        errors,
+                                        `question-${i + 1}`,
+                                      ),
+                                    }
+                                  : {})}
+                                aria-describedby={`valid-helper-question-${i + 1}`}
+                                {...register(`question-${i + 1}`, {
+                                  required: {
+                                    value: false,
+                                    message: "Bitte beantworte diese Frage.",
+                                  },
+                                  minLength: {
+                                    value: 1,
+                                    message:
+                                      "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
+                                  },
+                                })}
+                              />
+                              <label htmlFor={`question-${i + 1}-yes`}>
+                                Ja
+                              </label>
+                              <input
+                                type="radio"
+                                value="Nein"
+                                id={`question-${i + 1}-no`}
+                                {...(Object.hasOwn(errors, `question-${i + 1}`)
+                                  ? {
+                                      "aria-invalid": Object.hasOwn(
+                                        errors,
+                                        `question-${i + 1}`,
+                                      ),
+                                    }
+                                  : {})}
+                                aria-describedby={`valid-helper-question-${i + 1}`}
+                                {...register(`question-${i + 1}`, {
+                                  required: {
+                                    value: false,
+                                    message: "Bitte beantworte diese Frage.",
+                                  },
+                                  minLength: {
+                                    value: 1,
+                                    message:
+                                      "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
+                                  },
+                                })}
+                              />
+                              <label htmlFor={`question-${i + 1}-no`}>
+                                Nein
+                              </label>
+                            </div>
+                          )}
+
+                          {(question.type === "text" ||
+                            question.type === undefined) && (
+                            <textarea
+                              className="resize-none"
+                              placeholder={question.example}
+                              {...(Object.hasOwn(errors, `question-${i + 1}`)
+                                ? {
+                                    "aria-invalid": Object.hasOwn(
+                                      errors,
+                                      `question-${i + 1}`,
+                                    ),
+                                  }
+                                : {})}
+                              aria-describedby={`valid-helper-question-${i + 1}`}
+                              {...register(`question-${i + 1}`, {
+                                required: {
+                                  value: false,
+                                  message: "Bitte beantworte diese Frage.",
+                                },
+                                minLength: {
+                                  value: 1,
+                                  message:
+                                    "Deine Antwort sollte mindestens 1 Zeichen lang sein.",
+                                },
+                              })}
+                            />
+                          )}
                           {errors[`question-${i + 1}`] && (
                             <small id={`valid-helper-question-${i + 1}`}>
                               {errors[`question-${i + 1}`]?.message}
@@ -372,58 +277,51 @@ export default function Home() {
             </div>
           </div>
 
+          <hr />
+
+          <label>
+            <span>Hast Du Lust ein aktuelles Foto mit uns zu teilen?</span>
+            <br />
+            <small className="text-red-500">
+              Das Foto wird unabhängig von deinen Antworten gespeichert, sodass
+              diese anonym bleiben!
+            </small>
+            <br />
+            <small>
+              Wenn wir genug Bilder zusammen bekommen, werden wir versuchen eine
+              kleine Collage von allen Bildern zu erstellen
+            </small>
+            <input
+              type="file"
+              accept="image/png, image/gif, image/jpeg"
+              {...(directCam ? { capture: "environment" } : {})}
+              aria-describedby="valid-helper-picture"
+              {...(Object.hasOwn(errors, "picture")
+                ? { "aria-invalid": Object.hasOwn(errors, "picture") }
+                : {})}
+              {...register("picture", {
+                required: {
+                  value: false,
+                  message:
+                    "Bitte lade ein Bild von dir hoch um deinem Interview ein Gesicht zu geben.",
+                },
+              })}
+            />
+            {errors.picture ? (
+              <small id="valid-helper-picture">{errors.picture?.message}</small>
+            ) : (
+              <small id="picture-helper">
+                Zeig uns dein schönstes Lächeln!
+              </small>
+            )}
+          </label>
+
+          <hr />
+
           <div className="mt-4">
             <h3>Datenschutz</h3>
 
-            <label className={onFestival ? "mb-6" : ""}>
-              Bist du gerade auf dem Festival?{" "}
-              <input
-                type="checkbox"
-                checked={onFestival}
-                onChange={() => setOnFestival(!onFestival)}
-              />{" "}
-              {onFestival ? "Ja" : "Nein"}
-            </label>
-
             <div className="grid">
-              {!onFestival && (
-                <article>
-                  <label>
-                    Solltest du noch keine Einverständniserklärung ausgefüllt
-                    haben nutze bitte{" "}
-                    <a
-                      href="https://tms.aloom.de/files/659d6da2f07f91.52148902/EE_Foto-Film_U18_Festival.pdf"
-                      target="_blank"
-                      className="text-blue-500 underline"
-                    >
-                      diesen Link
-                    </a>{" "}
-                    und lade uns das ausgefüllte Formular hier hoch!
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      aria-describedby="valid-helper-datenschutzErklaerung"
-                      {...(Object.hasOwn(errors, "datenschutzErklaerung")
-                        ? {
-                            "aria-invalid": Object.hasOwn(
-                              errors,
-                              "datenschutzErklaerung",
-                            ),
-                          }
-                        : {})}
-                      {...register("datenschutzErklaerung", {
-                        required: false,
-                      })}
-                    />
-                    {errors.datenschutzErklaerung && (
-                      <small id="valid-helper-datenschutzErklaerung">
-                        {errors.datenschutzErklaerung?.message}
-                      </small>
-                    )}
-                  </label>
-                </article>
-              )}
-
               <div>
                 <div className="mb-2">
                   Ich habe den{" "}
@@ -472,8 +370,8 @@ export default function Home() {
                       },
                     })}
                   />
-                  ... und ich bin der Verarbeitung und Veröffentlichung meiner
-                  Daten einverstanden.
+                  ... und ich bin der Verarbeitung und Auswertung meiner Daten
+                  einverstanden.
                 </label>
                 {errors.terms2 && (
                   <small id="valid-helper-terms2" className="text-red-500">

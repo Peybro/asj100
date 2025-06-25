@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "100 Jahre ASJ",
+  title: "10 Jahre Abi",
   description: "",
 };
 

@@ -18,7 +18,9 @@ type FormData = {
   welcomeText: string;
   aboutYouDescription: string;
   questionsDescription: string;
-  [key: `${"question" | "example" | "ds-title" | "ds-text"}-${string}`]: string;
+  [
+    key: `${"question" | "example" | "type" | "ds-title" | "ds-text"}-${string}`
+  ]: string;
 };
 
 export default function Einstellungen() {
@@ -126,6 +128,7 @@ export default function Einstellungen() {
       settings.questions.push({
         question: data[`question-${question.uuid}`],
         example: data[`example-${question.uuid}`],
+        type: question.type || "text",
       });
     });
 
@@ -164,7 +167,12 @@ export default function Einstellungen() {
   function addQuestion(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
-    const newQuestion: Question = { uuid: uuid(), question: "", example: "" };
+    const newQuestion: Question = {
+      uuid: uuid(),
+      question: "",
+      example: "",
+      type: "text",
+    };
     setQuestions((prev) => [...prev, newQuestion]);
   }
 
@@ -240,20 +248,6 @@ export default function Einstellungen() {
                     setDescriptions((prev) => ({
                       ...prev,
                       welcomeText: value,
-                    }));
-                  }}
-                />
-              </label>
-
-              <label>
-                {'"Über dich"'}
-                <textarea
-                  {...register("aboutYouDescription")}
-                  onChange={(e) => {
-                    const value = e.currentTarget.value;
-                    setDescriptions((prev) => ({
-                      ...prev,
-                      aboutYouDescription: value,
                     }));
                   }}
                 />
@@ -347,50 +341,171 @@ export default function Einstellungen() {
                             </small>
                           )}
                         </label>
+
                         <label>
-                          Beispiel
-                          <textarea
-                            {...(Object.hasOwn(
-                              errors,
-                              `example-${question.uuid}`,
-                            )
+                          Typ
+                          <select
+                            {...(Object.hasOwn(errors, `type-${question.uuid}`)
                               ? {
                                   "aria-invalid": Object.hasOwn(
                                     errors,
-                                    `example-${question.uuid}`,
+                                    `type-${question.uuid}`,
                                   ),
                                 }
                               : {})}
-                            aria-describedby={`valid-helper-example-${question.uuid}`}
-                            {...register(`example-${question.uuid}`, {
+                            aria-describedby={`valid-helper-type-${question.uuid}`}
+                            {...register(`type-${question.uuid}`, {
                               required: {
-                                value: false,
-                                message: `Bitte ein Beispiel für Frage ${question.uuid} angeben.`,
+                                value: true,
+                                message: "Bitte den Typ der Frage angeben.",
                               },
                               onChange(event) {
                                 setQuestions((prev) =>
                                   prev.toSpliced(i, 1, {
                                     ...question,
-                                    example: event.target.value,
+                                    type: event.target.value,
                                   }),
                                 );
                               },
                             })}
-                          />
-                          {errors[`example-${question.uuid}`] && (
-                            <small id={`valid-helper-example-${question.uuid}`}>
-                              {errors[`example-${question.uuid}`]?.message}
+                          >
+                            <option
+                              value="text"
+                              selected={
+                                question.type === "text" ||
+                                question.type === undefined
+                              }
+                            >
+                              Text
+                            </option>
+                            <option
+                              value="yesno"
+                              selected={question.type === "yesno"}
+                            >
+                              Ja / Nein
+                            </option>
+                          </select>
+                          {errors[`type-${question.uuid}`] && (
+                            <small id={`valid-helper-type-${question.uuid}`}>
+                              {errors[`type-${question.uuid}`]?.message}
                             </small>
                           )}
                         </label>
 
-                        <footer>
+                        {(question.type === "text" ||
+                          question.type === undefined) && (
+                          <label>
+                            Beispiel
+                            <textarea
+                              {...(Object.hasOwn(
+                                errors,
+                                `example-${question.uuid}`,
+                              )
+                                ? {
+                                    "aria-invalid": Object.hasOwn(
+                                      errors,
+                                      `example-${question.uuid}`,
+                                    ),
+                                  }
+                                : {})}
+                              aria-describedby={`valid-helper-example-${question.uuid}`}
+                              {...register(`example-${question.uuid}`, {
+                                required: {
+                                  value: false,
+                                  message: `Bitte ein Beispiel für Frage ${question.uuid} angeben.`,
+                                },
+                                onChange(event) {
+                                  setQuestions((prev) =>
+                                    prev.toSpliced(i, 1, {
+                                      ...question,
+                                      example: event.target.value,
+                                    }),
+                                  );
+                                },
+                              })}
+                            />
+                            {errors[`example-${question.uuid}`] && (
+                              <small
+                                id={`valid-helper-example-${question.uuid}`}
+                              >
+                                {errors[`example-${question.uuid}`]?.message}
+                              </small>
+                            )}
+                          </label>
+                        )}
+
+                        <footer className="flex justify-between">
                           <button
                             className="border-red-500 bg-red-500"
                             onClick={(e) => removeQuestion(e, question.uuid)}
                           >
                             Entfernen
                           </button>
+
+                          <div className="flex gap-1">
+                            <button
+                              disabled={i === 0}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (i > 0) {
+                                  setQuestions((prev) => {
+                                    const newQuestions = prev.toSpliced(
+                                      i - 1,
+                                      0,
+                                      question,
+                                    );
+                                    newQuestions.splice(i + 1, 1); // Remove the original at i+1
+                                    return newQuestions;
+                                  });
+                                }
+                              }}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                className="bi bi-chevron-up"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"
+                                />
+                              </svg>
+                            </button>
+                            <button
+                              disabled={i === questions.length - 1}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (i < questions.length - 1) {
+                                  setQuestions((prev) => {
+                                    const newQuestions = prev.toSpliced(
+                                      i + 2,
+                                      0,
+                                      question,
+                                    );
+                                    newQuestions.splice(i, 1); // Remove the original at i
+                                    return newQuestions;
+                                  });
+                                }
+                              }}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                className="bi bi-chevron-down"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </footer>
                       </article>
                     </details>
