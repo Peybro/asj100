@@ -147,12 +147,21 @@ ${buildAnswerString(answers)}
     );
   }
 
+  function shuffleArray<T>(array: T[]): T[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
   return (
     <>
       <h1>Einsendungen ({interviewsValue?.docs?.length})</h1>
 
       <Toolbar>
         <button
+          className="outline"
           onClick={downloadAll}
           disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
         >
@@ -164,7 +173,7 @@ ${buildAnswerString(answers)}
               ? ""
               : editButtonClicked
                 ? "border-yellow-500 bg-yellow-500"
-                : "secondary"
+                : "secondary outline"
           }
           onClick={() => {
             if (!editMode) {
@@ -190,7 +199,9 @@ ${buildAnswerString(answers)}
       </Toolbar>
 
       <details>
-        <summary>Antworten</summary>
+        <summary role="button" className="">
+          Antworten
+        </summary>
 
         <div className="mt-5">
           {interviewsError && <ErrorIndicator error={interviewsError} />}
@@ -224,7 +235,9 @@ ${buildAnswerString(answers)}
       </details>
 
       <details>
-        <summary>Bilder</summary>
+        <summary role="button" className="">
+          Bilder <small>(zufällige Reihenfolge)</small>
+        </summary>
 
         <div className="mt-5">
           {pictureLinksError && <ErrorIndicator error={pictureLinksError} />}
@@ -236,7 +249,7 @@ ${buildAnswerString(answers)}
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
               {pictureLinksValue.docs.length > 0 &&
-                pictureLinksValue.docs.map((pictureLinkData) => {
+                shuffleArray(pictureLinksValue.docs).map((pictureLinkData) => {
                   const pictureLink = pictureLinkData.data();
 
                   return (

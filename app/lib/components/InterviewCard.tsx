@@ -92,7 +92,7 @@ ${buildAnswerString()}`;
           })}
         </details>
         <footer className="grid grid-cols-1">
-          <button onClick={download}>Download</button>
+          <button onClick={download} className="outline">Download</button>
           {editMode && (
             <button className="border-red-500 bg-red-500" onClick={remove}>
               Löschen
