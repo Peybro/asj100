@@ -92,13 +92,19 @@ export default function Home() {
       });
     }
 
-    const pictureLinkRef = doc(db, "portraitLinks", pictureUUID);
-    await setDoc(pictureLinkRef, { pictureName });
+    if (picture) {
+      const pictureLinkRef = doc(db, "portraitLinks", pictureUUID);
+      await setDoc(pictureLinkRef, { pictureName });
 
-    setWhatsUploading("Bild");
-    await uploadFile(storageRef(storage, `portraits/${pictureName}`), picture, {
-      contentType: "image/jpeg",
-    });
+      setWhatsUploading("Bild");
+      await uploadFile(
+        storageRef(storage, `portraits/${pictureName}`),
+        picture,
+        {
+          contentType: "image/jpeg",
+        },
+      );
+    }
 
     reset();
     toast.success("Vielen Dank für deine Teilnahme!", {

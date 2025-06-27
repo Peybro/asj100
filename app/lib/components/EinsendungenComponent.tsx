@@ -104,7 +104,7 @@ ${buildAnswerString(answers)}
     URL.revokeObjectURL(link.href);
   }
 
-  async function remove(pictureLink: string) {
+  async function removePicture(pictureLink: string) {
     const pictureStorageRef = ref(storage, `portraits/${pictureLink}`);
     try {
       await deleteDoc(doc(db, "portraitLinks", pictureLink.split(".")[0]));
@@ -135,7 +135,7 @@ ${buildAnswerString(answers)}
               <footer>
                 <button
                   className="border-red-500 bg-red-500"
-                  onClick={() => remove(pictureLink)}
+                  onClick={() => removePicture(pictureLink)}
                 >
                   Löschen
                 </button>
