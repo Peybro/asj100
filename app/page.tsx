@@ -18,7 +18,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
 import { DescriptionTexts } from "@/types/DescriptionTexts";
 import { v4 as uuidv4 } from "uuid";
-import { log } from "console";
+import ReactMarkdown from "react-markdown";
 
 type FormData = {
   name: string;
@@ -154,12 +154,18 @@ export default function Home() {
             <div>
               <h3>Fragen</h3>
 
-              <p>
+              <ReactMarkdown
+                components={{
+                  a: ({ node, ...props }) => (
+                    <a {...props} className="text-blue-500" />
+                  ),
+                }}
+              >
                 {
                   (settingsValue?.data()!.descriptionTexts as DescriptionTexts)
                     ?.questionsDescription
                 }
-              </p>
+              </ReactMarkdown>
 
               <div>
                 {settingsError && (
@@ -285,7 +291,7 @@ export default function Home() {
 
           <hr />
 
-          <label>
+          <label id="picture-upload">
             <span>Hast Du Lust ein aktuelles Foto mit uns zu teilen?</span>
             <br />
             <small className="text-red-500">

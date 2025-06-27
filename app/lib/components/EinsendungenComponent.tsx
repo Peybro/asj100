@@ -157,7 +157,7 @@ ${buildAnswerString(answers)}
 
   return (
     <>
-      <h1>Einsendungen ({interviewsValue?.docs?.length})</h1>
+      <h1>Einsendungen</h1>
 
       <Toolbar>
         <button
@@ -200,7 +200,7 @@ ${buildAnswerString(answers)}
 
       <details>
         <summary role="button" className="">
-          Antworten
+          Antworten ({interviewsValue?.docs?.length})
         </summary>
 
         <div className="mt-5">
@@ -236,7 +236,8 @@ ${buildAnswerString(answers)}
 
       <details>
         <summary role="button" className="">
-          Bilder <small>(zufällige Reihenfolge)</small>
+          Bilder ({pictureLinksValue?.docs?.length}){" "}
+          <small>(zufällige Reihenfolge)</small>
         </summary>
 
         <div className="mt-5">

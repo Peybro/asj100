@@ -77,30 +77,32 @@ ${buildAnswerString()}`;
 
           {answers.map((answer: Answer, i: number) => {
             return (
-              <div key={`answer-key-${i}`} className="mb-3">
-                <span className="font-bold">{answer.question}</span>
-                <br />
-                <span>
-                  {"> "}
-                  <span className="italic">
-                    {answer.answer === "" ? "-" : answer.answer}
+              <>
+                <div key={`answer-key-${i}`} className="mb-3">
+                  <span className="font-bold">{answer.question}</span>
+                  <br />
+                  <span>
+                    {"> "}
+                    <span className="italic">
+                      {answer.answer === "" ? "-" : answer.answer}
+                    </span>
                   </span>
-                </span>
-                <hr />
-              </div>
+                  <hr />
+                </div>
+              </>
             );
           })}
-        </details>
-        <footer className="grid grid-cols-1">
           <button onClick={download} className="outline">
             Download
           </button>
-          {editMode && (
-            <button className="border-red-500 bg-red-500" onClick={remove}>
-              Löschen
-            </button>
-          )}
-        </footer>
+        </details>
+        {/* <footer className="grid grid-cols-1"> */}
+        {editMode && (
+          <button className="border-red-500 bg-red-500" onClick={remove}>
+            Löschen
+          </button>
+        )}
+        {/* </footer> */}
       </article>
     );
   }
