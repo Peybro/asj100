@@ -240,10 +240,10 @@ ${buildAnswerString(answers)}
       </Toolbar>
 
       <details>
-        <summary role="button" className="">
+        <summary role="button">
           <span className="flex items-center gap-2">
             <MessageSquareWarning />{" "}
-            <>Antworten ({interviewsValue?.docs?.length})</>
+            <span>Antworten ({interviewsValue?.docs?.length})</span>
           </span>
         </summary>
 
@@ -338,7 +338,8 @@ ${buildAnswerString(answers)}
       <details>
         <summary role="button" className="">
           <span className="flex items-center gap-2">
-            <FileImage /> <>Bilder ({pictureLinksValue?.docs?.length})</>
+            <FileImage />{" "}
+            <span>Bilder ({pictureLinksValue?.docs?.length})</span>
             <small>(zufällige Reihenfolge)</small>
           </span>
         </summary>
