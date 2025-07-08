@@ -19,6 +19,7 @@ import QuestionSkeletonLoader from "@/components/QuestionSkeletonLoader";
 import { DescriptionTexts } from "@/types/DescriptionTexts";
 import { v4 as uuidv4 } from "uuid";
 import ReactMarkdown from "react-markdown";
+import { MessageCircleQuestionMark, ShieldAlert } from "lucide-react";
 
 type FormData = {
   name: string;
@@ -152,7 +153,10 @@ export default function Home() {
 
           <div className="grid">
             <div>
-              <h3>Fragen</h3>
+              <h3 className="flex items-center gap-2">
+                Fragen
+                <MessageCircleQuestionMark />
+              </h3>
 
               <ReactMarkdown
                 components={{
@@ -331,7 +335,9 @@ export default function Home() {
           <hr />
 
           <div className="mt-4">
-            <h3>Datenschutz</h3>
+            <h3 className="flex items-center gap-2">
+              Datenschutz <ShieldAlert />
+            </h3>
 
             <div className="grid">
               <div>
@@ -410,7 +416,7 @@ export default function Home() {
           type="submit"
           value={
             isSubmitting
-              ? `Lade ${whatsUploading + " "}hoch... ${snapshot?.bytesTransferred > 0 ? ((snapshot?.bytesTransferred / snapshot?.totalBytes) * 100).toFixed(0) + "%" : ""}`
+              ? `Lade ${whatsUploading} hoch... ${snapshot?.bytesTransferred > 0 ? ((snapshot?.bytesTransferred / snapshot?.totalBytes) * 100).toFixed(0) + "%" : ""}`
               : "Abschicken"
           }
           disabled={isSubmitting || !settingsValue}

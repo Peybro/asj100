@@ -13,7 +13,14 @@ import { Interview } from "../types/Interview";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { deleteDoc, doc } from "firebase/firestore";
-import { log } from "console";
+import {
+  Download,
+  FileImage,
+  FileQuestionMark,
+  FileUser,
+  MessageSquareWarning,
+  SquarePen,
+} from "lucide-react";
 
 /**
  * Shows all interviews that have been submitted
@@ -51,7 +58,7 @@ export default function EinsendungenComponent() {
         } else {
           questions.push({
             question: answer.question,
-            answers: [answer.answer ? answer.answer : "-"],
+            answers: [answer.answer],
           });
         }
       });
@@ -189,20 +196,20 @@ ${buildAnswerString(answers)}
 
       <Toolbar>
         <button
-          className="outline"
+          className="flex items-center gap-2 outline"
           onClick={downloadAll}
           disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
         >
-          Alle downloaden
+          <Download /> Alle downloaden
         </button>{" "}
         <button
-          className={
+          className={`${
             editMode
               ? ""
               : editButtonClicked
                 ? "border-yellow-500 bg-yellow-500"
                 : "secondary outline"
-          }
+          } flex items-center gap-2`}
           onClick={() => {
             if (!editMode) {
               if (editButtonClicked) {
@@ -218,34 +225,52 @@ ${buildAnswerString(answers)}
           }}
           disabled={!interviewsValue || interviewsValue?.docs?.length === 0}
         >
-          {editMode
-            ? "Fertig"
-            : editButtonClicked
-              ? `Bestätigen (${timeRemaining})`
-              : "Bearbeiten"}
+          {editMode && "Fertig"}
+          {!editMode &&
+            editButtonClicked &&
+            timeRemaining > 0 &&
+            `Bestätigen (${timeRemaining})`}
+          {!editMode && !editButtonClicked && (
+            <>
+              <SquarePen />
+              Bearbeiten
+            </>
+          )}
         </button>
       </Toolbar>
 
       <details>
         <summary role="button" className="">
-          Antworten ({interviewsValue?.docs?.length})
+          <span className="flex items-center gap-2">
+            <MessageSquareWarning />{" "}
+            <>Antworten ({interviewsValue?.docs?.length})</>
+          </span>
         </summary>
 
         <div className="mt-5">
-          <button
-            className="secondary my-4 outline"
-            onClick={() => setSortAnswers((prev) => !prev)}
-          >
-            {sortAnswers ? "Nach Personen sortieren" : "Nach Fragen sortieren"}
-          </button>
-
-          <h3>{sortAnswers ? "Fragen:" : "Personen:"}</h3>
+          <label className="mb-4 flex items-center gap-2">
+            <span
+              className={`flex items-center gap-2 ${sortAnswers ? "text-gray-600" : "text-green-500"}`}
+            >
+              Nach Personen sortieren <FileUser />
+            </span>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={sortAnswers}
+              onChange={() => setSortAnswers((prev) => !prev)}
+            />
+            <span
+              className={`flex items-center gap-2 ${!sortAnswers ? "text-gray-600" : "text-green-500"}`}
+            >
+              Nach Fragen sortieren <FileQuestionMark />
+            </span>
+          </label>
 
           {interviewsError && <ErrorIndicator error={interviewsError} />}
           {interviewsLoading && (
             <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>
           )}
-
           {!interviewsLoading && interviewsValue && (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
@@ -256,18 +281,32 @@ ${buildAnswerString(answers)}
                 uniqueQuestions.map((questionData, i) => (
                   <article key={`question_${i}`}>
                     <details>
-                      <summary className="font-bold">
-                        {questionData.question}
+                      <summary>
+                        {questionData.question}{" "}
+                        <span className="font-bold">
+                          (
+                          {
+                            questionData.answers.filter(
+                              (a) =>
+                                a !== null &&
+                                a !== undefined &&
+                                a !== "" &&
+                                a !== "-",
+                            ).length
+                          }
+                          )
+                        </span>
                       </summary>
                       <br />
                       {questionData.answers.map((answer, j) => {
-                        return (
-                          <span key={j}>
-                            {"> "}
-                            <span className="italic">{answer}</span>
-                            <br />
-                          </span>
-                        );
+                        if (answer && answer !== "" && answer !== "-")
+                          return (
+                            <span key={j}>
+                              {"> "}
+                              <span className="italic">{answer}</span>
+                              <br />
+                            </span>
+                          );
                       })}
                     </details>
                   </article>
@@ -298,8 +337,10 @@ ${buildAnswerString(answers)}
 
       <details>
         <summary role="button" className="">
-          Bilder ({pictureLinksValue?.docs?.length}){" "}
-          <small>(zufällige Reihenfolge)</small>
+          <span className="flex items-center gap-2">
+            <FileImage /> <>Bilder ({pictureLinksValue?.docs?.length})</>
+            <small>(zufällige Reihenfolge)</small>
+          </span>
         </summary>
 
         <div className="mt-5">

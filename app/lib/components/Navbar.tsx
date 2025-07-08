@@ -2,6 +2,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@/firebase-config";
 import { signOut, User } from "firebase/auth";
+import { ChartGantt, FileQuestionMark, LogOut, Settings } from "lucide-react";
 
 type NavbarProps = {
   user: User | null | undefined;
@@ -33,7 +34,8 @@ export default function Navbar({ user }: NavbarProps) {
             <a
               className={`${path.includes("einsendungen") || path.endsWith("admin") ? "text-blue-500" : ""}`}
             >
-              Einsendungen
+              {/* Einsendungen */}
+              <ChartGantt />
             </a>
           </Link>
         </li>
@@ -42,12 +44,15 @@ export default function Navbar({ user }: NavbarProps) {
             <a
               className={`${path.includes("einstellungen") ? "text-blue-500" : ""}`}
             >
-              Einstellungen
+              {/* Einstellungen */}
+              <Settings />
             </a>
           </Link>
         </li>
         <li>
-          <button onClick={logout}>Logout</button>
+          <button onClick={logout}>
+            <LogOut />
+          </button>
         </li>
       </>
     );
@@ -61,39 +66,40 @@ export default function Navbar({ user }: NavbarProps) {
         </li>
       </ul>
       <ul>
-        <li>
+        <li className="line">
           <Link href="/">zum Formular</Link>
         </li>
         {user && (
-          <>
-            <div className="hidden md:block">
-              <NavContent />
-            </div>
-            <li className="md:hidden">
-              <details className="dropdown">
-                <summary role="button">
-                  Menü
-                  {/* <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                    />
-                  </svg> */}
-                </summary>
-                <ul dir="rtl">
-                  <NavContent />
-                </ul>
-              </details>
-            </li>
-          </>
+          <NavContent />
+          // <>
+          //   <div className="hidden md:block">
+          //     <NavContent />
+          //   </div>
+          //   <li className="md:hidden">
+          //     <details className="dropdown">
+          //       <summary role="button">
+          //         Menü
+          //         {/* <svg
+          //           xmlns="http://www.w3.org/2000/svg"
+          //           fill="none"
+          //           viewBox="0 0 24 24"
+          //           strokeWidth={1.5}
+          //           stroke="currentColor"
+          //           className="w-6 h-6"
+          //         >
+          //           <path
+          //             strokeLinecap="round"
+          //             strokeLinejoin="round"
+          //             d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          //           />
+          //         </svg> */}
+          //       </summary>
+          //       <ul dir="rtl">
+          //         <NavContent />
+          //       </ul>
+          //     </details>
+          //   </li>
+          // </>
         )}
       </ul>
     </nav>
