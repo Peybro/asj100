@@ -13,6 +13,7 @@ import { Interview } from "../types/Interview";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { deleteObject, ref } from "firebase/storage";
 import { deleteDoc, doc } from "firebase/firestore";
+import { log } from "console";
 
 /**
  * Shows all interviews that have been submitted
@@ -30,6 +31,33 @@ export default function EinsendungenComponent() {
   const [editMode, setEditMode] = useState(false);
   const [editButtonClicked, setEditButtonClicked] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(3);
+  const [sortAnswers, setSortAnswers] = useState(false);
+
+  type UniqueQuestion = { question: string; answers: string[] };
+  const [uniqueQuestions, setUniqueQuestions] = useState<UniqueQuestion[]>([]);
+
+  // Get all unique questions from the interviews
+  useEffect(() => {
+    if (!interviewsValue) return;
+    const questions: UniqueQuestion[] = [];
+    interviewsValue.docs.forEach((interviewData) => {
+      const interview = interviewData.data() as Interview;
+      interview.answers.forEach((answer) => {
+        const existingQuestion = questions.find(
+          (q) => q.question === answer.question,
+        );
+        if (existingQuestion) {
+          existingQuestion.answers.push(answer.answer);
+        } else {
+          questions.push({
+            question: answer.question,
+            answers: [answer.answer ? answer.answer : "-"],
+          });
+        }
+      });
+    });
+    setUniqueQuestions(questions);
+  }, [interviewsValue]);
 
   // Timer for the edit button to confirm the deletion
   useEffect(() => {
@@ -204,6 +232,15 @@ ${buildAnswerString(answers)}
         </summary>
 
         <div className="mt-5">
+          <button
+            className="secondary my-4 outline"
+            onClick={() => setSortAnswers((prev) => !prev)}
+          >
+            {sortAnswers ? "Nach Personen sortieren" : "Nach Fragen sortieren"}
+          </button>
+
+          <h3>{sortAnswers ? "Fragen:" : "Personen:"}</h3>
+
           {interviewsError && <ErrorIndicator error={interviewsError} />}
           {interviewsLoading && (
             <LoadingSpinner>Lade Einsendungen...</LoadingSpinner>
@@ -212,10 +249,35 @@ ${buildAnswerString(answers)}
           {!interviewsLoading && interviewsValue && (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {interviewsValue.docs.length === 0 && <p>Keine Einsendungen</p>}
+              {/* list answers sorted by question */}
+              {/* check for same questions and list corresponding answers */}
+              {uniqueQuestions.length > 0 &&
+                sortAnswers &&
+                uniqueQuestions.map((questionData, i) => (
+                  <article key={`question_${i}`}>
+                    <details>
+                      <summary className="font-bold">
+                        {questionData.question}
+                      </summary>
+                      <br />
+                      {questionData.answers.map((answer, j) => {
+                        return (
+                          <span key={j}>
+                            {"> "}
+                            <span className="italic">{answer}</span>
+                            <br />
+                          </span>
+                        );
+                      })}
+                    </details>
+                  </article>
+                ))}
+
+              {/* list answers sorted by person */}
               {interviewsValue.docs.length > 0 &&
+                !sortAnswers &&
                 interviewsValue.docs.map((interviewData, i) => {
                   const interview = interviewData.data() as Interview;
-
                   return (
                     <InterviewCard
                       key={interview.id}
