@@ -40,10 +40,18 @@ export default function EinsendungenComponent() {
   const [timeRemaining, setTimeRemaining] = useState(3);
   const [sortAnswers, setSortAnswers] = useState(false);
 
-  /*const shuffledPictures = useMemo(
-    () => shuffleArray(pictureLinksValue.docs),
-    [pictureLinksValue && pictureLinksValue.docs]
-  );*/
+  // Shuffled list of pictures, only recomputed when pictureLinksValue changes
+  const shuffledPictures = useMemo(() => {
+    if (!pictureLinksValue || pictureLinksValue.docs.length === 0) return [];
+
+    const validDocs = pictureLinksValue.docs.filter((doc) => {
+      const data = doc.data();
+      return data && data.pictureName;
+    });
+
+    return shuffleArray(validDocs);
+  }, [pictureLinksValue]);
+
 
   type UniqueQuestion = { question: string; answers: string[] };
   const [uniqueQuestions, setUniqueQuestions] = useState<UniqueQuestion[]>([]);
@@ -188,12 +196,15 @@ ${buildAnswerString(answers)}
   }
 
   function shuffleArray<T>(array: T[]): T[] {
-    for (let i = array.length - 1; i > 0; i--) {
+    if (!Array.isArray(array)) return [];
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
-    return array;
+    return newArray;
   }
+
 
   return (
     <>
@@ -245,7 +256,7 @@ ${buildAnswerString(answers)}
       </Toolbar>
 
       <details>
-        <summary role="button">
+        <summary role="button" className="flex items-center justify-between gap-2">
           <span className="flex items-center gap-2">
             <MessageSquareWarning />{" "}
             <span>Antworten ({interviewsValue?.docs?.length})</span>
@@ -358,7 +369,7 @@ ${buildAnswerString(answers)}
           {!pictureLinksLoading && pictureLinksValue && (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
-              {pictureLinksValue.docs.length > 0 && shuffleArray(pictureLinksValue.docs).map((pictureLinkData) => {
+              {pictureLinksValue.docs.length > 0 && shuffledPictures.map((pictureLinkData) => {
                   const pictureLink = pictureLinkData.data();
 
                   return (
