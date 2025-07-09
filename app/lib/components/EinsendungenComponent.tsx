@@ -40,10 +40,10 @@ export default function EinsendungenComponent() {
   const [timeRemaining, setTimeRemaining] = useState(3);
   const [sortAnswers, setSortAnswers] = useState(false);
 
-const shuffledPictures = useMemo(
-  () => shuffleArray(pictureLinksValue.docs),
-  [pictureLinksValue.docs]
-);
+  /*const shuffledPictures = useMemo(
+    () => shuffleArray(pictureLinksValue.docs),
+    [pictureLinksValue && pictureLinksValue.docs]
+  );*/
 
   type UniqueQuestion = { question: string; answers: string[] };
   const [uniqueQuestions, setUniqueQuestions] = useState<UniqueQuestion[]>([]);
@@ -341,9 +341,8 @@ ${buildAnswerString(answers)}
       </details>
 
       <details>
-        <summary role="button" className="flex items-center justify-between gap-2 list-none cursor-pointer"
->
-  <span className="flex items-center gap-2">
+        <summary role="button" className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2">
             <FileImage />{" "}
             <span>Bilder ({pictureLinksValue?.docs?.length})</span>
             <small>(zufällige Reihenfolge)</small>
@@ -359,8 +358,10 @@ ${buildAnswerString(answers)}
           {!pictureLinksLoading && pictureLinksValue && (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
-              {pictureLinksValue.docs.length > 0 &&
-                shuffledPictures.map((pictureLinkData) => {
+              {pictureLinksValue.docs.length > 0 && useMemo(
+                  () => shuffleArray(pictureLinksValue.docs),
+                  [pictureLinksValue && pictureLinksValue.docs]
+                ).map((pictureLinkData) => {
                   const pictureLink = pictureLinkData.data();
 
                   return (
