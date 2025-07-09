@@ -52,22 +52,18 @@ export default function EinsendungenComponent() {
     return shuffleArray(validDocs);
   }, [pictureLinksValue]);
 
-
   type UniqueQuestion = { question: string; answers: string[] };
-  const [uniqueQuestions, setUniqueQuestions] = useState<UniqueQuestion[]>([]);
-
   // Get all unique questions from the interviews
-  useEffect(() => {
-    if (!interviewsValue) return;
+  const uniqueQuestions: UniqueQuestion[] = useMemo(() => {
+    if (!interviewsValue) return [];
     const questions: UniqueQuestion[] = [];
+
     interviewsValue.docs.forEach((interviewData) => {
       const interview = interviewData.data() as Interview;
       interview.answers.forEach((answer) => {
-        const existingQuestion = questions.find(
-          (q) => q.question === answer.question,
-        );
-        if (existingQuestion) {
-          existingQuestion.answers.push(answer.answer);
+        const existing = questions.find((q) => q.question === answer.question);
+        if (existing) {
+          existing.answers.push(answer.answer);
         } else {
           questions.push({
             question: answer.question,
@@ -76,8 +72,10 @@ export default function EinsendungenComponent() {
         }
       });
     });
-    setUniqueQuestions(questions);
+
+    return questions;
   }, [interviewsValue]);
+
 
   // Timer for the edit button to confirm the deletion
   useEffect(() => {
@@ -204,7 +202,6 @@ ${buildAnswerString(answers)}
     }
     return newArray;
   }
-
 
   return (
     <>
