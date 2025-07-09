@@ -4,7 +4,7 @@ import { db, storage } from "@/firebase-config";
 import { collection } from "firebase/firestore";
 import InterviewCard from "@/components/InterviewCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo} from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/types/Answer";
 import Toolbar from "@/components/Toolbar";
@@ -39,6 +39,11 @@ export default function EinsendungenComponent() {
   const [editButtonClicked, setEditButtonClicked] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(3);
   const [sortAnswers, setSortAnswers] = useState(false);
+
+const shuffledPictures = useMemo(
+  () => shuffleArray(pictureLinksValue.docs),
+  [pictureLinksValue.docs]
+);
 
   type UniqueQuestion = { question: string; answers: string[] };
   const [uniqueQuestions, setUniqueQuestions] = useState<UniqueQuestion[]>([]);
@@ -336,8 +341,9 @@ ${buildAnswerString(answers)}
       </details>
 
       <details>
-        <summary role="button" className="">
-          <span className="flex items-center gap-2">
+        <summary role="button" className="flex items-center justify-between gap-2 list-none cursor-pointer"
+>
+  <span className="flex items-center gap-2">
             <FileImage />{" "}
             <span>Bilder ({pictureLinksValue?.docs?.length})</span>
             <small>(zufällige Reihenfolge)</small>
@@ -354,7 +360,7 @@ ${buildAnswerString(answers)}
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
               {pictureLinksValue.docs.length > 0 &&
-                shuffleArray(pictureLinksValue.docs).map((pictureLinkData) => {
+                shuffledPictures.map((pictureLinkData) => {
                   const pictureLink = pictureLinkData.data();
 
                   return (
