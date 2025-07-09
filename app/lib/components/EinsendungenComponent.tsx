@@ -360,7 +360,7 @@ ${buildAnswerString(answers)}
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
               {pictureLinksValue.docs.length > 0 && useMemo(
                   () => shuffleArray(pictureLinksValue.docs),
-                  [pictureLinksValue && pictureLinksValue.docs]
+                  [pictureLinksValue.docs]
                 ).map((pictureLinkData) => {
                   const pictureLink = pictureLinkData.data();
 
