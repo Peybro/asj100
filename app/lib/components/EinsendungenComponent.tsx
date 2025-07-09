@@ -358,10 +358,7 @@ ${buildAnswerString(answers)}
           {!pictureLinksLoading && pictureLinksValue && (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
-              {pictureLinksValue.docs.length > 0 && useMemo(
-                  () => shuffleArray(pictureLinksValue.docs),
-                  [pictureLinksValue.docs]
-                ).map((pictureLinkData) => {
+              {pictureLinksValue.docs.length > 0 && shuffleArray(pictureLinksValue.docs).map((pictureLinkData) => {
                   const pictureLink = pictureLinkData.data();
 
                   return (
