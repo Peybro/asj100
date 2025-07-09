@@ -4,7 +4,7 @@ import { db, storage } from "@/firebase-config";
 import { collection } from "firebase/firestore";
 import InterviewCard from "@/components/InterviewCard";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { useEffect, useState, useMemo} from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useCollection } from "react-firebase-hooks/firestore";
 import type { Answer } from "@/types/Answer";
 import Toolbar from "@/components/Toolbar";
@@ -38,7 +38,19 @@ export default function EinsendungenComponent() {
   const [editMode, setEditMode] = useState(false);
   const [editButtonClicked, setEditButtonClicked] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(3);
-  const [sortAnswers, setSortAnswers] = useState(false);
+  const [sortAnswers, setSortAnswers] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("sortAnswers");
+      return stored ? JSON.parse(stored) : false;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("sortAnswers", JSON.stringify(sortAnswers));
+    }
+  }, [sortAnswers]);
 
   // Shuffled list of pictures, only recomputed when pictureLinksValue changes
   const shuffledPictures = useMemo(() => {
@@ -216,13 +228,12 @@ ${buildAnswerString(answers)}
           <Download /> Alle downloaden
         </button>{" "}
         <button
-          className={`${
-            editMode
-              ? ""
-              : editButtonClicked
-                ? "border-yellow-500 bg-yellow-500"
-                : "secondary outline"
-          } flex items-center gap-2`}
+          className={`${editMode
+            ? ""
+            : editButtonClicked
+              ? "border-yellow-500 bg-yellow-500"
+              : "secondary outline"
+            } flex items-center gap-2`}
           onClick={() => {
             if (!editMode) {
               if (editButtonClicked) {
@@ -367,15 +378,15 @@ ${buildAnswerString(answers)}
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {pictureLinksValue.docs.length === 0 && <p>Keine Bilder</p>}
               {shuffledPictures.length > 0 && shuffledPictures.map((pictureLinkData) => {
-                  const pictureLink = pictureLinkData.data();
+                const pictureLink = pictureLinkData.data();
 
-                  return (
-                    <Picture
-                      key={pictureLinkData.id}
-                      pictureLink={pictureLink.pictureName}
-                    />
-                  );
-                })}
+                return (
+                  <Picture
+                    key={pictureLinkData.id}
+                    pictureLink={pictureLink.pictureName}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
